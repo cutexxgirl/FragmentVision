@@ -15,7 +15,6 @@ Far distance rendering mod utilising LoDs
 [modproperties.voxy]
 commit = "${commit}"
 buildtime = "${buildtime}"
-"sodium:config_api_user" = "me.cortex.voxy.client.config.VoxyConfigMenu"
 
 [[dependencies.voxy]]
 modId = "minecraft"

@@ -7,6 +7,8 @@ import java.util.function.LongConsumer;
 
 public class RenderDistanceTracker {
     private static final int CHECK_DISTANCE_BLOCKS = 128;
+    private static final int TOP_LEVEL = WorldEngine.MAX_LOD_LAYER;
+    private static final int TOP_LEVEL_SCALE = 1 << TOP_LEVEL;
     private final LongConsumer addTopLevelNode;
     private final LongConsumer removeTopLevelNode;
     private final int processRate;
@@ -22,8 +24,8 @@ public class RenderDistanceTracker {
         this.renderDistance = 2;
         this.tracker = new RingTracker(this.renderDistance, 0, 0, true);
         this.processRate = rate;
-        this.minSec = minSec;
-        this.maxSec = maxSec;
+        this.minSec = Math.floorDiv(minSec, TOP_LEVEL_SCALE);
+        this.maxSec = Math.floorDiv(maxSec, TOP_LEVEL_SCALE);
     }
 
     public void setRenderDistance(int renderDistance) {
@@ -50,13 +52,13 @@ public class RenderDistanceTracker {
 
     private void add(int x, int z) {
         for (int y = this.minSec; y <= this.maxSec; y++) {
-            this.addTopLevelNode.accept(WorldEngine.getWorldSectionId(4, x, y, z));
+            this.addTopLevelNode.accept(WorldEngine.getWorldSectionId(TOP_LEVEL, x, y, z));
         }
     }
 
     private void rem(int x, int z) {
         for (int y = this.minSec; y <= this.maxSec; y++) {
-            this.removeTopLevelNode.accept(WorldEngine.getWorldSectionId(4, x, y, z));
+            this.removeTopLevelNode.accept(WorldEngine.getWorldSectionId(TOP_LEVEL, x, y, z));
         }
     }
 }

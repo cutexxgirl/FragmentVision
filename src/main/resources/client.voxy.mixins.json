@@ -10,6 +10,7 @@
     "minecraft.MixinClientPacketListener",
     "minecraft.MixinLevelRenderer",
     "minecraft.MixinMinecraft",
+    "minecraft.MixinRenderSystem",
     "sodium.AccessorChunkTracker",
     "sodium.AccessorSodiumWorldRenderer",
     "sodium.MixinChunkJobQueue",

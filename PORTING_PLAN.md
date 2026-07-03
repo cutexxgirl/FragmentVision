@@ -114,3 +114,30 @@
 - JarJar metadata for RocksDB is correct: `org.rocksdb:rocksdbjni:10.2.1`.
 - Ignore the earlier Gradle `runClient` Sodium dependency result for Prism debugging; it was a dev-client-only false lead.
 - Next real action: launch the Prism instance again and inspect fresh `latest.log`/`debug.log` from that run.
+
+## Handoff note 2026-07-04 02:08
+
+- Fixed Voxy client bootstrap on NeoForge:
+  - `MixinRenderSystem` now injects into Minecraft 1.21.1 `RenderSystem.initRenderer(int, boolean)`;
+  - `minecraft.MixinRenderSystem` is included in `client.voxy.mixins.json`;
+  - the source exclude for `MixinRenderSystem` was removed from `build.gradle`.
+- Fixed Sodium config registration:
+  - removed duplicate `sodium:config_api_user` mod property from `META-INF/neoforge.mods.toml`;
+  - kept `@ConfigEntryPointForge("voxy")` as the single config entrypoint.
+- Fixed the world-render crash after Voxy renderer activation:
+  - `RenderDistanceTracker` now converts level-0 Y section bounds to top-level LOD Y coordinates with `Math.floorDiv`;
+  - top-level node ids now use `WorldEngine.MAX_LOD_LAYER` instead of hardcoded `4`.
+- Rebuilt with:
+  - `wsl -e bash -lc 'cd /mnt/p/FragmentVision && export JAVA_HOME="$HOME/.cache/codex-jdk21" && export PATH="$JAVA_HOME/bin:$PATH" && ./gradlew clean build --no-daemon --console=plain'`
+- Fresh jar copied to:
+  - `P:\PrismLauncher\instances\test voxy\minecraft\mods\voxy-0.2.16-beta-08c89ca.jar`
+- Installed Prism jar timestamp/size:
+  - `2026-07-04 02:04:04`, `11,886,695` bytes.
+- Prism world launch command used:
+  - `P:\PrismLauncher\prismlauncher.exe --launch "test voxy" --world "Новый мир"`
+- Verification:
+  - Minecraft reached `Minecraft NeoForge* 1.21.1 - Одиночная игра`;
+  - fresh `latest.log` contains `Creating Voxy render system` and `Voxy render system created`;
+  - no fresh crash report after this run;
+  - `P:\PrismLauncher\instances\test voxy\minecraft\config\voxy-config.json` exists;
+  - user confirmed: `работает`.
