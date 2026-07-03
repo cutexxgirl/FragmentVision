@@ -16,13 +16,14 @@ import me.cortex.voxy.common.world.other.Mapper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ColorResolver;
@@ -71,7 +72,7 @@ public class ModelFactory {
         }
     }
 
-    private final Biome DEFAULT_BIOME = Minecraft.getInstance().level.registryAccess().lookupOrThrow(Registries.BIOME).getValue(Biomes.PLAINS);
+    private final Biome DEFAULT_BIOME = Minecraft.getInstance().level.registryAccess().lookupOrThrow(Registries.BIOME).getOrThrow(Biomes.PLAINS).value();
 
     public final SoftwareModelTextureBakery bakery2;
     private final long bakeScratchBuffer = MemoryUtil.nmemAlloc(MODEL_TEXTURE_SIZE*MODEL_TEXTURE_SIZE*8*6);
@@ -244,14 +245,14 @@ public class ModelFactory {
         boolean hasDarkenedTextures = (flags&2)!=0;
         boolean isShaded = (flags&1)!=0;
 
-        ChunkSectionLayer layer = null;
+        RenderType layer = null;
         {
             var blockState = bake.state;
             if (blockState.getBlock() instanceof LiquidBlock) {
                 layer = ItemBlockRenderTypes.getRenderLayer(blockState.getFluidState());
             } else {
                 if (blockState.getBlock() instanceof LeavesBlock) {
-                    layer = ChunkSectionLayer.SOLID;
+                    layer = RenderType.solid();
                 } else {
                     layer = ItemBlockRenderTypes.getChunkRenderType(blockState);
                 }
@@ -274,7 +275,7 @@ public class ModelFactory {
         var biomeEntry = this.biomeQueue.poll();
         while (biomeEntry != null) {
             var biomeRegistry = Minecraft.getInstance().level.registryAccess().lookupOrThrow(Registries.BIOME);
-            var mcbiomeEntry = biomeRegistry.get(Identifier.parse(biomeEntry.biome));
+            var mcbiomeEntry = biomeRegistry.get(ResourceKey.create(Registries.BIOME, ResourceLocation.parse(biomeEntry.biome)));
             if (!mcbiomeEntry.isPresent()) {
                 Logger.error("Could not find biome: " + biomeEntry.biome + " using default");
             }
@@ -352,7 +353,7 @@ public class ModelFactory {
         }
     }
 
-    private ModelBakeResultUpload processTextureBakeResult(int blockId, BlockState blockState, ColourDepthTextureData[] textureData, boolean isShaded, boolean darkenedTinting, ChunkSectionLayer layer) {
+    private ModelBakeResultUpload processTextureBakeResult(int blockId, BlockState blockState, ColourDepthTextureData[] textureData, boolean isShaded, boolean darkenedTinting, RenderType layer) {
         if (this.idMappings[blockId] != -1) {
             //This should be impossible to reach as it means that multiple bakes for the same blockId happened and where inflight at the same time!
             throw new IllegalStateException("Block id already added: " + blockId + " for state: " + blockState);
@@ -422,7 +423,7 @@ public class ModelFactory {
         }
 
 
-        int checkMode = layer==ChunkSectionLayer.SOLID?TextureUtils.WRITE_CHECK_STENCIL:TextureUtils.WRITE_CHECK_ALPHA;
+        int checkMode = layer==RenderType.solid()?TextureUtils.WRITE_CHECK_STENCIL:TextureUtils.WRITE_CHECK_ALPHA;
 
 
 
@@ -446,7 +447,7 @@ public class ModelFactory {
         //TODO: special case stuff like vines and glow lichen, where it can be represented by a single double sided quad
         // since that would help alot with perf of lots of vines, can be done by having one of the faces just not exist and the other be in no occlusion mode
 
-        var depths = computeModelDepth(textureData, checkMode, layer!=ChunkSectionLayer.SOLID?TextureUtils.DEPTH_MODE_MIN:TextureUtils.DEPTH_MODE_AVG);
+        var depths = computeModelDepth(textureData, checkMode, layer!=RenderType.solid()?TextureUtils.DEPTH_MODE_MIN:TextureUtils.DEPTH_MODE_AVG);
 
         //TODO: THIS, note this can be tested for in 2 ways, re render the model with quad culling disabled and see if the result
         // is the same, (if yes then needs double sided quads)
@@ -484,7 +485,7 @@ public class ModelFactory {
         //Each face gets 1 byte, with the top 2 bytes being for whatever
         long metadata = 0;
         metadata |= isBiomeColourDependent?1:0;
-        metadata |= layer == ChunkSectionLayer.TRANSLUCENT?2:0;
+        metadata |= layer == RenderType.translucent()?2:0;
         metadata |= needsDoubleSidedQuads?4:0;
         metadata |= ((!isFluid) && !blockState.getFluidState().isEmpty())?8:0;//Has a fluid state accosiacted with it and is not itself a fluid
         metadata |= isFluid?16:0;//Is a fluid
@@ -520,7 +521,7 @@ public class ModelFactory {
 
             //TODO: add alot of config options for the following
             boolean occludesFace = true;
-            occludesFace &= layer != ChunkSectionLayer.TRANSLUCENT;//If its translucent, it doesnt occlude
+            occludesFace &= layer != RenderType.translucent();//If its translucent, it doesnt occlude
 
             //TODO: make this an option, basicly if the face is really close, it occludes otherwise it doesnt
             occludesFace &= offset < 0.1;//If the face is rendered far away from the other face, then it doesnt occlude
@@ -540,7 +541,7 @@ public class ModelFactory {
             metadata |= canBeOccluded?4:0;
 
             //Face uses its own lighting if its not flat against the adjacent block & isnt traslucent
-            metadata |= (offset > 0.01 || layer == ChunkSectionLayer.TRANSLUCENT)?0b1000:0;
+            metadata |= (offset > 0.01 || layer == RenderType.translucent())?0b1000:0;
 
 
 
@@ -563,11 +564,11 @@ public class ModelFactory {
             int area = (faceSize[1]-faceSize[0]+1) * (faceSize[3]-faceSize[2]+1);
             boolean needsAlphaDiscard = ((float)writeCount)/area<0.9;//If the amount of area covered by written pixels is less than a threashold, disable discard as its not needed
 
-            needsAlphaDiscard |= layer != ChunkSectionLayer.SOLID;
-            needsAlphaDiscard &= layer != ChunkSectionLayer.TRANSLUCENT;//Translucent doesnt have alpha discard
+            needsAlphaDiscard |= layer != RenderType.solid();
+            needsAlphaDiscard &= layer != RenderType.translucent();//Translucent doesnt have alpha discard
             faceModelData |= needsAlphaDiscard?1<<22:0;
 
-            faceModelData |= ((!faceCoversFullBlock)&&layer != ChunkSectionLayer.TRANSLUCENT)?1<<23:0;//Alpha discard override, translucency doesnt have alpha discard
+            faceModelData |= ((!faceCoversFullBlock)&&layer != RenderType.translucent())?1<<23:0;//Alpha discard override, translucency doesnt have alpha discard
 
             //Bits 24,25 are tint metadata
             if (colourProvider!=null) {//We have a tint
@@ -598,7 +599,7 @@ public class ModelFactory {
         int modelFlags = 0;
         modelFlags |= colourProvider != null?1:0;
         modelFlags |= isBiomeColourDependent?2:0;//Basicly whether to use the next int as a colour or as a base index/id into a colour buffer for biome dependent colours
-        modelFlags |= layer == ChunkSectionLayer.TRANSLUCENT?4:0;//Is translucent
+        modelFlags |= layer == RenderType.translucent()?4:0;//Is translucent
 
 
         //TODO: THIS
@@ -664,7 +665,7 @@ public class ModelFactory {
     private static int getBlockLightEmission(BlockState state) {
         boolean isEmissive = state.emissiveRendering(new BlockGetter() {
             @Override
-            public @org.jspecify.annotations.Nullable BlockEntity getBlockEntity(BlockPos pos) {
+            public @org.jetbrains.annotations.Nullable BlockEntity getBlockEntity(BlockPos pos) {
                 return null;
             }
 
@@ -684,7 +685,7 @@ public class ModelFactory {
             }
 
             @Override
-            public int getMinY() {
+            public int getMinBuildHeight() {
                 return 0;
             }
         }, BlockPos.ZERO);
@@ -772,7 +773,7 @@ public class ModelFactory {
     }
 
     private static BlockColor getColourProvider(Block block) {
-        return Minecraft.getInstance().getBlockColors().blockColors.byId(BuiltInRegistries.BLOCK.getId(block));
+        return Minecraft.getInstance().getBlockColors().blockColors.get(block);
     }
 
     //TODO: add a method to detect biome dependent colours (can do by detecting if getColor is ever called)
@@ -826,7 +827,7 @@ public class ModelFactory {
             }
 
             @Override
-            public int getMinY() {
+            public int getMinBuildHeight() {
                 return 0;
             }
         };
@@ -882,7 +883,7 @@ public class ModelFactory {
             }
 
             @Override
-            public int getMinY() {
+            public int getMinBuildHeight() {
                 return 0;
             }
         };

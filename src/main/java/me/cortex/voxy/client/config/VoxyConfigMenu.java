@@ -8,6 +8,7 @@ import me.cortex.voxy.client.core.util.IrisUtil;
 import me.cortex.voxy.common.util.cpu.CpuLayout;
 import me.cortex.voxy.commonImpl.VoxyCommon;
 import net.caffeinemc.mods.sodium.api.config.ConfigEntryPoint;
+import net.caffeinemc.mods.sodium.api.config.ConfigEntryPointForge;
 import net.caffeinemc.mods.sodium.api.config.ConfigState;
 import net.caffeinemc.mods.sodium.api.config.option.OptionFlag;
 import net.caffeinemc.mods.sodium.api.config.option.OptionImpact;
@@ -15,8 +16,9 @@ import net.caffeinemc.mods.sodium.api.config.option.Range;
 import net.caffeinemc.mods.sodium.api.config.structure.ConfigBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
+@ConfigEntryPointForge("voxy")
 public class VoxyConfigMenu implements ConfigEntryPoint {
     @Override
     public void registerConfigLate(ConfigBuilder B) {
@@ -25,7 +27,7 @@ public class VoxyConfigMenu implements ConfigEntryPoint {
         var CFG = VoxyConfig.CONFIG;
 
         var cc = B.registerModOptions("voxy", "Voxy", VoxyCommon.MOD_VERSION)
-                .setIcon(Identifier.parse("voxy:icon.png"));
+                .setIcon(ResourceLocation.parse("voxy:icon.png"));
 
         final var RENDER_RELOAD = OptionFlag.REQUIRES_RENDERER_RELOAD.getId().toString();
 

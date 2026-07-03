@@ -6,7 +6,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import me.cortex.voxy.common.Logger;
 import me.cortex.voxy.commonImpl.VoxyCommon;
-import net.fabricmc.loader.api.FabricLoader;
+import me.cortex.voxy.commonImpl.VoxyPlatform;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -96,8 +96,8 @@ public class Serialization {
         Map<Class<?>, GsonConfigSerialization<?>> serializers = new HashMap<>();
 
         Set<String> clazzs = new LinkedHashSet<>();
-        var path = FabricLoader.getInstance().getModContainer("voxy").get().getRootPaths().get(0);
-        clazzs.addAll(collectAllClasses(path, BASE_SEARCH_PACKAGE));
+        VoxyPlatform.getCodeSourceRoot(Serialization.class)
+                .ifPresent(path -> clazzs.addAll(collectAllClasses(path, BASE_SEARCH_PACKAGE)));
         clazzs.addAll(collectAllClasses(BASE_SEARCH_PACKAGE));
         int count = 0;
         outer:
@@ -170,16 +170,20 @@ public class Serialization {
         try {
             InputStream stream = Serialization.class.getClassLoader()
                     .getResourceAsStream(pack.replaceAll("[.]", "/"));
-            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-            return reader.lines().flatMap(inner -> {
-                if (inner.endsWith(".class")) {
-                    return Stream.of(pack + "." + inner.replace(".class", ""));
-                } else if (!inner.contains(".")) {
-                    return collectAllClasses(pack + "." + inner).stream();
-                } else {
-                    return Stream.of();
-                }
-            }).collect(Collectors.toList());
+            if (stream == null) {
+                return List.of();
+            }
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
+                return reader.lines().flatMap(inner -> {
+                    if (inner.endsWith(".class")) {
+                        return Stream.of(pack + "." + inner.replace(".class", ""));
+                    } else if (!inner.contains(".")) {
+                        return collectAllClasses(pack + "." + inner).stream();
+                    } else {
+                        return Stream.of();
+                    }
+                }).collect(Collectors.toList());
+            }
         } catch (Exception e) {
             Logger.error("Failed to collect classes in package: " + pack, e);
             return List.of();

@@ -2,7 +2,6 @@ package me.cortex.voxy.client.core.model;
 
 import net.caffeinemc.mods.sodium.client.util.color.ColorSRGB;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
-import net.minecraft.util.ARGB;
 
 import java.util.Arrays;
 
@@ -279,8 +278,14 @@ public class TextureUtils {
                 r / 4,
                 g / 4,
                 b / 4,
-                darkend ? ((int) a) / 4 : ARGB.linearToSrgbChannel(a / 4)
+                darkend ? ((int) a) / 4 : linearToSrgbChannel(a / 4)
         );
+    }
+
+    private static int linearToSrgbChannel(float value) {
+        value = Math.clamp(value, 0.0f, 1.0f);
+        float srgb = value <= 0.0031308f ? value * 12.92f : 1.055f * (float) Math.pow(value, 1.0f / 2.4f) - 0.055f;
+        return Math.clamp(Math.round(srgb * 255.0f), 0, 255);
     }
 
 }

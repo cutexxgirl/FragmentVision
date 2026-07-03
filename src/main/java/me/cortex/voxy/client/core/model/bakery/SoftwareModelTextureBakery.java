@@ -1,20 +1,14 @@
 package me.cortex.voxy.client.core.model.bakery;
 
-import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.opengl.GlTexture;
-import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.systems.CommandEncoder;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.TextureFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.cortex.voxy.client.core.model.ModelFactory;
 import me.cortex.voxy.common.util.UnsafeUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.ColorResolver;
 import net.minecraft.world.level.LightLayer;
@@ -33,10 +27,6 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryUtil;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import static org.lwjgl.opengl.ARBDirectStateAccess.glGetTextureImage;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_UNPACK_ALIGNMENT;
@@ -46,6 +36,7 @@ import static org.lwjgl.opengl.GL15C.glBindBuffer;
 import static org.lwjgl.opengl.GL21.GL_PIXEL_PACK_BUFFER;
 import static org.lwjgl.opengl.GL30C.GL_FRAMEBUFFER;
 import static org.lwjgl.opengl.GL30C.glBindFramebuffer;
+import static org.lwjgl.opengl.GL45C.glGetTextureLevelParameteri;
 
 public class SoftwareModelTextureBakery {
     //Note: the first bit of metadata is if alpha discard is enabled
@@ -58,15 +49,12 @@ public class SoftwareModelTextureBakery {
     }
 
     public void setupTexture() {
-        var tex = Minecraft.getInstance().getTextureManager().getTexture(Identifier.fromNamespaceAndPath("minecraft", "textures/atlas/blocks.png")).getTexture();
-        if (tex.getFormat() != TextureFormat.RGBA8) {
-            throw new IllegalStateException("Block atlas not rgba8");
-        }
+        var tex = Minecraft.getInstance().getTextureManager().getTexture(ResourceLocation.fromNamespaceAndPath("minecraft", "textures/atlas/blocks.png"));
+        int textureId = tex.getId();
+        int targetMipLevel = 0;
 
-        int targetMipLevel = 0;// Math.min(tex.getMipLevels(), 4)-1;//todo: we want to target the mip layer that has the 16x16 sized textures
-
-        int width = tex.getWidth(targetMipLevel);
-        int height = tex.getHeight(targetMipLevel);
+        int width = glGetTextureLevelParameteri(textureId, targetMipLevel, GL_TEXTURE_WIDTH);
+        int height = glGetTextureLevelParameteri(textureId, targetMipLevel, GL_TEXTURE_HEIGHT);
 
         //Just do it ourselves as doing it with b3d has some issues, (doing it ourselves is also just much much much shorter)
         var texture = new int[width * height];
@@ -80,21 +68,21 @@ public class SoftwareModelTextureBakery {
         glPixelStorei(GL_PACK_SKIP_ROWS, 0);
         glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
         glPixelStorei(GL_PACK_ALIGNMENT, 4);
-        glGetTextureImage(((GlTexture) tex).glId(), 0, GL_RGBA, GL_UNSIGNED_BYTE, texture);
+        glGetTextureImage(textureId, targetMipLevel, GL_RGBA, GL_UNSIGNED_BYTE, texture);
         this.rasterizer.setSamplerTexture(texture, width, height);
     }
 
-    public static int getMetaFromLayer(ChunkSectionLayer layer) {
-        boolean hasDiscard = layer == ChunkSectionLayer.CUTOUT ||
-                layer == ChunkSectionLayer.TRANSLUCENT||
-                layer == ChunkSectionLayer.TRIPWIRE;
+    public static int getMetaFromLayer(RenderType layer) {
+        boolean hasDiscard = layer == RenderType.cutout() ||
+                layer == RenderType.translucent()||
+                layer == RenderType.tripwire();
 
         int meta = hasDiscard?1:0;
         meta |= true?2:0;
         return meta;
     }
 
-    private void bakeBlockModel(BlockState state, ChunkSectionLayer layer) {
+    private void bakeBlockModel(BlockState state, RenderType layer) {
         if (state.getRenderShape() == RenderShape.INVISIBLE) {
             return;//Dont bake if invisible
         }
@@ -105,18 +93,16 @@ public class SoftwareModelTextureBakery {
 
         int meta = getMetaFromLayer(layer);
 
-        for (var part : model.collectParts(new SingleThreadedRandomSource(42L))) {
-            for (Direction direction : new Direction[]{Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST, null}) {
-                var quads = part.getQuads(direction);
-                for (var quad : quads) {
-                    this.vc.quad(quad, meta|(quad.isTinted()?4:0));
-                }
+        for (Direction direction : new Direction[]{Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST, null}) {
+            var quads = model.getQuads(state, direction, new SingleThreadedRandomSource(42L));
+            for (var quad : quads) {
+                this.vc.quad(quad, meta|(quad.isTinted()?4:0));
             }
         }
     }
 
 
-    private void bakeFluidState(BlockState state, ChunkSectionLayer layer, int face) {
+    private void bakeFluidState(BlockState state, RenderType layer, int face) {
         {
             //TODO: somehow set the tint flag per quad or something?
             int metadata = getMetaFromLayer(layer);
@@ -185,7 +171,7 @@ public class SoftwareModelTextureBakery {
             }
 
             @Override
-            public int getMinY() {
+            public int getMinBuildHeight() {
                 return 0;
             }
         }, this.vc, state, state.getFluidState());
@@ -193,7 +179,7 @@ public class SoftwareModelTextureBakery {
     }
 
     private static boolean shouldReturnAirForFluid(BlockPos pos, int face) {
-        var fv = Direction.from3DDataValue(face).getUnitVec3i();
+        var fv = Direction.from3DDataValue(face).getNormal();
         int dot = fv.getX()*pos.getX() + fv.getY()*pos.getY() + fv.getZ()*pos.getZ();
         return dot >= 1;
     }
@@ -211,13 +197,13 @@ public class SoftwareModelTextureBakery {
 
 
         boolean isBlock = true;
-        ChunkSectionLayer layer;
+        RenderType layer;
         if (state.getBlock() instanceof LiquidBlock) {
             layer = ItemBlockRenderTypes.getRenderLayer(state.getFluidState());
             isBlock = false;
         } else {
             if (state.getBlock() instanceof LeavesBlock) {
-                layer = ChunkSectionLayer.SOLID;
+                layer = RenderType.solid();
             } else {
                 layer = ItemBlockRenderTypes.getChunkRenderType(state);
             }
@@ -230,9 +216,9 @@ public class SoftwareModelTextureBakery {
         }
 
         {
-            this.rasterizer.setBlending(layer == ChunkSectionLayer.TRANSLUCENT);
+            this.rasterizer.setBlending(layer == RenderType.translucent());
 
-            //var tex = Minecraft.getInstance().getTextureManager().getTexture(Identifier.fromNamespaceAndPath("minecraft", "textures/atlas/blocks.png")).getTexture();
+            //var tex = Minecraft.getInstance().getTextureManager().getTexture(ResourceLocation.fromNamespaceAndPath("minecraft", "textures/atlas/blocks.png")).getTexture();
             //blockTextureId = ((com.mojang.blaze3d.opengl.GlTexture)tex).glId();
         }
 

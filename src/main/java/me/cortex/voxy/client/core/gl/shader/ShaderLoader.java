@@ -1,7 +1,7 @@
 package me.cortex.voxy.client.core.gl.shader;
 
 
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.io.IOUtils;
 
 import java.io.BufferedReader;
@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 public class ShaderLoader {
     public static String parse(String id) {
         var src =  "#version 460 core\n";
-        src += String.join("\n", ShaderLoadingParser.parseRoot(Identifier.parse(id)));
+        src += String.join("\n", ShaderLoadingParser.parseRoot(ResourceLocation.parse(id)));
         return src;
     }
 
@@ -26,7 +26,7 @@ public class ShaderLoader {
 
     private static final class ShaderLoadingParser {
         private static final Pattern IMPORT_PATTERN = Pattern.compile("#import <(?<namespace>.*):(?<path>.*)>");
-        public static List<String> parseRoot(Identifier id) {
+        public static List<String> parseRoot(ResourceLocation id) {
             List<String> out = new ArrayList<>();
             for (var line : loadShaderAsset(id).lines().toList()) {
                 if (line.startsWith("#version")) {
@@ -34,7 +34,7 @@ public class ShaderLoader {
                 } else if (line.startsWith("#import")) {
                     var match = IMPORT_PATTERN.matcher(line);
                     if (!match.matches()) throw new IllegalArgumentException("Unknown import: " + line);
-                    var iid = Identifier.fromNamespaceAndPath(match.group("namespace"), match.group("path"));
+                    var iid = ResourceLocation.fromNamespaceAndPath(match.group("namespace"), match.group("path"));
                     out.addAll(parseRoot(iid));
                 } else {
                     out.add(line);
@@ -43,7 +43,7 @@ public class ShaderLoader {
             return out;
         }
 
-        private static String loadShaderAsset(Identifier id) {
+        private static String loadShaderAsset(ResourceLocation id) {
             String path = String.format("/assets/%s/shaders/%s", id.getNamespace(), id.getPath());
             try (InputStream in = ShaderLoadingParser.class.getResourceAsStream(path)) {
                 if (in == null) {

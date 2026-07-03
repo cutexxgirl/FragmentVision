@@ -1,0 +1,56 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "All-Rights-Reserved"
+
+[[mods]]
+modId = "voxy"
+version = "${version}"
+displayName = "Voxy"
+logoFile = "assets/voxy/icon.png"
+authors = "Cortex"
+description = '''
+Far distance rendering mod utilising LoDs
+'''
+
+[modproperties.voxy]
+commit = "${commit}"
+buildtime = "${buildtime}"
+"sodium:config_api_user" = "me.cortex.voxy.client.config.VoxyConfigMenu"
+
+[[dependencies.voxy]]
+modId = "minecraft"
+type = "required"
+versionRange = "1.21.1"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.voxy]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21.1.235,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.voxy]]
+modId = "sodium"
+type = "required"
+versionRange = "[0.8.12-beta.2,0.8.13)"
+ordering = "AFTER"
+side = "CLIENT"
+
+[[dependencies.voxy]]
+modId = "embeddium"
+type = "incompatible"
+reason = "Voxy's first NeoForge port targets Sodium internals directly."
+versionRange = "[0.0.1,)"
+ordering = "NONE"
+side = "CLIENT"
+
+[[mixins]]
+config = "common.voxy.mixins.json"
+
+[[mixins]]
+config = "client.voxy.mixins.json"
+
+[[accessTransformers]]
+file = "META-INF/accesstransformer.cfg"
