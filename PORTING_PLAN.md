@@ -36,6 +36,9 @@
   - `MixinWorld` -> constructor с `Supplier<ProfilerFiller>`;
   - `MixinClientLevel` -> constructor с `Supplier<ProfilerFiller>` и без старого `seaLevel` параметра.
 - [x] Убран нефатальный Voxy `Serialization.collectAllClasses` NPE при запуске под NeoForge classloader.
+- [x] Исправлен fog для Voxy LOD на Sodium `1.21.1/modern-port`: LOD viewport теперь получает текущие `RenderSystem` fog start/end/color/shape вместо `VoxyFogParameters.disabled(...)`.
+- [x] Voxy post-fog приведён ближе к Sodium 1.21.1: учитывается `FogShape.CYLINDER`, а fog lerp использует `smoothstep`.
+- [x] Исправлен портовый перекос в software model bake: `RenderType.cutoutMipped()` теперь считается alpha-discard слоем, а block model quads берутся через NeoForge layer-aware overload с `ModelData.EMPTY`.
 
 ## Проверено
 
@@ -51,6 +54,7 @@
 - [x] В свежем `latest.log` нет Voxy `ERROR/FATAL`, нет `Mixin apply for mod voxy`, нет `Failed to collect classes`.
 - [x] Исправлен crash при входе в мир: `sodium.MixinRenderRegionManager` больше не требует устаревший Sodium `Math.toIntExact(J)` target.
 - [x] Существующий мир `Новый мир` запущен через Prism `--world`; клиент дошёл до одиночной игры без `ERROR/FATAL`.
+- [x] На `2026-07-04 02:34` свежий jar `voxy-0.2.16-beta-057039e.jar` запущен в мире `Новый мир`; `latest.log` содержит `Creating Voxy render system` / `Voxy render system created` и не содержит Voxy `ERROR/FATAL`, `Critical injection failure`, `Game crashed`.
 
 ## История запуска
 
@@ -68,9 +72,11 @@
 ## Следующее
 
 - [x] Проверить загрузку мира в тестовом Prism-инстансе.
-- [ ] Проверить создание/чтение Voxy config.
-- [ ] Проверить включение Voxy renderer и отсутствие визуальных/runtime ошибок.
-- [ ] Проверить отсутствие ошибок RocksDB/LMDB/ZSTD/LZ4 при реальной загрузке мира.
+- [x] Проверить создание/чтение Voxy config.
+- [x] Проверить включение Voxy renderer и отсутствие runtime ошибок.
+- [x] Проверить отсутствие Voxy/RocksDB/LMDB/ZSTD/LZ4 `ERROR/FATAL` при реальной загрузке мира.
+- [x] Визуально проверить smoke-test: грани LOD блоков больше не отрезаются, LOD видны за натуральными чанками, багов в обычной сцене нет.
+- [ ] Отдельно проверить настоящий environmental fog: вода, лава, powder snow, darkness/blindness, world/boss fog.
 - [ ] Если появится новый crash, чинить уже следующий реальный Voxy/NeoForge runtime blocker.
 - [ ] После стабилизации runtime убрать временные исключения/заглушки там, где возможно.
 - [ ] Отдельным этапом вернуть/адаптировать compat-модули: Iris, ModMenu/конфиг UI, Flashback, Nvidium, Chunky, Vivecraft.
@@ -141,3 +147,109 @@
   - no fresh crash report after this run;
   - `P:\PrismLauncher\instances\test voxy\minecraft\config\voxy-config.json` exists;
   - user confirmed: `работает`.
+
+## Handoff note 2026-07-04 02:34
+
+- Created/switch branch:
+  - requested literal `dev 0.0.2` is not a valid Git ref name;
+  - working branch is `dev-0.0.2`.
+- Fixed LOD fog on Sodium 1.21.1:
+  - `src/main/java/me/cortex/voxy/client/core/rendering/VoxyFogParameters.java`
+  - `src/main/java/me/cortex/voxy/client/mixin/sodium/MixinDefaultChunkRenderer.java`
+  - `src/main/java/me/cortex/voxy/client/core/NormalRenderPipeline.java`
+  - `src/main/resources/assets/voxy/shaders/post/blit_texture_depth_cutout.frag`
+- Fixed likely LOD face-loss source in model baking:
+  - `src/main/java/me/cortex/voxy/client/core/model/bakery/SoftwareModelTextureBakery.java`
+  - `RenderType.cutoutMipped()` now uses alpha discard;
+  - model quads are queried through NeoForge layer-aware `getQuads(..., ModelData.EMPTY, layer)`.
+- Rebuilt with:
+  - `wsl -e bash -lc 'cd /mnt/p/FragmentVision && export JAVA_HOME="$HOME/.cache/codex-jdk21" && export PATH="$JAVA_HOME/bin:$PATH" && ./gradlew build --no-daemon --console=plain'`
+- Fresh jar copied to:
+  - `P:\PrismLauncher\instances\test voxy\minecraft\mods\voxy-0.2.16-beta-057039e.jar`
+- Previous Prism jar disabled as:
+  - `P:\PrismLauncher\instances\test voxy\minecraft\mods\voxy-0.2.16-beta-08c89ca.jar.disabled`
+- Prism world launch command used:
+  - `P:\PrismLauncher\prismlauncher.exe --launch "test voxy" --world "Новый мир"`
+- Verification:
+  - Minecraft reached `Minecraft NeoForge* 1.21.1 - Одиночная игра`;
+  - fresh `latest.log` contains `Creating Voxy render system` and `Voxy render system created`;
+  - no Voxy `ERROR/FATAL`, no `Critical injection failure`, no `Game crashed`;
+  - `P:\PrismLauncher\instances\test voxy\minecraft\config\voxy-config.json` exists, timestamp `2026-07-04 02:33:50`;
+  - user confirmed later: block faces are no longer culled and ordinary-scene LOD/fog has no visible bugs.
+
+## Handoff note 2026-07-04 02:45
+
+- Fixed the over-fogged LOD regression from the first fog pass:
+  - `src/main/java/me/cortex/voxy/client/core/rendering/VoxyFogParameters.java`
+  - Minecraft/Sodium 1.21.1 exposes only one `RenderSystem` fog range, so the ordinary render-distance terrain fog looked like environmental fog to Voxy;
+  - `VoxyFogParameters.fromRenderSystem` now detects the vanilla 1.21.1 terrain-fog shape/range and returns disabled fog for that case;
+  - actual environmental fog remains enabled because water/lava/powder-snow/effect/world-fog ranges do not match the vanilla terrain-fog formula.
+- Rebuilt with:
+  - `wsl -e bash -lc 'cd /mnt/p/FragmentVision && export JAVA_HOME="$HOME/.cache/codex-jdk21" && export PATH="$JAVA_HOME/bin:$PATH" && ./gradlew build --no-daemon --console=plain'`
+- Fresh jar copied to:
+  - `P:\PrismLauncher\instances\test voxy\minecraft\mods\voxy-0.2.16-beta-057039e.jar`
+- Installed Prism jar timestamp/size:
+  - `2026-07-04 02:42:38`, `11,887,695` bytes.
+- Prism world launch command that worked:
+  - `P:\PrismLauncher\prismlauncher.exe --launch "test voxy" --world "Новый мир"`
+- Verification:
+  - Minecraft reached `Minecraft NeoForge* 1.21.1 - Одиночная игра`;
+  - fresh `latest.log` contains `Creating Voxy render system` and `Voxy render system created`;
+  - no fresh crash report after this run;
+  - fresh log scan found no `[ERROR]`, `[FATAL]`, `Critical injection failure`, or `Game crashed`;
+  - user confirmed later: ordinary-scene LOD/fog has no visible bugs; real environmental fog still needs a separate check.
+
+## Handoff note 2026-07-04 02:55
+
+- Moved render-distance fog from the edge of real Sodium chunks to the edge of Voxy LOD:
+  - `src/main/java/me/cortex/voxy/client/core/rendering/VoxyFogParameters.java`
+  - `src/main/java/me/cortex/voxy/client/core/NormalRenderPipeline.java`
+  - `src/main/resources/assets/voxy/shaders/post/blit_texture_depth_cutout.frag`
+  - `src/main/java/me/cortex/voxy/client/mixin/minecraft/MixinFogRenderer.java`
+  - `src/main/resources/client.voxy.mixins.json`
+- `VoxyFogParameters` now carries separate environmental and render-distance ranges, matching Sodium 1.21.11's fog model more closely.
+- The post blit combines environmental fog and Voxy render-distance fog with `max(...)`; render fog is cylindrical and ends at `sectionRenderDistance * 512` blocks.
+- The adapted Minecraft 1.21.1 `MixinFogRenderer` disables only ordinary vanilla terrain fog on real chunks after `FogRenderer.setupFog`, leaving water/lava/powder/effect/world fog alone.
+- Rebuilt and copied fresh jar:
+  - `P:\PrismLauncher\instances\test voxy\minecraft\mods\voxy-0.2.16-beta-057039e.jar`
+  - timestamp/size: `2026-07-04 02:52:10`, `11,889,416` bytes.
+- Verification:
+  - `./gradlew build --no-daemon --console=plain` succeeded;
+  - Minecraft reached `Minecraft NeoForge* 1.21.1 - Одиночная игра`;
+  - fresh `latest.log` contains `Creating Voxy render system` and `Voxy render system created`;
+  - no fresh crash report;
+  - fresh log scan found no `[ERROR]`, `[FATAL]`, `Critical injection failure`, `Mixin apply for mod voxy`, or `Game crashed`;
+  - user confirmed: `всё работает`, block-face culling is gone, LOD visibility is correct, no current visible bugs.
+
+## Handoff note 2026-07-04 04:05
+
+- Addressed short 1px white/black streaks visible on LOD block faces:
+  - screenshot looked like custom model-atlas bleeding, not face culling;
+  - `src/main/resources/assets/voxy/shaders/lod/gl46/quads.frag` now clamps per-face local UVs by half a 16x16 texel before sampling the 3x2 model-face atlas;
+  - this is shader-side only and does not require rebaking Voxy storage.
+- Added optional Chunky NeoForge integration:
+  - `src/main/java/me/cortex/voxy/commonImpl/mixin/chunky/MixinNeoForgeWorld.java`
+  - `src/main/resources/chunky.voxy.mixins.json`
+  - `src/main/resources/META-INF/neoforge.mods.toml`
+  - NeoForge Chunky 1.4.23 uses `org.popcraft.chunky.platform.NeoForgeWorld#getChunkAtAsync`, not the Fabric classes used by upstream Voxy's Fabric mixin;
+  - after Chunky finishes loading a full chunk, the mixin asks `VoxelIngestService.tryAutoIngestChunk` to ingest it.
+- Improved LOD foliage parity:
+  - `src/main/java/me/cortex/voxy/client/core/model/bakery/SoftwareModelTextureBakery.java`
+  - `src/main/java/me/cortex/voxy/client/core/model/ModelFactory.java`
+  - leaves are no longer forced onto `RenderType.solid()`;
+  - Voxy now uses Minecraft's block chunk render type for leaves, so alpha/cutout behavior should be closer to real Sodium chunks.
+- Rebuilt successfully with:
+  - `wsl -e bash -lc 'cd /mnt/p/FragmentVision && export JAVA_HOME="$HOME/.cache/codex-jdk21" && export PATH="$JAVA_HOME/bin:$PATH" && ./gradlew build --no-daemon --console=plain'`
+- Fresh jar copied to:
+  - `P:\PrismLauncher\instances\test voxy\minecraft\mods\voxy-0.2.16-beta-057039e.jar`
+  - timestamp/size: `2026-07-04 04:01:51`, `11,891,544` bytes.
+- Verification:
+  - `./gradlew build --no-daemon --console=plain` succeeded;
+  - jar contains `MixinNeoForgeWorld.class`, `chunky.voxy.mixins.json`, patched `quads.frag`, `ModelFactory.class`, and `SoftwareModelTextureBakery.class`;
+  - fresh log scan found no `[ERROR]`, `[FATAL]`, `Critical injection failure`, `Mixin apply for mod voxy`, `InvalidInjection`, or `Game crashed`;
+  - after the jar copy, Minecraft was restarted at `2026-07-04 04:02:54`; the fresh log sees `voxy-0.2.16-beta-057039e.jar` and `Chunky 1.4.23`;
+  - this verifies startup/mixin discovery only; the latest foliage, Chunky ingestion, and visual fixes still need in-world testing.
+- Remaining larger visual parity backlog:
+  - vanilla/Sodium chunks still have per-vertex AO, biome color blending, more exact transparency behavior, and fluid edge handling that Voxy LODs do not fully reproduce;
+  - water chunk-boundary seams likely need fluid-aware LOD meshing/culling across neighboring sections plus better translucent handling, not just a shader tweak;
+  - LOD-to-real-chunk replacement can be softened later with a transition band/crossfade/dither, but it must be designed around depth and translucent rendering.

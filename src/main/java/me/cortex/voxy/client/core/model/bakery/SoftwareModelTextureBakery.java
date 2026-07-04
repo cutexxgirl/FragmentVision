@@ -13,7 +13,6 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.ColorResolver;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -21,6 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.SingleThreadedRandomSource;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.level.material.FluidState;
+import net.neoforged.neoforge.client.model.data.ModelData;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -74,6 +74,7 @@ public class SoftwareModelTextureBakery {
 
     public static int getMetaFromLayer(RenderType layer) {
         boolean hasDiscard = layer == RenderType.cutout() ||
+                layer == RenderType.cutoutMipped() ||
                 layer == RenderType.translucent()||
                 layer == RenderType.tripwire();
 
@@ -94,7 +95,7 @@ public class SoftwareModelTextureBakery {
         int meta = getMetaFromLayer(layer);
 
         for (Direction direction : new Direction[]{Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST, null}) {
-            var quads = model.getQuads(state, direction, new SingleThreadedRandomSource(42L));
+            var quads = model.getQuads(state, direction, new SingleThreadedRandomSource(42L), ModelData.EMPTY, layer);
             for (var quad : quads) {
                 this.vc.quad(quad, meta|(quad.isTinted()?4:0));
             }
@@ -202,11 +203,7 @@ public class SoftwareModelTextureBakery {
             layer = ItemBlockRenderTypes.getRenderLayer(state.getFluidState());
             isBlock = false;
         } else {
-            if (state.getBlock() instanceof LeavesBlock) {
-                layer = RenderType.solid();
-            } else {
-                layer = ItemBlockRenderTypes.getChunkRenderType(state);
-            }
+            layer = ItemBlockRenderTypes.getChunkRenderType(state);
         }
 
         //TODO: support block model entities

@@ -74,7 +74,6 @@ sourceSets {
             exclude 'me/cortex/voxy/client/mixin/iris/**'
             exclude 'me/cortex/voxy/client/mixin/nvidium/**'
             exclude 'me/cortex/voxy/client/mixin/minecraft/MixinDebugScreenEntryList.java'
-            exclude 'me/cortex/voxy/client/mixin/minecraft/MixinFogRenderer.java'
             exclude 'me/cortex/voxy/client/mixin/minecraft/MixinGlDebug.java'
             exclude 'me/cortex/voxy/client/mixin/minecraft/MixinGPUSelect.java'
             exclude 'me/cortex/voxy/commonImpl/mixin/chunky/MixinFabricWorld.java'

@@ -12,6 +12,9 @@
 layout(binding = 0) uniform sampler2D blockModelAtlas;
 layout(binding = 2) uniform sampler2D depthTex;
 
+const vec2 MODEL_FACE_TILE_SCALE = 1.0 / (vec2(3.0, 2.0) * 256.0);
+const vec2 MODEL_FACE_TEXEL_INSET = vec2(0.5 / 16.0);
+
 //#define DEBUG_RENDER
 
 //TODO: need to fix when merged quads have discardAlpha set to false but they span multiple tiles
@@ -73,7 +76,7 @@ vec2 getBaseUV() {
     uint face = getFace();
     uint modelId = interData.x>>16;
     vec2 modelUV = vec2(modelId&0xFFu, (modelId>>8)&0xFFu)*(1.0/(256.0));
-    return modelUV + (vec2(face>>1, face&1u) * (1.0/(vec2(3.0, 2.0)*256.0)));
+    return modelUV + (vec2(face>>1, face&1u) * MODEL_FACE_TILE_SCALE);
 }
 
 
@@ -126,13 +129,14 @@ void main() {
     #endif
     #endif
 
-    vec2 uv2 = modf(uv, tile)*(1.0/(vec2(3.0,2.0)*256.0));
+    vec2 localUv = clamp(modf(uv, tile), MODEL_FACE_TEXEL_INSET, 1.0 - MODEL_FACE_TEXEL_INSET);
+    vec2 uv2 = localUv * MODEL_FACE_TILE_SCALE;
     vec4 colour;
     vec2 texPos = uv2 + getBaseUV();
 //This is deprecated, TODO: remove the non mip code path
     //if (useMipmaps())
     {
-        vec2 uvSmol = uv*(1.0/(vec2(3.0,2.0)*256.0));
+        vec2 uvSmol = uv * MODEL_FACE_TILE_SCALE;
         vec2 dx = dFdx(uvSmol);//vec2(lDx, dDx);
         vec2 dy = dFdy(uvSmol);//vec2(lDy, dDy);
         colour = textureGrad(blockModelAtlas, texPos, dx, dy);

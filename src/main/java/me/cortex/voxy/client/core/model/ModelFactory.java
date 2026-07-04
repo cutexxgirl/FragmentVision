@@ -251,11 +251,7 @@ public class ModelFactory {
             if (blockState.getBlock() instanceof LiquidBlock) {
                 layer = ItemBlockRenderTypes.getRenderLayer(blockState.getFluidState());
             } else {
-                if (blockState.getBlock() instanceof LeavesBlock) {
-                    layer = RenderType.solid();
-                } else {
-                    layer = ItemBlockRenderTypes.getChunkRenderType(blockState);
-                }
+                layer = ItemBlockRenderTypes.getChunkRenderType(blockState);
             }
         }
 

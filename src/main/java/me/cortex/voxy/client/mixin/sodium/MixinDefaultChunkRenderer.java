@@ -53,7 +53,7 @@ public abstract class MixinDefaultChunkRenderer extends ShaderChunkRenderer {
                 if (IrisUtil.irisShaderPackEnabled()) {
                     viewport = renderer.getViewport();
                 } else {
-                    var fogParameters = VoxyFogParameters.disabled(Minecraft.getInstance().gameRenderer.getRenderDistance());
+                    var fogParameters = VoxyFogParameters.fromRenderSystem(Minecraft.getInstance().gameRenderer.getRenderDistance());
                     viewport = renderer.setupViewport(matrices.projection(), matrices.modelView(), fogParameters, camera.x, camera.y, camera.z);
                 }
                 renderer.renderOpaque(viewport);

@@ -51,5 +51,8 @@ config = "common.voxy.mixins.json"
 [[mixins]]
 config = "client.voxy.mixins.json"
 
+[[mixins]]
+config = "chunky.voxy.mixins.json"
+
 [[accessTransformers]]
 file = "META-INF/accesstransformer.cfg"

@@ -96,15 +96,25 @@ public class NormalRenderPipeline extends AbstractRenderPipeline {
             float end = viewport.fogParameters.environmentalEnd();
             if (Math.abs(end-start)>1) {
                 float invEndFogDelta = 1f / (end - start);
-                float endDistance = Math.max(Minecraft.getInstance().gameRenderer.getRenderDistance(), 20*16);//TODO: make this constant a config option
+                float endDistance = viewport.fogParameters.renderEnd();
                 endDistance *= (float)Math.sqrt(3);
                 float startDelta = -start * invEndFogDelta;
-                glUniform4f(4, invEndFogDelta, startDelta, Math.clamp(endDistance*invEndFogDelta+startDelta, 0, 1),0);//
-                glUniform4f(5, viewport.fogParameters.red(), viewport.fogParameters.green(), viewport.fogParameters.blue(), viewport.fogParameters.alpha());
+                glUniform4f(4, invEndFogDelta, startDelta, Math.clamp(endDistance*invEndFogDelta+startDelta, 0, 1), viewport.fogParameters.shape());//
             } else {
                 glUniform4f(4, 0, 0, 0, 0);
-                glUniform4f(5, 0, 0, 0, 0);
             }
+
+            start = viewport.fogParameters.renderStart();
+            end = viewport.fogParameters.renderEnd();
+            if (Math.abs(end-start)>1) {
+                float invEndFogDelta = 1f / (end - start);
+                float startDelta = -start * invEndFogDelta;
+                glUniform4f(6, invEndFogDelta, startDelta, 1, 0);
+            } else {
+                glUniform4f(6, 0, 0, 0, 0);
+            }
+
+            glUniform4f(5, viewport.fogParameters.red(), viewport.fogParameters.green(), viewport.fogParameters.blue(), viewport.fogParameters.alpha());
         }
 
         glBindTextureUnit(3, this.colourSSAOTex.id);

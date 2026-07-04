@@ -10,6 +10,7 @@
     "minecraft.MixinClientPacketListener",
     "minecraft.MixinLevelRenderer",
     "minecraft.MixinMinecraft",
+    "minecraft.MixinFogRenderer",
     "minecraft.MixinRenderSystem",
     "sodium.AccessorChunkTracker",
     "sodium.AccessorSodiumWorldRenderer",
