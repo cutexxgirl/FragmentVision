@@ -145,15 +145,9 @@ public class SoftwareModelTextureBakery {
                     return Blocks.AIR.defaultBlockState();
                 }
 
-                //Fixme:
-                // This makes it so that the top face of water is always air, if this is commented out
-                //  the up block will be a liquid state which makes the sides full
-                // if this is uncommented, that issue is fixed but e.g. stacking water layers ontop of eachother
-                //  doesnt fill the side of the block
-
-                //if (pos.getY() == 1) {
-                //    return Blocks.AIR.getDefaultState();
-                //}
+                if (pos.getY() == 1) {
+                    return Blocks.AIR.defaultBlockState();
+                }
                 return state;
             }
 
@@ -163,6 +157,9 @@ public class SoftwareModelTextureBakery {
                     return Blocks.AIR.defaultBlockState().getFluidState();
                 }
 
+                if (pos.getY() == 1) {
+                    return Blocks.AIR.defaultBlockState().getFluidState();
+                }
                 return state.getFluidState();
             }
 

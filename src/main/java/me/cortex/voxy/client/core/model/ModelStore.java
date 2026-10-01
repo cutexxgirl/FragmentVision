@@ -9,7 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11C.GL_NEAREST;
-import static org.lwjgl.opengl.GL11C.GL_NEAREST_MIPMAP_LINEAR;
+import static org.lwjgl.opengl.GL11C.GL_NEAREST_MIPMAP_NEAREST;
 import static org.lwjgl.opengl.GL12C.GL_TEXTURE_MAX_LOD;
 import static org.lwjgl.opengl.GL12C.GL_TEXTURE_MIN_LOD;
 import static org.lwjgl.opengl.GL30.glBindBufferBase;
@@ -35,7 +35,9 @@ public class ModelStore {
                 .getTexture(ResourceLocation.fromNamespaceAndPath("minecraft", "textures/atlas/blocks.png")))
                 .mipLevel;
 
-        glSamplerParameteri(this.blockSampler, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+        mipLvl = Math.min(mipLvl, Math.max(0, ModelFactory.LAYERS - 2));
+
+        glSamplerParameteri(this.blockSampler, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
         glSamplerParameteri(this.blockSampler, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glSamplerParameteri(this.blockSampler, GL_TEXTURE_MIN_LOD, 0);
         glSamplerParameteri(this.blockSampler, GL_TEXTURE_MAX_LOD, mipLvl);//Integer.numberOfTrailingZeros(ModelFactory.MODEL_TEXTURE_SIZE)

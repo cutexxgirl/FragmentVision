@@ -18,6 +18,7 @@ layout(binding = SCENE_UNIFORM_BINDING, std140) uniform SceneUniform {
     uint frameId;
     uint requestQueueSize;
     float renderDistance;
+    float vanillaRenderDistance;
 };
 
 #import <voxy:lod/hierarchical/queue.glsl>
@@ -115,6 +116,28 @@ bool isWithinRenderDistance(in UnpackedNode node) {
     return xzDist <= renderDistance;
 }
 
+bool shouldRefineChunkTransition(in UnpackedNode node) {
+    if (vanillaRenderDistance <= 0.0f || node.lodLevel == 0) {
+        return false;
+    }
+
+    vec3 close = closestPointToCamera(node);
+    vec3 far = furthestPointToCamera(node);
+    float closestXZ = length(close.xz);
+    float furthestXZ = length(far.xz);
+
+    float innerEdge = max(0.0f, vanillaRenderDistance - 24.0f);
+    float highDetailEdge = vanillaRenderDistance + 40.0f;
+    float lowDetailEdge = vanillaRenderDistance + 104.0f;
+
+    if (furthestXZ < innerEdge || closestXZ > lowDetailEdge) {
+        return false;
+    }
+
+    uint targetLod = closestXZ < highDetailEdge ? 0u : 1u;
+    return node.lodLevel > targetLod;
+}
+
 
 void traverse(in UnpackedNode node) {
     #ifdef HAS_STATISTICS
@@ -131,7 +154,7 @@ void traverse(in UnpackedNode node) {
         //It is visible, TODO: maybe do a more detailed hiz test? (or make it so that )
 
         //Only decend if not a root node
-        if (node.lodLevel!=0 && shouldDecend()) {
+        if (node.lodLevel!=0 && (shouldDecend() || shouldRefineChunkTransition(node))) {
             if (hasChildren(node)) {
                 //printf("A");
                 enqueueChildren(node);

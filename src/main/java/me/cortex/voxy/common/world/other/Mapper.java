@@ -46,6 +46,19 @@ public class Mapper {
     public static final long UNKNOWN_MAPPING = -1;
     public static final long AIR = 0;
 
+    private static final int MIP_LEVEL_SHIFT = 0;
+    private static final int MIP_LOCAL_X_SHIFT = 3;
+    private static final int MIP_LOCAL_Y_SHIFT = 7;
+    private static final int MIP_LOCAL_Z_SHIFT = 11;
+    private static final int MIP_MIXED_SHIFT = 15;
+
+    private static final long MIP_DATA_MASK =
+            (0b111L << MIP_LEVEL_SHIFT) |
+            (0xFL << MIP_LOCAL_X_SHIFT) |
+            (0xFL << MIP_LOCAL_Y_SHIFT) |
+            (0xFL << MIP_LOCAL_Z_SHIFT) |
+            (1L << MIP_MIXED_SHIFT);
+
     private final ReentrantLock blockLock = new ReentrantLock();
     private final ConcurrentHashMap<BlockState, StateEntry> block2stateEntry = new ConcurrentHashMap<>(2000,0.75f, 10);
     private final ObjectArrayList<StateEntry> blockId2stateEntry = new ObjectArrayList<>();
@@ -85,12 +98,47 @@ public class Mapper {
         return (int) ((id>>56)&0xFF);
     }
 
+    public static int getMipLevel(long id) {
+        return (int) ((id >> MIP_LEVEL_SHIFT) & 0b111);
+    }
+
+    public static int getMipLocalX(long id) {
+        return (int) ((id >> MIP_LOCAL_X_SHIFT) & 0xF);
+    }
+
+    public static int getMipLocalY(long id) {
+        return (int) ((id >> MIP_LOCAL_Y_SHIFT) & 0xF);
+    }
+
+    public static int getMipLocalZ(long id) {
+        return (int) ((id >> MIP_LOCAL_Z_SHIFT) & 0xF);
+    }
+
+    public static boolean isMippedMixed(long id) {
+        return ((id >> MIP_MIXED_SHIFT) & 1) != 0;
+    }
+
+    public static long withMippedChild(long selected, int childIndex, boolean mixed) {
+        int level = Math.min(getMipLevel(selected) + 1, 4);
+        int childScale = 1 << (level - 1);
+        int localX = getMipLocalX(selected) + (((childIndex >> 2) & 1) * childScale);
+        int localY = getMipLocalY(selected) + (((childIndex >> 1) & 1) * childScale);
+        int localZ = getMipLocalZ(selected) + ((childIndex & 1) * childScale);
+
+        long mipData = ((long) level << MIP_LEVEL_SHIFT) |
+                ((long) localX << MIP_LOCAL_X_SHIFT) |
+                ((long) localY << MIP_LOCAL_Y_SHIFT) |
+                ((long) localZ << MIP_LOCAL_Z_SHIFT) |
+                (mixed ? (1L << MIP_MIXED_SHIFT) : 0);
+        return (selected & ~MIP_DATA_MASK) | mipData;
+    }
+
     public static long withLight(long id, int light) {
         return (id&(~(0xFFL<<56)))|(Integer.toUnsignedLong(light&0xFF)<<56);
     }
 
     public static long withBlockBiome(long id, int block, int biome) {
-        return (id&(0xFFL<<56))|(Integer.toUnsignedLong(block)<<27)|(Integer.toUnsignedLong(biome)<<47);
+        return (id&(MIP_DATA_MASK | (0xFFL<<56)))|(Integer.toUnsignedLong(block)<<27)|(Integer.toUnsignedLong(biome)<<47);
     }
 
     public static long airWithLight(int light) {

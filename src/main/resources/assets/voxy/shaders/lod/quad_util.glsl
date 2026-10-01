@@ -20,6 +20,29 @@ vec4 getFaceSize(uint faceData) {
     return faceOffsetsSizes;
 }
 
+void applyFluidLocalY(inout vec4 faceSize, inout float depthOffset, uint face, float lodScale, float mipLocalY, bool isFluid) {
+    if (!isFluid || lodScale <= 1.0) {
+        return;
+    }
+
+    uint axis = face>>1;
+    float localY = clamp(mipLocalY, 0.0, lodScale - 1.0);
+
+    if (axis == 0u) {
+        if ((face&1u) == 0u) {
+            depthOffset = (localY + depthOffset) / lodScale;
+        } else {
+            depthOffset = 1.0 - ((localY + (1.0 - depthOffset)) / lodScale);
+        }
+    } else if (axis == 1u) {
+        faceSize.z = (localY + faceSize.z) / lodScale;
+        faceSize.w /= lodScale;
+    } else if (axis == 2u) {
+        faceSize.x = (localY + faceSize.x) / lodScale;
+        faceSize.y /= lodScale;
+    }
+}
+
 
 vec2 taaOffset = vec2(0);//TODO: compute this
 
@@ -137,6 +160,7 @@ void setupQuad(out QuadData quad, const in Quad rawQuad, uvec2 sPos, bool genera
     #endif
     vec3 quadStart = extractPos(rawQuad);
     float depthOffset = extractFaceIndentation(faceData);
+    applyFluidLocalY(faceSize, depthOffset, face, lodScale, float(extractMipLocalY(rawQuad)), modelIsFluid(model));
     quadStart += swizzelDataAxis(face>>1, vec3(faceSize.xz, mix(depthOffset, 1-depthOffset, float(face&1u))));
 
     quad.lodScale = lodScale;

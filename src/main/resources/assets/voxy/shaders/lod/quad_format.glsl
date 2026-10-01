@@ -20,6 +20,10 @@ uint extractStateId(uint64_t quad) {
     return Eu32(quad, 16, 26);
 }
 
+uint extractMipLocalY(uint64_t quad) {
+    return Eu32(quad, 4, 42);
+}
+
 uint extractBiomeId(uint64_t quad) {
     return Eu32(quad, 9, 46);
 }
@@ -61,8 +65,11 @@ uint extractFace(ivec2 quad) {
 }
 
 uint extractStateId(ivec2 quad) {
-    //Eu32(quad, 20, 26);
-    return Eu32v(quad, 6, 26)|(Eu32v(quad, 14, 32)<<6);
+    return Eu32v(quad, 6, 26)|(Eu32v(quad, 10, 32)<<6);
+}
+
+uint extractMipLocalY(ivec2 quad) {
+    return Eu32v(quad, 4, 42);
 }
 
 uint extractBiomeId(ivec2 quad) {

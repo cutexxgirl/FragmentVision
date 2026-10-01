@@ -52,11 +52,7 @@ public class SSAO {
                     return createSSAO(properties, SSAOMode.BEST);//create the best ssao
                 }
             } else {
-                if (Capabilities.INSTANCE.isAmd) {
-                    return createSSAO(properties, SSAOMode.BETTER);
-                } else {
-                    return createSSAO(properties, SSAOMode.BASIC);
-                }
+                return createSSAO(properties, SSAOMode.BETTER);
             }
         } else {
             throw new IllegalArgumentException();

@@ -17,6 +17,7 @@ import me.cortex.voxy.client.core.rendering.util.UploadStream;
 import me.cortex.voxy.common.Logger;
 import me.cortex.voxy.common.util.MemoryBuffer;
 import me.cortex.voxy.common.world.WorldEngine;
+import net.minecraft.client.Minecraft;
 import org.lwjgl.system.MemoryUtil;
 
 import java.util.List;
@@ -228,6 +229,7 @@ public class HierarchicalOcclusionTraverser {
         //Put the render distance here so that it can generate a correct circle, TODO: make it not top level section sized
         MemoryUtil.memPutFloat(ptr, (float) Math.pow(VoxyConfig.CONFIG.sectionRenderDistance*16*32,2));ptr += 4;
 
+        MemoryUtil.memPutFloat(ptr, Minecraft.getInstance().options.getEffectiveRenderDistance()*16.0f);ptr += 4;
 
     }
 

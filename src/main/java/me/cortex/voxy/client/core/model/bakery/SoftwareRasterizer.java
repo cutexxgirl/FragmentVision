@@ -177,9 +177,8 @@ public class SoftwareRasterizer {
         int colour = this.sampleTexture(u,v);//The ABGR colour of this pixel
 
 
-        final int ALPHA_CUTOFF_THRESHOLD = 0;
-        //TODO: meta&1 OR if we are blending
-        if ((meta&1)!=0 && (colour>>>24)<=ALPHA_CUTOFF_THRESHOLD) {//Discard on small alpha
+        final int ALPHA_CUTOFF_THRESHOLD = 1;
+        if ((colour>>>24)<=ALPHA_CUTOFF_THRESHOLD) {
             return;
         }
 

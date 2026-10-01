@@ -208,6 +208,7 @@ public class RenderDataFactory {
         lightAndBiome &= ~(ModelQueries._isFullyOpaque(metadata)*(0xFFL << 55));//If its fully opaque it always uses neighbor light?
 
         long quadData = lightAndBiome;
+        quadData |= Integer.toUnsignedLong(Mapper.getMipLocalY(state))<<42;
         quadData |= Integer.toUnsignedLong(modelId)<<26;
         quadData |= getQuadTyping(metadata);//Returns the typing already shifted by 1
         return quadData;
@@ -1353,6 +1354,9 @@ public class RenderDataFactory {
                         int fluidId = this.modelMan.getFluidClientStateId(modelId);
                         A |= Integer.toUnsignedLong(fluidId)<<26;
                         Am = this.modelMan.getModelMetadataFromClientId(fluidId);
+
+                        //Update quad typing info to be the fluid type
+                        A &= ~0b110L; A |= getQuadTyping(Am);
                     }
 
 

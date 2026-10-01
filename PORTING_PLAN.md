@@ -253,3 +253,149 @@
   - vanilla/Sodium chunks still have per-vertex AO, biome color blending, more exact transparency behavior, and fluid edge handling that Voxy LODs do not fully reproduce;
   - water chunk-boundary seams likely need fluid-aware LOD meshing/culling across neighboring sections plus better translucent handling, not just a shader tweak;
   - LOD-to-real-chunk replacement can be softened later with a transition band/crossfade/dither, but it must be designed around depth and translucent rendering.
+
+## Handoff note 2026-07-04 04:30
+
+- User asked to push `0.0.2` and continue on `0.0.3`.
+- Committed current `dev-0.0.2` as:
+  - `c50a0454 Port Voxy fog and Chunky fixes`
+- Pushed:
+  - `origin/dev-0.0.2`
+- Created and switched to:
+  - `dev-0.0.3`
+- Added first `dev-0.0.3` visual fixes:
+  - `src/main/java/me/cortex/voxy/client/core/model/bakery/SoftwareRasterizer.java`
+    - fully transparent/near-transparent sampled texels are now discarded before depth/stencil writes for every layer, not only `RenderType` layers with alpha discard;
+    - this targets grass-side overlay pixels polluting baked LOD face textures.
+  - `src/main/java/me/cortex/voxy/client/core/model/ModelStore.java`
+    - model-atlas sampler now uses nearest mip selection instead of linear mip blending;
+    - max model-atlas LOD is clamped to avoid the coarsest 2x2 face mip.
+  - `src/main/java/me/cortex/voxy/client/core/model/bakery/SoftwareModelTextureBakery.java`
+    - fluid bake now reports the block/fluid above as air;
+    - this follows the old FIXME in that file and should stop water side previews from becoming full-height slabs when a water block exists above.
+- Rebuilt successfully with:
+  - `wsl -e bash -lc 'cd /mnt/p/FragmentVision && export JAVA_HOME="$HOME/.cache/codex-jdk21" && export PATH="$JAVA_HOME/bin:$PATH" && ./gradlew build --no-daemon --console=plain'`
+- Fresh jar installed to Prism:
+  - `P:\PrismLauncher\instances\test voxy\minecraft\mods\voxy-0.2.16-beta-c50a045.jar`
+  - previous Prism jar disabled as `voxy-0.2.16-beta-057039e.jar.disabled`
+- Startup verification:
+  - Minecraft launched at `2026-07-04 04:23:35`;
+  - latest log sees `voxy-0.2.16-beta-c50a045.jar`;
+  - Voxy render system was created;
+  - no Voxy `[ERROR]`, `[FATAL]`, critical mixin failure, invalid injection, or game crash found.
+- Still needs visual verification:
+  - grass side stripes;
+  - far-water black broken line;
+  - high-altitude parent LOD face-loss.
+- High-altitude culling likely needs a deeper second pass:
+  - lower 27 bits in `Mapper` mapping ids are currently unused;
+  - possible proper fix is to mark mipped/mixed representative cells in `Mipper` and teach `RenderDataFactory` not to let those parent LOD cells aggressively `cullsSame`/`faceOccludes`;
+  - blindly disabling all parent LOD occlusion would be a useful diagnostic but may inflate geometry too much for a default fix.
+
+## Handoff note 2026-07-04 05:00
+
+- User confirmed:
+  - grass 1px stripes are gone;
+  - high-altitude LOD face-loss is gone;
+  - water still had the same black broken-line problem after the first fluid bake change.
+- Added a second water-specific fix:
+  - `src/main/java/me/cortex/voxy/client/core/model/ModelFactory.java`
+  - `src/main/resources/assets/voxy/shaders/lod/block_model.glsl`
+  - `src/main/resources/assets/voxy/shaders/lod/quad_util.glsl`
+- Cause hypothesis:
+  - fluid/water model has a sub-block height inset;
+  - Voxy LOD shader scaled that inset by `lodScale`;
+  - at high LOD, a normal water height gap can become a multi-block gap, visible as a black broken line on distant water.
+- Fix:
+  - model flags now include `isFluid`;
+  - shader keeps fluid face insets in block units instead of LOD-cell units;
+  - solid/cutout/non-fluid models keep the old behavior.
+- Rebuilt and installed:
+  - `P:\PrismLauncher\instances\test voxy\minecraft\mods\voxy-0.2.16-beta-c50a045.jar`
+  - timestamp/size: `2026-07-04 04:51:37`, `11,891,912` bytes.
+- Verification:
+  - `./gradlew build --no-daemon --console=plain` succeeded;
+  - Minecraft reached single-player;
+  - fresh log sees `voxy-0.2.16-beta-c50a045.jar`;
+  - Voxy render system created;
+  - no Voxy/mixin/shader critical errors were found.
+- Created next-chat document:
+  - `NEXT_CHAT_VISUAL_PARITY.md`
+
+## Handoff note 2026-07-04 05:15
+
+- User reported the first water fix was still wrong:
+  - LOD water was visibly higher than real water;
+  - the height mismatch produced black broken gaps at distant water boundaries;
+  - rare dirt/grass-face streaks still existed, but much less often.
+- Added a deeper water-height fix:
+  - `src/main/java/me/cortex/voxy/common/world/other/Mapper.java`
+    - lower unused mapping-id bits now carry mip metadata: selected child local X/Y/Z, mip level, and a mixed-cell flag;
+  - `src/main/java/me/cortex/voxy/common/world/other/Mipper.java`
+    - when a 2x2x2 mip cell chooses a representative block, it preserves which child voxel was selected;
+  - `src/main/java/me/cortex/voxy/client/core/rendering/building/RenderDataFactory.java`
+    - quad data now packs the selected mip-local Y into free quad bits 42..45;
+    - X outer fluid meshing now updates quad typing after replacing a block-with-fluid model by its fluid model on both sides;
+  - `src/main/resources/assets/voxy/shaders/lod/quad_format.glsl`
+    - added `extractMipLocalY(...)`;
+  - `src/main/resources/assets/voxy/shaders/lod/quad_util.glsl`
+    - fluid quads now apply the selected local Y before scaling to the LOD cell.
+- Reason:
+  - Voxy used to choose a representative water block for a parent LOD cell but then render that water as if it occupied the whole parent cell;
+  - if the chosen water was in the lower half of the cell, the LOD surface became too high;
+  - carrying `mipLocalY` lets the shader place the fluid surface back at the representative source height inside the coarse LOD cell.
+- Rebuilt successfully with:
+  - `wsl -e bash -lc 'cd /mnt/p/FragmentVision && export JAVA_HOME="$HOME/.cache/codex-jdk21" && export PATH="$JAVA_HOME/bin:$PATH" && ./gradlew build --no-daemon --console=plain'`
+- Fresh jar installed to Prism:
+  - `P:\PrismLauncher\instances\test voxy\minecraft\mods\voxy-0.2.16-beta-c50a045.jar`
+  - timestamp/size: `2026-07-04 05:11:19`, `11,892,842` bytes.
+- Runtime verification:
+  - Prism launched `test voxy` into world `Новый мир` at `2026-07-04 05:14:08`;
+  - fresh `latest.log` sees `voxy-0.2.16-beta-c50a045.jar`;
+  - Voxy render system was created with `NormalRenderPipeline` / `MDICSectionRenderer`;
+  - no `[ERROR]`, `[FATAL]`, critical mixin failure, invalid injection, game crash, or shader compile/link failure was found in the fresh log scan.
+- Important testing note:
+  - old Voxy cached LOD data does not have the new mip-local metadata;
+  - if the old distant-water seam remains in already-ingested regions, clear/reingest the Voxy cache for that area before judging the fix.
+
+## Handoff note 2026-07-04 14:41
+
+- Created and switched to requested branch:
+  - `dev-0.0.4`
+- User reported:
+  - water bug is fixed;
+  - next target is visually softer LOD -> real chunk replacement, better grass/water color parity, and AO if practical.
+- Added visual transition work:
+  - `src/main/java/me/cortex/voxy/client/core/rendering/hierachical/HierarchicalOcclusionTraverser.java`
+    - traversal uniform upload now includes the vanilla/Sodium render distance in blocks;
+  - `src/main/resources/assets/voxy/shaders/lod/hierarchical/traversal_dev.comp`
+    - nodes near the real-chunk boundary force extra descent to LOD0/LOD1 inside a transition band;
+  - `src/main/java/me/cortex/voxy/client/core/rendering/section/backend/mdic/MDICSectionRenderer.java`
+  - `src/main/resources/assets/voxy/shaders/lod/gl46/bindings.glsl`
+    - the GL46 render uniform layout was checked against the transition work;
+    - screen-door fragment fade was intentionally removed after review because Voxy pixels that survive the depth-bound check usually do not overlap real chunks, so discarding them can create background holes.
+  - `src/main/resources/assets/voxy/shaders/lod/gl46/quads3.vert`
+  - `src/main/resources/assets/voxy/shaders/lod/gl46/quads.frag`
+    - no active fragment fade is used; visual smoothing currently comes from the extra LOD refinement band.
+- Added color/light parity work:
+  - `src/main/java/me/cortex/voxy/common/world/other/Mipper.java`
+    - non-air parent cells now use averaged light;
+    - parent biome id now uses majority vote among non-air children instead of inheriting only the chosen representative child;
+    - mixed-cell flag now also treats biome-id differences as mixed.
+- Added AO/default quality work:
+  - `src/main/java/me/cortex/voxy/client/core/SSAO.java`
+    - `AUTO` falls back to `BETTER` SSAO when dedicated GPU memory cannot be queried, instead of dropping to `BASIC`;
+    - true per-corner block AO remains a larger mesh-format change and was not added in this pass.
+- Fixed an important packed-quad fallback bug:
+  - `src/main/resources/assets/voxy/shaders/lod/quad_format.glsl`
+    - non-64-bit `extractStateId(ivec2)` now reads the 16-bit state id from bits 26..41 only;
+    - it no longer consumes bits 42..45, which are now used for `mipLocalY`.
+- Rebuilt successfully with:
+  - `wsl -e bash -lc 'cd /mnt/p/FragmentVision && export JAVA_HOME="$HOME/.cache/codex-jdk21" && export PATH="$JAVA_HOME/bin:$PATH" && ./gradlew build --no-daemon --console=plain'`
+- Fresh jar installed to Prism:
+  - `P:\PrismLauncher\instances\test voxy\minecraft\mods\voxy-0.2.16-beta-c50a045.jar`
+  - timestamp/size: `2026-07-04 14:50:01`, `11,894,157` bytes.
+- Runtime limitation:
+  - Codex-side Prism launch currently fails before Voxy renderer creation because Java NIO selector fails in this environment;
+  - minimal Java repro: `Selector.open()` throws `java.io.IOException: Unable to establish loopback connection`, caused by `java.net.SocketException: Invalid argument: connect`;
+  - this is outside the Voxy renderer/shader path, so this pass is verified by Gradle build and code audit, not by in-world visual inspection.

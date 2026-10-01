@@ -5,3 +5,6 @@
 /run/
 /out/
 /logs/
+
+# Local caches, generated captures and reference checkouts
+/.vscode/
