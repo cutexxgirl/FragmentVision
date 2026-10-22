@@ -61,14 +61,22 @@ public class SoftwareModelTextureBakery {
 
         glFlush();
         glFinish();
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
-        glPixelStorei(GL_PACK_ROW_LENGTH, width);
-        glPixelStorei(GL_PACK_IMAGE_HEIGHT, 0);
-        glPixelStorei(GL_PACK_SKIP_ROWS, 0);
-        glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
-        glPixelStorei(GL_PACK_ALIGNMENT, 4);
-        glGetTextureImage(textureId, targetMipLevel, GL_RGBA, GL_UNSIGNED_BYTE, texture);
+        // Pixel-pack state is global. Leaking the atlas row length makes F2
+        // downloadTexture write atlas-sized rows into a screen-sized native buffer.
+        int packBuffer = glGetInteger(org.lwjgl.opengl.GL21.GL_PIXEL_PACK_BUFFER_BINDING);
+        int[] parameters = {GL_PACK_ROW_LENGTH, GL_PACK_IMAGE_HEIGHT, GL_PACK_SKIP_ROWS,
+                GL_PACK_SKIP_PIXELS, GL_PACK_ALIGNMENT, org.lwjgl.opengl.GL12.GL_PACK_SKIP_IMAGES,
+                GL_PACK_SWAP_BYTES, GL_PACK_LSB_FIRST};
+        int[] previous = new int[parameters.length];
+        for (int i = 0; i < parameters.length; i++) previous[i] = glGetInteger(parameters[i]);
+        try {
+            glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+            for (int parameter : parameters) glPixelStorei(parameter, parameter == GL_PACK_ALIGNMENT ? 4 : 0);
+            glGetTextureImage(textureId, targetMipLevel, GL_RGBA, GL_UNSIGNED_BYTE, texture);
+        } finally {
+            for (int i = 0; i < parameters.length; i++) glPixelStorei(parameters[i], previous[i]);
+            glBindBuffer(GL_PIXEL_PACK_BUFFER, packBuffer);
+        }
         this.rasterizer.setSamplerTexture(texture, width, height);
     }
 
