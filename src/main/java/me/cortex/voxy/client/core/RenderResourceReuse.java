@@ -39,7 +39,7 @@ public class RenderResourceReuse {
             atlas = MODEL_TEXTURE_CACHE.removeFirst().zero();
         } else {
             atlas = new GlTexture().store(GL_RGBA8,
-                        Integer.numberOfTrailingZeros(ModelFactory.MODEL_TEXTURE_SIZE),
+                        ModelFactory.MIP_LEVELS,
                         ModelFactory.MODEL_TEXTURE_SIZE*3*256,
                         ModelFactory.MODEL_TEXTURE_SIZE*2*256)
                     .name("ModelTextures");

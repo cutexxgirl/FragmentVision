@@ -206,7 +206,7 @@ public class MDICSectionRenderer extends AbstractSectionRenderer<MDICViewport, B
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         }
         FragmentAtmosphereCompat.bindMaterial(this.terrainShader.id());
-        try { glMultiDrawElementsIndirectCountARB(GL_TRIANGLES, GL_UNSIGNED_SHORT, indirectOffset, drawCountOffset, maxDrawCount, 0); }
+        try (var leaves = FragmentAtmosphereCompat.hasMaterial() ? this.modelStore.filteredLeaves() : null) { glMultiDrawElementsIndirectCountARB(GL_TRIANGLES, GL_UNSIGNED_SHORT, indirectOffset, drawCountOffset, maxDrawCount, 0); }
         finally { FragmentAtmosphereCompat.releaseMaterial(); }
         if (VoxyClient.getOcclusionDebugState()==3) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -249,7 +249,7 @@ public class MDICSectionRenderer extends AbstractSectionRenderer<MDICViewport, B
         glMemoryBarrier(GL_COMMAND_BARRIER_BIT|GL_SHADER_STORAGE_BARRIER_BIT);//Barrier everything is needed
         glProvokingVertex(GL_FIRST_VERTEX_CONVENTION);
         FragmentAtmosphereCompat.bindMaterial(this.translucentTerrainShader.id());
-        try { glMultiDrawElementsIndirectCountARB(GL_TRIANGLES, GL_UNSIGNED_SHORT, TRANSLUCENT_OFFSET*5*4, 4*4, Math.min(this.geometryManager.getSectionCount(), TRANSLUCENT_DRAW_COUNT), 0); }
+        try (var leaves = FragmentAtmosphereCompat.hasMaterial() ? this.modelStore.filteredLeaves() : null) { glMultiDrawElementsIndirectCountARB(GL_TRIANGLES, GL_UNSIGNED_SHORT, TRANSLUCENT_OFFSET*5*4, 4*4, Math.min(this.geometryManager.getSectionCount(), TRANSLUCENT_DRAW_COUNT), 0); }
         finally { FragmentAtmosphereCompat.releaseMaterial(); }
 
         glEnable(GL_CULL_FACE);

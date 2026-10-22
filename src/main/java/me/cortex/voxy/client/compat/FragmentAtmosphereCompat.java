@@ -27,6 +27,7 @@ public final class FragmentAtmosphereCompat {
     }
     private record MaterialApi(Method source, Method bind, Method release, Method colorProvider) {}
     private static final MaterialApi MATERIAL = discoverMaterial();
+    public static boolean hasMaterial() { return MATERIAL != null; }
     private static MaterialApi discoverMaterial() {
         if (API == null) return null;
         try {

@@ -63,6 +63,7 @@ import static org.lwjgl.opengl.GL11.*;
 public class ModelFactory {
     public static final int MODEL_TEXTURE_SIZE = 16;
     public static final int LAYERS = Integer.numberOfTrailingZeros(MODEL_TEXTURE_SIZE);
+    public static final int MIP_LEVELS = LAYERS + 1; // Include one texel per face.
 
     //TODO: replace the fluid BlockState with a client model id integer of the fluidState, requires looking up
     // the fluid state in the mipper
@@ -332,7 +333,7 @@ public class ModelFactory {
             int Y = ((this.modelId>>8)&0xFF) * MODEL_TEXTURE_SIZE*2;
 
             long cAddr = this.texture.address;
-            for (int lvl = 0; lvl < LAYERS; lvl++) {
+            for (int lvl = 0; lvl < MIP_LEVELS; lvl++) {
                 nglTextureSubImage2D(atlas.id, lvl, X >> lvl, Y >> lvl, (MODEL_TEXTURE_SIZE*3) >> lvl, (MODEL_TEXTURE_SIZE*2) >> lvl, GL_RGBA, GL_UNSIGNED_BYTE, cAddr);
                 cAddr += (MODEL_TEXTURE_SIZE*MODEL_TEXTURE_SIZE*3*2*4)>>(lvl<<1);
             }

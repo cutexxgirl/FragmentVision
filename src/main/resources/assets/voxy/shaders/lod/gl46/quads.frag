@@ -119,6 +119,7 @@ vec4 computeColour(vec2 texturePos, vec4 colour) {
 // FRAGMENT_MATERIAL_SOURCE
 #ifdef FR_LOD_MATERIAL
 flat in float fr_LodMaterial;
+layout(binding = 11) uniform sampler2D fv_LeafAtlas;
 #endif
 void main() {
     //vec2 uv = vec2(0);
@@ -146,6 +147,19 @@ void main() {
 #ifdef FR_LOD_MATERIAL
         float leafBias = fr_LodHigh != 0 && fr_LodMaterial > 1.5 && fr_LodMaterial < 2.5 ? 1.68179283 : 1.0;
         dx *= leafBias; dy *= leafBias; // Same +0.75 leaf mip bias as native High.
+#endif
+#ifdef FR_LOD_MATERIAL
+        if (fr_LightEnabled != 0 && fr_LodHigh != 0 && fr_LodMaterial > 1.5 && fr_LodMaterial < 2.5) {
+            vec2 atlasSize = vec2(textureSize(blockModelAtlas, 0));
+            float footprint = max(length(dx * atlasSize), length(dy * atlasSize));
+            float mip = clamp(log2(max(footprint, 1.0)), 0.0, 4.0);
+            // Clamp against the coarser trilinear level: every face/model stays
+            // inside its own tile, including the final 1x1 average colour.
+            float inset = 0.5 / exp2(4.0 - ceil(mip));
+            vec2 filteredUV = clamp(localUv, vec2(inset), vec2(1.0 - inset));
+            colour = textureLod(fv_LeafAtlas, getBaseUV() + filteredUV * MODEL_FACE_TILE_SCALE, mip);
+        }
+        else
 #endif
         colour = textureGrad(blockModelAtlas, texPos, dx, dy);
     }// else {

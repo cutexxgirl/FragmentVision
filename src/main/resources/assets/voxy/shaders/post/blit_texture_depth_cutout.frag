@@ -56,6 +56,29 @@ void main() {
     }
     #ifdef FRAGMENT_ATMOSPHERE
     if (fr_Aerial.w > 0.5) {
+        // A subpixel, depth-aware softening only in distant air. Reuses this
+        // composite and its existing colour/depth targets; no blur framebuffer.
+        float softness = fr_AerialSoftness * smoothstep(96.0, 256.0, length(point));
+        if (softness > 0.001) {
+            vec2 inverseSize = 1.0 / vec2(textureSize(colourTex, 0));
+            vec2 pixel = 0.85 * inverseSize;
+            vec2 offsets[4] = vec2[4](vec2(1,0), vec2(-1,0), vec2(0,1), vec2(0,-1));
+            vec3 sum = colour.rgb;
+            float total = 1.0;
+            float distanceToEye = length(point);
+            for (int i = 0; i < 4; i++) {
+                vec2 uv = clamp(UV + offsets[i] * pixel, 0.5 * inverseSize, 1.0 - 0.5 * inverseSize);
+                float d = texture(depthTex, uv).r;
+                if (d <= 0.0 || d >= 1.0) continue;
+                vec4 neighbour = texture(colourTex, uv);
+                float gap = abs(length(rev3d(vec3(uv, d))) - distanceToEye);
+                float w = (1.0 - smoothstep(max(1.0, distanceToEye * 0.01),
+                            max(3.0, distanceToEye * 0.035), gap)) * step(0.01, neighbour.a);
+                sum += neighbour.rgb * w;
+                total += w;
+            }
+            colour.rgb = mix(colour.rgb, sum / total, softness);
+        }
         colour.rgb = fr_aerialFog(colour.rgb, point);
         colour.rgb = fr_aerialLodEdge(colour.rgb, point, fv_LodEdge.x, fv_LodEdge.y);
     } else

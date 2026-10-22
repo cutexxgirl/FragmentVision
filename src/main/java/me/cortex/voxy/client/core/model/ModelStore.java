@@ -24,6 +24,7 @@ public class ModelStore {
     final GlBuffer modelColourBuffer;
     final GlTexture textures;
     public final int blockSampler = glGenSamplers();
+    private final int leafSampler = glGenSamplers();
 
     public ModelStore() {
         this.modelBuffer = new GlBuffer(MODEL_SIZE * (1<<16)).name("ModelData");
@@ -41,6 +42,10 @@ public class ModelStore {
         glSamplerParameteri(this.blockSampler, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glSamplerParameteri(this.blockSampler, GL_TEXTURE_MIN_LOD, 0);
         glSamplerParameteri(this.blockSampler, GL_TEXTURE_MAX_LOD, mipLvl);//Integer.numberOfTrailingZeros(ModelFactory.MODEL_TEXTURE_SIZE)
+        glSamplerParameteri(this.leafSampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glSamplerParameteri(this.leafSampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glSamplerParameteri(this.leafSampler, GL_TEXTURE_MIN_LOD, 0);
+        glSamplerParameteri(this.leafSampler, GL_TEXTURE_MAX_LOD, ModelFactory.LAYERS);
     }
 
 
@@ -49,6 +54,29 @@ public class ModelStore {
         this.modelColourBuffer.free();
         RenderResourceReuse.giveBackModelStoreTextureAtlas(this.textures);
         glDeleteSamplers(this.blockSampler);
+        glDeleteSamplers(this.leafSampler);
+    }
+
+    public LeafAtlasBinding filteredLeaves() { return new LeafAtlasBinding(); }
+    /** Separate filtered view; ordinary blocks retain their pixel-art sampler. */
+    public final class LeafAtlasBinding implements AutoCloseable {
+        private final int texture, sampler;
+        private LeafAtlasBinding() {
+            int active = glGetInteger(org.lwjgl.opengl.GL13.GL_ACTIVE_TEXTURE);
+            org.lwjgl.opengl.GL13.glActiveTexture(org.lwjgl.opengl.GL13.GL_TEXTURE0 + 11);
+            texture = glGetInteger(GL_TEXTURE_BINDING_2D);
+            sampler = org.lwjgl.opengl.GL30.glGetIntegeri(GL_SAMPLER_BINDING, 11);
+            glBindTexture(GL_TEXTURE_2D, textures.id);
+            glBindSampler(11, leafSampler);
+            org.lwjgl.opengl.GL13.glActiveTexture(active);
+        }
+        @Override public void close() {
+            int active = glGetInteger(org.lwjgl.opengl.GL13.GL_ACTIVE_TEXTURE);
+            org.lwjgl.opengl.GL13.glActiveTexture(org.lwjgl.opengl.GL13.GL_TEXTURE0 + 11);
+            glBindTexture(GL_TEXTURE_2D, texture);
+            glBindSampler(11, sampler);
+            org.lwjgl.opengl.GL13.glActiveTexture(active);
+        }
     }
 
 
