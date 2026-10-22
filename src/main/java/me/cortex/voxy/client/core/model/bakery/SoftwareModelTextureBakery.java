@@ -105,6 +105,10 @@ public class SoftwareModelTextureBakery {
         for (Direction direction : new Direction[]{Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST, null}) {
             var quads = model.getQuads(state, direction, new SingleThreadedRandomSource(42L), ModelData.EMPTY, layer);
             for (var quad : quads) {
+                // Bushy cards belong to nearby geometry, not the six LOD face
+                // textures. Keep the cube's original leaf sprite and tint.
+                if (state.is(net.minecraft.tags.BlockTags.LEAVES)
+                        && quad.getSprite().contents().name().getPath().contains("_bushy")) continue;
                 this.vc.quad(quad, meta|(quad.isTinted()?4:0));
             }
         }
