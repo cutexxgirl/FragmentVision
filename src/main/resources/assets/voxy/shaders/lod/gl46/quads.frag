@@ -116,6 +116,10 @@ vec4 computeColour(vec2 texturePos, vec4 colour) {
 #endif
 
 
+// FRAGMENT_MATERIAL_SOURCE
+#ifdef FR_LOD_MATERIAL
+flat in float fr_LodMaterial;
+#endif
 void main() {
     //vec2 uv = vec2(0);
     //Tile is the tile we are in
@@ -139,6 +143,10 @@ void main() {
         vec2 uvSmol = uv * MODEL_FACE_TILE_SCALE;
         vec2 dx = dFdx(uvSmol);//vec2(lDx, dDx);
         vec2 dy = dFdy(uvSmol);//vec2(lDy, dDy);
+#ifdef FR_LOD_MATERIAL
+        float leafBias = fr_LodHigh != 0 && fr_LodMaterial > 1.5 && fr_LodMaterial < 2.5 ? 1.68179283 : 1.0;
+        dx *= leafBias; dy *= leafBias; // Same +0.75 leaf mip bias as native High.
+#endif
         colour = textureGrad(blockModelAtlas, texPos, dx, dy);
     }// else {
     //    colour = textureLod(blockModelAtlas, texPos, 0);
@@ -168,12 +176,25 @@ void main() {
 
 
     //Also, small quad is really fking over the mipping level somehow
+    float cutoutAlpha = 1.0;
+#ifndef TRANSLUCENT
+    if (useDiscard())
+#endif
+    {
+#ifdef FR_LOD_MATERIAL
+        // Match native filtered alpha: sharp level-zero cutouts made distant crowns noisy.
+        if (fr_LightEnabled != 0 && fr_LodMaterial > 1.5 && fr_LodMaterial < 2.5)
+            cutoutAlpha = colour.a;
+        else
+#endif
+            cutoutAlpha = textureLod(blockModelAtlas, texPos, 0).a;
+    }
     #ifndef TRANSLUCENT
     colour.a = 1.0f;
-    if (useDiscard() && (textureLod(blockModelAtlas, texPos, 0).a <= 0.1f)) {
+    if (useDiscard() && (cutoutAlpha <= 0.1f)) {
     //if (useDiscard() && (colour.a <= 0.1f)) {
     #else
-    if (textureLod(blockModelAtlas, texPos, 0).a == 0.0f) {
+    if (cutoutAlpha == 0.0f) {
     #endif
         //This is stupidly stupidly bad for divergence
         //TODO: FIXME, basicly what this do is sample the exact pixel (no lod) for discarding, this stops mipmapping fucking it over
@@ -191,6 +212,12 @@ void main() {
 
     #ifndef PATCHED_SHADER
     colour = computeColour(texPos, colour);
+#ifdef FR_LOD_MATERIAL
+    if (fr_LodMaterial > 4.5 && fr_LightEnabled != 0) {
+        colour.rgb = fr_lodWaterColor();
+        colour.a = 1.0;
+    } else colour.rgb = fr_lighting(colour.rgb, fr_LodMaterial > 4.5 ? 0.0 : fr_LodMaterial);
+#endif
     outColour = colour;
 
     #ifdef DEBUG_RENDER

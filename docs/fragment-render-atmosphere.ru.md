@@ -44,3 +44,20 @@ pixel-pack параметры и PBO; DSA readback не требует отвя�
 
 Полный отчёт, GPU-проверка одинакового оптического столба и фотографии находятся
 в Fragment Render: `docs/atmosphere/` и `tools/sky/check_aerial.py`.
+
+## Общие материалы
+
+Дополнительно связаны runtime материалы через необязательные методы
+`materialShaderSource`, `bindMaterial`, `releaseMaterial`, `blockColorProvider`.
+MDIC передаёт исходный lightmap, sky/block light и camera-relative world position
+в родной материал Render; vanilla directional face tint отключается при активном
+освещении Render. Medium/High выбираются uniform, воздушная перспектива остаётся
+в финальном composite, однократно. ModelFactory использует BiomePalette Render
+вместо прямого вызова vanilla BlockColor. Классы материалов занимают свободные
+биты runtime model flags; persistent cache и размер quad не меняются.
+
+Дальняя вода получает тот же глубокий цвет и мягкую рефлексию из существующего
+sky cache. Подробный отчёт и тестовая область 6561 чанк — в Render
+`docs/lod-materials/`. Геометрическое упрощение LOD сохранено.
+
+В High листва также использует native mip bias +0.75. Cutout проверяет фильтрованную альфу готовой пробы, чтобы дальние кроны не покрывались резкими пиксельными отверстиями. У standalone Vision и остальных материалов правила прежние.

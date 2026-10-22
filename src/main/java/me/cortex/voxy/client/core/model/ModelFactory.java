@@ -601,6 +601,13 @@ public class ModelFactory {
         //TODO: THIS
         modelFlags |= isShaded?8:0;//model has AO and shade
         modelFlags |= isFluid?16:0;//model represents a fluid surface
+        int fragmentMaterial = isFluid && blockState.getFluidState().is(net.minecraft.tags.FluidTags.WATER) ? 5
+                : blockState.is(net.minecraft.tags.BlockTags.LEAVES) ? 2
+                : (blockState.is(net.minecraft.world.level.block.Blocks.GRASS_BLOCK)
+                || blockState.is(net.minecraft.world.level.block.Blocks.DIRT)
+                || blockState.is(net.minecraft.world.level.block.Blocks.MOSS_BLOCK)) ? 3
+                : blockState.is(net.minecraft.tags.BlockTags.REPLACEABLE_BY_TREES) && !isFluid ? 1 : 0;
+        modelFlags |= fragmentMaterial << 5; // runtime model metadata, not persistent LOD format
 
         //modelFlags |= blockRenderLayer == RenderLayer.getSolid()?0:1;// should discard alpha
         MemoryUtil.memPutInt(uploadPtr, modelFlags); uploadPtr += 4;
@@ -770,7 +777,7 @@ public class ModelFactory {
     }
 
     private static BlockColor getColourProvider(Block block) {
-        return Minecraft.getInstance().getBlockColors().blockColors.get(block);
+        return me.cortex.voxy.client.compat.FragmentAtmosphereCompat.colorProvider(block.defaultBlockState(), Minecraft.getInstance().getBlockColors().blockColors.get(block));
     }
 
     //TODO: add a method to detect biome dependent colours (can do by detecting if getColor is ever called)

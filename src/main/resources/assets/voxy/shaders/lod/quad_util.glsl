@@ -128,6 +128,9 @@ uvec3 makeRemainingAttributes(const in BlockModel model, const in Quad quad, uin
         addin = encodedData;
     }
 
+#ifdef FR_LOD_MATERIAL
+    if (fr_LightEnabled == 0)
+#endif
     tinting.rgb *= computeDirectionalFaceTint(isShaded, face);
 
     attributes.x = packVec4(tinting);

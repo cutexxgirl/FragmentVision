@@ -2,6 +2,7 @@ package me.cortex.voxy.client.core.rendering.section.backend.mdic;
 
 
 import me.cortex.voxy.client.RenderStatistics;
+import me.cortex.voxy.client.compat.FragmentAtmosphereCompat;
 import me.cortex.voxy.client.VoxyClient;
 import me.cortex.voxy.client.core.AbstractRenderPipeline;
 import me.cortex.voxy.client.core.gl.Capabilities;
@@ -101,6 +102,7 @@ public class MDICSectionRenderer extends AbstractSectionRenderer<MDICViewport, B
         this.pipeline = pipeline;
         //The pipeline can be used to transform the renderer in abstract ways
 
+        String material = FragmentAtmosphereCompat.materialSource();
         String vertex = ShaderLoader.parse("voxy:lod/gl46/quads3.vert");
         String taa = pipeline.taaFunction("taaShift");
         if (taa != null) {
@@ -108,6 +110,7 @@ public class MDICSectionRenderer extends AbstractSectionRenderer<MDICViewport, B
         }
         var builder = Shader.make()
                 .apply(this.properties::apply)
+                .defineIf("FR_LOD_MATERIAL", !material.isEmpty())
                 .defineIf("TAA_PATCH", taa != null)
                 .defineIf("DEBUG_RENDER", false)
 
@@ -120,7 +123,7 @@ public class MDICSectionRenderer extends AbstractSectionRenderer<MDICViewport, B
         //Apply per face tinting
         addDirectionalFaceTint(builder, Minecraft.getInstance().level);
 
-        String frag = ShaderLoader.parse("voxy:lod/gl46/quads.frag");
+        String frag = ShaderLoader.parse("voxy:lod/gl46/quads.frag").replace("// FRAGMENT_MATERIAL_SOURCE", material);
 
         String opaqueFrag = pipeline.patchOpaqueShader(this, frag);
         opaqueFrag = opaqueFrag==null?frag:opaqueFrag;
@@ -202,7 +205,9 @@ public class MDICSectionRenderer extends AbstractSectionRenderer<MDICViewport, B
         if (VoxyClient.getOcclusionDebugState()==3) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         }
-        glMultiDrawElementsIndirectCountARB(GL_TRIANGLES, GL_UNSIGNED_SHORT, indirectOffset, drawCountOffset, maxDrawCount, 0);
+        FragmentAtmosphereCompat.bindMaterial(this.terrainShader.id());
+        try { glMultiDrawElementsIndirectCountARB(GL_TRIANGLES, GL_UNSIGNED_SHORT, indirectOffset, drawCountOffset, maxDrawCount, 0); }
+        finally { FragmentAtmosphereCompat.releaseMaterial(); }
         if (VoxyClient.getOcclusionDebugState()==3) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
@@ -243,7 +248,9 @@ public class MDICSectionRenderer extends AbstractSectionRenderer<MDICViewport, B
 
         glMemoryBarrier(GL_COMMAND_BARRIER_BIT|GL_SHADER_STORAGE_BARRIER_BIT);//Barrier everything is needed
         glProvokingVertex(GL_FIRST_VERTEX_CONVENTION);
-        glMultiDrawElementsIndirectCountARB(GL_TRIANGLES, GL_UNSIGNED_SHORT, TRANSLUCENT_OFFSET*5*4, 4*4, Math.min(this.geometryManager.getSectionCount(), TRANSLUCENT_DRAW_COUNT), 0);
+        FragmentAtmosphereCompat.bindMaterial(this.translucentTerrainShader.id());
+        try { glMultiDrawElementsIndirectCountARB(GL_TRIANGLES, GL_UNSIGNED_SHORT, TRANSLUCENT_OFFSET*5*4, 4*4, Math.min(this.geometryManager.getSectionCount(), TRANSLUCENT_DRAW_COUNT), 0); }
+        finally { FragmentAtmosphereCompat.releaseMaterial(); }
 
         glEnable(GL_CULL_FACE);
         glBindVertexArray(0);
