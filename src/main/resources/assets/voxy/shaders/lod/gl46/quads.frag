@@ -119,6 +119,7 @@ vec4 computeColour(vec2 texturePos, vec4 colour) {
 // FRAGMENT_MATERIAL_SOURCE
 #ifdef FR_LOD_MATERIAL
 flat in float fr_LodMaterial;
+uniform int fr_LodDebug;
 layout(binding = 11) uniform sampler2D fv_LeafAtlas;
 #endif
 void main() {
@@ -231,6 +232,7 @@ void main() {
         colour.rgb = fr_lodWaterColor();
         colour.a = 1.0;
     } else colour.rgb = fr_lighting(colour.rgb, fr_LodMaterial > 4.5 ? 0.0 : fr_LodMaterial);
+    if (fr_LodDebug != 0) colour.rgb = vec3(1.0, 0.0, 0.8);
 #endif
     outColour = colour;
 

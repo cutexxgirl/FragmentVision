@@ -42,6 +42,11 @@ public class SoftwareRasterizer {
 
     private boolean cullBackFace;
     private boolean doTheBlending;
+    private boolean preserveTransparentTexels;
+
+    public void setPreserveTransparentTexels(boolean preserve) {
+        this.preserveTransparentTexels = preserve;
+    }
 
     private int samplerWidth;
     private int samplerHeight;
@@ -151,7 +156,8 @@ public class SoftwareRasterizer {
                 float w1 = edge(v2, v3, cx, cy)*invArea;
                 float w2 = edge(v3, v1, cx, cy)*invArea;
                 float w3 = 1.0f-w1-w2;
-                if ((w1>0.0f&&w2>0.0f&&w3>0.0f)||(orZero&&w1>=0.0f&&w2>=0.0f&&w3>=0.0f)) {
+                if ((w1>0.0f&&w2>0.0f&&w3>0.0f)||(orZero&&w1>=0.0f&&w2>=0.0f&&w3>=0.0f)
+                        || (this.preserveTransparentTexels && w1 >= -0.000001f && w2 >= -0.000001f && w3 >= -0.000001f)) {
                     //Dont need to worry about perspective correction afak as it should already be all correct
 
                     //pixel is inside the triangle
@@ -165,6 +171,7 @@ public class SoftwareRasterizer {
         float z = Math.fma(b1, this.scratchR1.z, Math.fma(b2, this.scratchR2.z, b3 * this.scratchR3.z));
         z = Math.fma(z,0.5f,0.5f);
         if (z<0.0f && -0.000001f<=z) z = 0;//Clamp to 0 if its really small negative
+        if (this.preserveTransparentTexels && z <= 1.000001f && z >= -0.000001f) z = Math.clamp(z, 0.0f, 1.0f);
         if (z<0.0f||z>1.0f)
             return;//TODO: check this
 
@@ -178,7 +185,7 @@ public class SoftwareRasterizer {
 
 
         final int ALPHA_CUTOFF_THRESHOLD = 1;
-        if ((colour>>>24)<=ALPHA_CUTOFF_THRESHOLD) {
+        if (!this.preserveTransparentTexels && (colour>>>24)<=ALPHA_CUTOFF_THRESHOLD) {
             return;
         }
 

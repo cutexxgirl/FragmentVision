@@ -43,7 +43,13 @@ public class SoftwareModelTextureBakery {
     private static final Matrix4f[] VIEWS = new Matrix4f[6];
 
     private final ReuseVertexConsumer vc = new ReuseVertexConsumer();
-    private final SoftwareRasterizer rasterizer = new SoftwareRasterizer(ModelFactory.MODEL_TEXTURE_SIZE);
+    private final SoftwareRasterizer[] mipRasterizers = java.util.stream.IntStream.range(0, ModelFactory.MIP_LEVELS)
+            .mapToObj(level -> new SoftwareRasterizer(ModelFactory.MODEL_TEXTURE_SIZE >> level))
+            .toArray(SoftwareRasterizer[]::new);
+    private SoftwareRasterizer rasterizer = mipRasterizers[0];
+    private boolean compactLeafCube;
+    private int nativeMipLevels;
+    public boolean supportsNativeLeafMips() { return compactLeafCube && nativeMipLevels == mipRasterizers.length; }
 
     public SoftwareModelTextureBakery() {
     }
@@ -51,13 +57,6 @@ public class SoftwareModelTextureBakery {
     public void setupTexture() {
         var tex = Minecraft.getInstance().getTextureManager().getTexture(ResourceLocation.fromNamespaceAndPath("minecraft", "textures/atlas/blocks.png"));
         int textureId = tex.getId();
-        int targetMipLevel = 0;
-
-        int width = glGetTextureLevelParameteri(textureId, targetMipLevel, GL_TEXTURE_WIDTH);
-        int height = glGetTextureLevelParameteri(textureId, targetMipLevel, GL_TEXTURE_HEIGHT);
-
-        //Just do it ourselves as doing it with b3d has some issues, (doing it ourselves is also just much much much shorter)
-        var texture = new int[width * height];
 
         glFlush();
         glFinish();
@@ -72,12 +71,52 @@ public class SoftwareModelTextureBakery {
         try {
             glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
             for (int parameter : parameters) glPixelStorei(parameter, parameter == GL_PACK_ALIGNMENT ? 4 : 0);
-            glGetTextureImage(textureId, targetMipLevel, GL_RGBA, GL_UNSIGNED_BYTE, texture);
+            // Preserve the actual native mip pyramid, including Sodium's alpha-
+            // weighted filtering and pack-defined mips. Rebuilding from discarded
+            // cutouts/dilated RGB changes both canopy albedo and coverage.
+            int[] texture = null;
+            int width = 0, height = 0;
+            nativeMipLevels = 0;
+            for (int level = 0; level < mipRasterizers.length; level++) {
+                int levelWidth = glGetTextureLevelParameteri(textureId, level, GL_TEXTURE_WIDTH);
+                if (levelWidth > 0) {
+                    width = levelWidth;
+                    height = glGetTextureLevelParameteri(textureId, level, GL_TEXTURE_HEIGHT);
+                    texture = new int[width * height];
+                    glGetTextureImage(textureId, level, GL_RGBA, GL_UNSIGNED_BYTE, texture);
+                    dumpNativeSpriteAudit((net.minecraft.client.renderer.texture.TextureAtlas) tex, texture, width, level);
+                    nativeMipLevels = level + 1;
+                }
+                if (texture == null) throw new IllegalStateException("Native block atlas is empty");
+                // When mipmaps are disabled, retain only one base atlas copy.
+                // Such models use Vision's normal generated mip fallback below.
+                mipRasterizers[level].setSamplerTexture(texture, width, height);
+            }
         } finally {
             for (int i = 0; i < parameters.length; i++) glPixelStorei(parameters[i], previous[i]);
             glBindBuffer(GL_PIXEL_PACK_BUFFER, packBuffer);
         }
-        this.rasterizer.setSamplerTexture(texture, width, height);
+    }
+
+    private void dumpNativeSpriteAudit(net.minecraft.client.renderer.texture.TextureAtlas atlas, int[] pixels, int width, int mip) {
+        String directory = System.getProperty("voxy.fragment.materialAuditDirectory");
+        if (directory == null) return;
+        try {
+            var path = java.nio.file.Path.of(directory);
+            java.nio.file.Files.createDirectories(path);
+            for (String name : new String[]{"birch_leaves", "oak_leaves", "dark_oak_leaves", "spruce_leaves"}) {
+                var sprite = atlas.getSprite(ResourceLocation.fromNamespaceAndPath("minecraft", "block/" + name));
+                int size = Math.max(1, sprite.contents().width() >> mip);
+                var image = new java.awt.image.BufferedImage(size, size, java.awt.image.BufferedImage.TYPE_INT_ARGB);
+                for (int y = 0; y < size; y++) for (int x = 0; x < size; x++) {
+                    int abgr = pixels[(sprite.getY() >> mip) * width + (sprite.getX() >> mip) + y * width + x];
+                    image.setRGB(x, y, (abgr & 0xff00ff00) | ((abgr & 255) << 16) | ((abgr >>> 16) & 255));
+                }
+                javax.imageio.ImageIO.write(image, "png", path.resolve("native-" + name + "-mip" + mip + ".png").toFile());
+            }
+        } catch (java.io.IOException error) {
+            org.slf4j.LoggerFactory.getLogger("FragmentLODMaterialAudit").warn("Cannot save native atlas reference", error);
+        }
     }
 
     public static int getMetaFromLayer(RenderType layer) {
@@ -91,6 +130,20 @@ public class SoftwareModelTextureBakery {
         return meta;
     }
 
+    private final java.util.Set<net.minecraft.world.level.block.Block> auditedLeaves = new java.util.HashSet<>();
+
+    static boolean isLeafCubeFace(net.minecraft.client.renderer.block.model.BakedQuad quad) {
+        int[] data = quad.getVertices();
+        int stride = data.length / 4;
+        int axis = quad.getDirection().getAxis().ordinal(); // X,Y,Z
+        float plane = quad.getDirection().getAxisDirection() == Direction.AxisDirection.POSITIVE ? 1.0f : 0.0f;
+        for (int v = 0; v < 4; v++) for (int c = 0; c < 3; c++) {
+            float p = Float.intBitsToFloat(data[v * stride + c]);
+            if (p < -0.0001f || p > 1.0001f || c == axis && Math.abs(p - plane) > 0.0001f) return false;
+        }
+        return !quad.getSprite().contents().name().getPath().contains("_bushy");
+    }
+
     private void bakeBlockModel(BlockState state, RenderType layer) {
         if (state.getRenderShape() == RenderShape.INVISIBLE) {
             return;//Dont bake if invisible
@@ -102,15 +155,31 @@ public class SoftwareModelTextureBakery {
 
         int meta = getMetaFromLayer(layer);
 
+        var quads = new java.util.ArrayList<net.minecraft.client.renderer.block.model.BakedQuad>();
         for (Direction direction : new Direction[]{Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST, null}) {
-            var quads = model.getQuads(state, direction, new SingleThreadedRandomSource(42L), ModelData.EMPTY, layer);
-            for (var quad : quads) {
-                // Bushy cards belong to nearby geometry, not the six LOD face
-                // textures. Keep the cube's original leaf sprite and tint.
-                if (state.is(net.minecraft.tags.BlockTags.LEAVES)
-                        && quad.getSprite().contents().name().getPath().contains("_bushy")) continue;
-                this.vc.quad(quad, meta|(quad.isTinted()?4:0));
-            }
+            quads.addAll(model.getQuads(state, direction, new SingleThreadedRandomSource(42L), ModelData.EMPTY, layer));
+        }
+        boolean leaves = state.is(net.minecraft.tags.BlockTags.LEAVES);
+        int baseFaces = 0;
+        if (leaves) for (var quad : quads) {
+            if (isLeafCubeFace(quad)) baseFaces |= 1 << quad.getDirection().get3DDataValue();
+        }
+        // A known full leaf cube can be reduced by geometry, even when a pack
+        // reuses its base sprite for decorative cards. Unknown custom leaf
+        // models retain their geometry rather than disappearing altogether.
+        boolean compactCube = leaves && baseFaces == 63;
+        this.compactLeafCube = compactCube;
+        int kept = 0, skipped = 0;
+        for (var quad : quads) {
+            if (leaves && (quad.getSprite().contents().name().getPath().contains("_bushy")
+                    || compactCube && !isLeafCubeFace(quad))) { skipped++; continue; }
+            this.vc.quad(quad, meta|(quad.isTinted()?4:0));
+            kept++;
+        }
+        if (Boolean.getBoolean("voxy.fragment.materialAudit") && leaves && auditedLeaves.add(state.getBlock())) {
+            org.slf4j.LoggerFactory.getLogger("FragmentLODMaterialAudit").info("LOD leaf geometry "
+                    + net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(state.getBlock())
+                    + " compactCube=" + compactCube + " kept=" + kept + " skipped=" + skipped);
         }
     }
 
@@ -198,12 +267,20 @@ public class SoftwareModelTextureBakery {
         this.vc.free();
     }
 
-    private static final long SINGLE_FACE_OUTPUT_SIZE = (ModelFactory.MODEL_TEXTURE_SIZE * ModelFactory.MODEL_TEXTURE_SIZE)*8;
     //The outputBuffer layout is different from the non software rasterized ModelTextureBakery
     // in this version the values are simply appended (0,0),(1,0),(2,0),(0,1),(1,1),(2,1)
 
     public int renderToOutput(BlockState state, long outputBuffer) {
-        MemoryUtil.memSet(outputBuffer,0,16*16*8*6);
+        return renderToOutput(state, outputBuffer, 0, false);
+    }
+
+    private int renderToOutput(BlockState state, long outputBuffer, int mip, boolean preserveTransparent) {
+        this.compactLeafCube = false;
+        this.rasterizer = mipRasterizers[mip];
+        this.rasterizer.setPreserveTransparentTexels(preserveTransparent);
+        int size = ModelFactory.MODEL_TEXTURE_SIZE >> mip;
+        long faceBytes = (long) size * size * 8;
+        MemoryUtil.memSet(outputBuffer, 0, faceBytes * 6);
 
 
         boolean isBlock = true;
@@ -241,7 +318,7 @@ public class SoftwareModelTextureBakery {
                     this.rasterizer.clear();
 
                     this.rasterizer.raster(VIEWS[i], this.vc);
-                    UnsafeUtil.memcpy(this.rasterizer.getRawFramebuffer(), outputBuffer+(SINGLE_FACE_OUTPUT_SIZE*i));
+                    UnsafeUtil.memcpy(this.rasterizer.getRawFramebuffer(), outputBuffer+(faceBytes*i));
                 }
             }
         } else {//Is fluid, slow path :(
@@ -259,7 +336,7 @@ public class SoftwareModelTextureBakery {
 
                 //The projection matrix
                 this.rasterizer.raster(VIEWS[i], this.vc);
-                UnsafeUtil.memcpy(this.rasterizer.getRawFramebuffer(), outputBuffer+(SINGLE_FACE_OUTPUT_SIZE*i));
+                UnsafeUtil.memcpy(this.rasterizer.getRawFramebuffer(), outputBuffer+(faceBytes*i));
             }
         }
 
@@ -269,6 +346,50 @@ public class SoftwareModelTextureBakery {
 
 
 
+
+    /** Bake the same atlas mip pyramid as native chunks; metadata keeps the normal cutout bake. */
+    public void putNativeMipTextures(BlockState state, long scratch, me.cortex.voxy.common.util.MemoryBuffer into) {
+        long target = into.address;
+        for (int mip = 0; mip < mipRasterizers.length; mip++) {
+            int size = ModelFactory.MODEL_TEXTURE_SIZE >> mip;
+            renderToOutput(state, scratch, mip, true);
+            for (int face = 0; face < 6; face++) {
+                for (int y = 0; y < size; y++) for (int x = 0; x < size; x++) {
+                    int colour = MemoryUtil.memGetInt(scratch + ((long)face * size * size + y * size + x) * 8);
+                    int offset = (((face & 1) * size + y) * size * 3 + (face >> 1) * size + x) * 4;
+                    MemoryUtil.memPutInt(target + offset, colour);
+                }
+            }
+            target += (long) size * size * 6 * 4;
+        }
+        this.rasterizer = mipRasterizers[0];
+        this.rasterizer.setPreserveTransparentTexels(false);
+        dumpMipAudit(state, into, "");
+    }
+
+    private final java.util.Set<String> auditedMipLeaves = new java.util.HashSet<>();
+    public void dumpMipAudit(BlockState state, me.cortex.voxy.common.util.MemoryBuffer data, String prefix) {
+        String directory = System.getProperty("voxy.fragment.materialAuditDirectory");
+        if (directory == null || !auditedMipLeaves.add(prefix + net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(state.getBlock()))) return;
+        try {
+            var path = java.nio.file.Path.of(directory);
+            java.nio.file.Files.createDirectories(path);
+            String name = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(state.getBlock()).getPath();
+            long ptr = data.address;
+            for (int mip = 0; mip < mipRasterizers.length; mip++) {
+                int size = ModelFactory.MODEL_TEXTURE_SIZE >> mip;
+                var image = new java.awt.image.BufferedImage(size * 3, size * 2, java.awt.image.BufferedImage.TYPE_INT_ARGB);
+                for (int y = 0; y < size * 2; y++) for (int x = 0; x < size * 3; x++) {
+                    int abgr = MemoryUtil.memGetInt(ptr + (y * size * 3L + x) * 4);
+                    image.setRGB(x, y, (abgr & 0xff00ff00) | ((abgr & 255) << 16) | ((abgr >>> 16) & 255));
+                }
+                javax.imageio.ImageIO.write(image, "png", path.resolve(prefix + name + "-mip" + mip + ".png").toFile());
+                ptr += (long) size * size * 6 * 4;
+            }
+        } catch (java.io.IOException error) {
+            org.slf4j.LoggerFactory.getLogger("FragmentLODMaterialAudit").warn("Cannot save mip audit", error);
+        }
+    }
 
     static {
         //the face/direction is the face (e.g. down is the down face)

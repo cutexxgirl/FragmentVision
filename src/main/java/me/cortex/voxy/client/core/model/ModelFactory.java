@@ -67,9 +67,9 @@ public class ModelFactory {
 
     //TODO: replace the fluid BlockState with a client model id integer of the fluidState, requires looking up
     // the fluid state in the mipper
-    private record ModelEntry(ColourDepthTextureData down, ColourDepthTextureData up, ColourDepthTextureData north, ColourDepthTextureData south, ColourDepthTextureData west, ColourDepthTextureData east, int fluidBlockStateId, int tintingColour) {
-        public ModelEntry(ColourDepthTextureData[] textures, int fluidBlockStateId, int tintingColour) {
-            this(textures[0], textures[1], textures[2], textures[3], textures[4], textures[5], fluidBlockStateId, tintingColour);
+    private record ModelEntry(ColourDepthTextureData down, ColourDepthTextureData up, ColourDepthTextureData north, ColourDepthTextureData south, ColourDepthTextureData west, ColourDepthTextureData east, int fluidBlockStateId, int tintingColour, int material, int colourDomain) {
+        public ModelEntry(ColourDepthTextureData[] textures, int fluidBlockStateId, int tintingColour, int material, int colourDomain) {
+            this(textures[0], textures[1], textures[2], textures[3], textures[4], textures[5], fluidBlockStateId, tintingColour, material, colourDomain);
         }
     }
 
@@ -126,6 +126,7 @@ public class ModelFactory {
     private final Mapper mapper;
     private final ModelStore storage;
 
+    private final java.util.Set<Block> auditedMaterials = new java.util.HashSet<>();
     private final ConcurrentLinkedDeque<BlockBake> bakeQueue = new ConcurrentLinkedDeque<>();
 
     private final ConcurrentLinkedDeque<ResultUploader> uploadResults = new ConcurrentLinkedDeque<>();
@@ -390,9 +391,27 @@ public class ModelFactory {
             isBiomeColourDependent = isBiomeDependentColour(colourProvider, blockState);
         }
 
+        int fragmentMaterial = fragmentMaterial(blockState, isFluid);
+        if (Boolean.getBoolean("voxy.fragment.materialAudit") && colourProvider != null
+                && auditedMaterials.add(blockState.getBlock())) {
+            StringBuilder audit = new StringBuilder("LOD material ").append(BuiltInRegistries.BLOCK.getKey(blockState.getBlock()))
+                    .append(" class=").append(fragmentMaterial).append(" biomeDependent=").append(isBiomeColourDependent);
+            for (var biome : this.biomes) {
+                audit.append(" ").append(biome == null ? "null" : Minecraft.getInstance().level.registryAccess().registryOrThrow(Registries.BIOME).getKey(biome))
+                        .append("=").append(Integer.toHexString(captureColourConstant(colourProvider, blockState, biome == null ? DEFAULT_BIOME : biome)));
+            }
+            int count = 0; double[] rgb = new double[3];
+            for (int c : textureData[1].colour()) if ((c >>> 24) != 0) {
+                for (int k = 0; k < 3; k++) rgb[k] += (c >>> (k * 8)) & 255;
+                count++;
+            }
+            for (int k = 0; k < 3; k++) rgb[k] /= Math.max(1, count);
+            org.slf4j.LoggerFactory.getLogger("FragmentLODMaterialAudit").info(audit + " topAlbedo=" + java.util.Arrays.toString(rgb));
+        }
         ModelEntry entry;
         {//Deduplicate same entries
-            entry = new ModelEntry(textureData, clientFluidStateId, isBiomeColourDependent||colourProvider==null?-1:captureColourConstant(colourProvider, blockState, DEFAULT_BIOME)|0xFF000000);
+            entry = new ModelEntry(textureData, clientFluidStateId, isBiomeColourDependent||colourProvider==null?-1:captureColourConstant(colourProvider, blockState, DEFAULT_BIOME)|0xFF000000,
+                    fragmentMaterial, isBiomeColourDependent ? BuiltInRegistries.BLOCK.getId(blockState.getBlock()) : -1);
             int possibleDuplicate = this.modelTexture2id.getInt(entry);
             if (possibleDuplicate != -1) {//Duplicate found
                 this.idMappings[blockId] = possibleDuplicate;
@@ -602,12 +621,6 @@ public class ModelFactory {
         //TODO: THIS
         modelFlags |= isShaded?8:0;//model has AO and shade
         modelFlags |= isFluid?16:0;//model represents a fluid surface
-        int fragmentMaterial = isFluid && blockState.getFluidState().is(net.minecraft.tags.FluidTags.WATER) ? 5
-                : blockState.is(net.minecraft.tags.BlockTags.LEAVES) ? 2
-                : (blockState.is(net.minecraft.world.level.block.Blocks.GRASS_BLOCK)
-                || blockState.is(net.minecraft.world.level.block.Blocks.DIRT)
-                || blockState.is(net.minecraft.world.level.block.Blocks.MOSS_BLOCK)) ? 3
-                : blockState.is(net.minecraft.tags.BlockTags.REPLACEABLE_BY_TREES) && !isFluid ? 1 : 0;
         modelFlags |= fragmentMaterial << 5; // runtime model metadata, not persistent LOD format
 
         //modelFlags |= blockRenderLayer == RenderLayer.getSolid()?0:1;// should discard alpha
@@ -628,7 +641,7 @@ public class ModelFactory {
                 uploadResult.biomeUploadIndex = biomeIndex;
                 long clrUploadPtr = (uploadResult.biomeUpload = new MemoryBuffer(4L * this.biomes.size())).address;
                 for (var biome : this.biomes) {
-                    MemoryUtil.memPutInt(clrUploadPtr, captureColourConstant(colourProvider, blockState, biome) | 0xFF000000); clrUploadPtr += 4;
+                    MemoryUtil.memPutInt(clrUploadPtr, captureColourConstant(colourProvider, blockState, biome == null ? DEFAULT_BIOME : biome) | 0xFF000000); clrUploadPtr += 4;
                 }
             }
         }
@@ -650,7 +663,15 @@ public class ModelFactory {
         //TODO callback to inject extra data into the model data
 
 
-        MipGen.putTextures(darkenedTinting, textureData, uploadResult.texture);
+        if (fragmentMaterial == 2 && this.bakery2.supportsNativeLeafMips()) {
+            if (System.getProperty("voxy.fragment.materialAuditDirectory") != null) {
+                MipGen.putTextures(darkenedTinting, textureData, uploadResult.texture);
+                this.bakery2.dumpMipAudit(blockState, uploadResult.texture, "legacy-");
+            }
+            this.bakery2.putNativeMipTextures(blockState, this.bakeScratchBuffer, uploadResult.texture);
+        } else {
+            MipGen.putTextures(darkenedTinting, textureData, uploadResult.texture);
+        }
 
         //glGenerateTextureMipmap(this.textures.id);
 
@@ -665,6 +686,15 @@ public class ModelFactory {
         this.blockStatesInFlightLock.unlock();
 
         return uploadResult;
+    }
+
+    private static int fragmentMaterial(BlockState blockState, boolean isFluid) {
+        return isFluid && blockState.getFluidState().is(net.minecraft.tags.FluidTags.WATER) ? 5
+                : blockState.is(net.minecraft.tags.BlockTags.LEAVES) ? 2
+                : (blockState.is(net.minecraft.world.level.block.Blocks.GRASS_BLOCK)
+                || blockState.is(net.minecraft.world.level.block.Blocks.DIRT)
+                || blockState.is(net.minecraft.world.level.block.Blocks.MOSS_BLOCK)) ? 3
+                : blockState.is(net.minecraft.tags.BlockTags.REPLACEABLE_BY_TREES) && !isFluid ? 1 : 0;
     }
 
     private static int getBlockLightEmission(BlockState state) {
@@ -767,10 +797,10 @@ public class ModelFactory {
             MemoryUtil.memPutLong(modelUpPtr, Integer.toUnsignedLong(entry.left())|(Integer.toUnsignedLong(biomeIndex)<<32));modelUpPtr+=8;
             long clrUploadPtr = result.biomeColourBuffer.address + biomeIndex * 4L;
             for (var biomeE : this.biomes) {
-                if (biomeE == null) {
-                    continue;//If null, ignore
-                }
-                MemoryUtil.memPutInt(clrUploadPtr, captureColourConstant(colourProvider, entry.right(), biomeE)|0xFF000000); clrUploadPtr += 4;
+                // Every biome ID owns a slot, even when arrivals are out of order.
+                MemoryUtil.memPutInt(clrUploadPtr, captureColourConstant(colourProvider, entry.right(),
+                        biomeE == null ? DEFAULT_BIOME : biomeE)|0xFF000000);
+                clrUploadPtr += 4;
             }
         }
 
