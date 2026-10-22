@@ -28,6 +28,11 @@ float projDepth(vec3 pos) {
     return view.z/view.w;
 }
 
+// FRAGMENT_ATMOSPHERE_SOURCE
+#ifdef FRAGMENT_ATMOSPHERE
+uniform vec2 fv_LodEdge;
+#endif
+
 void main() {
     float depth = texture(depthTex, UV.xy).r;
     if (depth == 0.0f || depth == 1.0f) {
@@ -49,6 +54,13 @@ void main() {
     if (colour.a == 0.0) {
         discard;
     }
+    #ifdef FRAGMENT_ATMOSPHERE
+    if (fr_Aerial.w > 0.5) {
+        colour.rgb = fr_aerialFog(colour.rgb, point);
+        colour.rgb = fr_aerialLodEdge(colour.rgb, point, fv_LodEdge.x, fv_LodEdge.y);
+    } else
+    #endif
+    {
     #ifdef USE_ENV_FOG
     if (fogColour.a>0.0){
         float environmentalDistance = endParams.w > 0.5 ? max(length(point.xz), abs(point.y)) : length(point.xyz);
@@ -59,6 +71,7 @@ void main() {
         colour.rgb = mix(colour.rgb, fogColour.rgb, fogLerp*fogColour.a);
     }
     #endif
+    }
     #else
     colour = vec4(0);
     #endif

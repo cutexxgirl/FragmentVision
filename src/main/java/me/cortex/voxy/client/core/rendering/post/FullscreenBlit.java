@@ -39,6 +39,8 @@ public class FullscreenBlit {
                 .compile();
     }
 
+    public int program() { return this.shader.id(); }
+
     public void bind() {
         this.shader.bind();
     }

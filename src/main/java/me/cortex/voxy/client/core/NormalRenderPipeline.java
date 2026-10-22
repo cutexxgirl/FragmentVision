@@ -1,6 +1,7 @@
 package me.cortex.voxy.client.core;
 
 import me.cortex.voxy.client.config.VoxyConfig;
+import me.cortex.voxy.client.compat.FragmentAtmosphereCompat;
 import me.cortex.voxy.client.core.gl.GlFramebuffer;
 import me.cortex.voxy.client.core.gl.GlTexture;
 import me.cortex.voxy.client.core.gl.shader.Shader;
@@ -44,7 +45,8 @@ public class NormalRenderPipeline extends AbstractRenderPipeline {
         super(properties, nodeManager, nodeCleaner, traversal, frexSupplier, false);
         this.useEnvFog = VoxyConfig.CONFIG.useEnvironmentalFog;
         this.finalBlit = new FullscreenBlit(properties, "voxy:post/blit_texture_depth_cutout.frag",
-                a->a.defineIf("USE_ENV_FOG", this.useEnvFog).define("EMIT_COLOUR"));
+                a->a.defineIf("USE_ENV_FOG", this.useEnvFog).define("EMIT_COLOUR")
+                        .replace("// FRAGMENT_ATMOSPHERE_SOURCE", FragmentAtmosphereCompat.shaderSource()));
 
 
         this.ssao = SSAO.createSSAO(properties, VoxyConfig.CONFIG.getSSAOMode());
@@ -119,17 +121,23 @@ public class NormalRenderPipeline extends AbstractRenderPipeline {
 
         glBindTextureUnit(3, this.colourSSAOTex.id);
 
-        //Do alpha blending
-        //Unbelievably jank hack, only blit out to the framebuffer if we are rendering fog
-        if (!fogCoversAllRendering) {
-            glEnable(GL_BLEND);
-            glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-            AbstractRenderPipeline.transformBlitDepth(this.finalBlit, this.fb.getDepthTex().id, sourceFrameBuffer, viewport, new Matrix4f(viewport.vanillaProjection).mul(viewport.modelView));
-            glDisable(GL_BLEND);
-        } else {
-            glDisable(GL_STENCIL_TEST);
-            glDisable(GL_DEPTH_TEST);
-        }
+        int program = this.finalBlit.program();
+        glUniform2f(glGetUniformLocation(program, "fv_LodEdge"),
+                viewport.fogParameters.renderEnd() * 0.80f, viewport.fogParameters.renderEnd());
+        FragmentAtmosphereCompat.bind(program);
+        try {
+            //Do alpha blending
+            //Unbelievably jank hack, only blit out to the framebuffer if we are rendering fog
+            if (!fogCoversAllRendering) {
+                glEnable(GL_BLEND);
+                glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+                AbstractRenderPipeline.transformBlitDepth(this.finalBlit, this.fb.getDepthTex().id, sourceFrameBuffer, viewport, new Matrix4f(viewport.vanillaProjection).mul(viewport.modelView));
+                glDisable(GL_BLEND);
+            } else {
+                glDisable(GL_STENCIL_TEST);
+                glDisable(GL_DEPTH_TEST);
+            }
+        } finally { FragmentAtmosphereCompat.release(); }
         //glBlitNamedFramebuffer(this.fbSSAO.id, sourceFrameBuffer, 0,0, viewport.width, viewport.height, 0,0, viewport.width, viewport.height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     }
 
