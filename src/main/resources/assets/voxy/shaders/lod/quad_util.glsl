@@ -128,9 +128,8 @@ uvec3 makeRemainingAttributes(const in BlockModel model, const in Quad quad, uin
         addin = encodedData;
     }
 
-#ifdef FR_LOD_MATERIAL
-    if (fr_LightEnabled == 0)
-#endif
+    // Native Sodium retains baked face shade in its vertex colour even with
+    // Fragment lighting. Keep the same albedo factor at the LOD handover.
     tinting.rgb *= computeDirectionalFaceTint(isShaded, face);
 
     attributes.x = packVec4(tinting);

@@ -147,7 +147,13 @@ void main() {
         vec2 dy = dFdy(uvSmol);//vec2(lDy, dDy);
 #ifdef FR_LOD_MATERIAL
         float leafBias = fr_LodHigh != 0 && fr_LodMaterial > 1.5 && fr_LodMaterial < 2.5 ? 1.68179283 : 1.0;
-        dx *= leafBias; dy *= leafBias; // Same +0.75 leaf mip bias as native High.
+#ifdef FR_LEAF_DETAIL_POLICY
+        if (fr_LodHigh != 0 && fr_LeafDetail != 0 && ((interData.w >> 3u) & 7u) == 0u && fr_LodMaterial > 1.5 && fr_LodMaterial < 2.5) {
+            vec4 gradients = fr_leafGradients(uvSmol, vec2(textureSize(blockModelAtlas, 0)), fr_RelativePosition, fr_LeafMipBias);
+            dx = gradients.xy; dy = gradients.zw;
+        } else
+#endif
+        { dx *= leafBias; dy *= leafBias; }
 #endif
 #ifdef FR_LOD_MATERIAL
         if (fr_LightEnabled != 0 && fr_LodHigh != 0 && fr_LodMaterial > 1.5 && fr_LodMaterial < 2.5) {
@@ -206,7 +212,14 @@ void main() {
     }
     #ifndef TRANSLUCENT
     colour.a = 1.0f;
-    if (useDiscard() && (cutoutAlpha <= 0.1f)) {
+    float cutoff = 0.1;
+#ifdef FR_LOD_MATERIAL
+#ifdef FR_LEAF_DETAIL_POLICY
+    if (fr_LodHigh != 0 && fr_LeafDetail != 0 && ((interData.w >> 3u) & 7u) == 0u && fr_LodMaterial > 1.5 && fr_LodMaterial < 2.5)
+        cutoff = fr_leafCutoff(fr_RelativePosition);
+#endif
+#endif
+    if (useDiscard() && (cutoutAlpha <= cutoff)) {
     //if (useDiscard() && (colour.a <= 0.1f)) {
     #else
     if (cutoutAlpha == 0.0f) {
