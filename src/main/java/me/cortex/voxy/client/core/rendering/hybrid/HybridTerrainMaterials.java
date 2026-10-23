@@ -12,7 +12,7 @@ public final class HybridTerrainMaterials {
             Blocks.COARSE_DIRT, Blocks.GRASS_BLOCK, Blocks.PODZOL, Blocks.MYCELIUM,
             Blocks.MOSS_BLOCK, Blocks.SAND, Blocks.RED_SAND, Blocks.GRAVEL,
             Blocks.SANDSTONE, Blocks.RED_SANDSTONE, Blocks.SNOW_BLOCK, Blocks.SNOW,
-            Blocks.PACKED_ICE, Blocks.TERRACOTTA);
+            Blocks.POWDER_SNOW, Blocks.PACKED_ICE, Blocks.TERRACOTTA);
     public static boolean natural(BlockState state) {
         return NATURAL.contains(state.getBlock()) && state.getFluidState().isEmpty();
     }

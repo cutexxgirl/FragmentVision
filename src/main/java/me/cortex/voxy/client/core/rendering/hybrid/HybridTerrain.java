@@ -13,6 +13,7 @@ import me.cortex.voxy.common.world.WorldSection;
 import me.cortex.voxy.common.world.other.Mapper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Direction;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
@@ -32,7 +33,7 @@ import static org.lwjgl.opengl.GL45C.*;
 
 /** Opt-in, bounded exterior-terrain experiment. Off until explicitly built and enabled. */
 public final class HybridTerrain implements AutoCloseable {
-    private static final int SIZE=768, STEP=4, TEXTURE_SIZE=32;
+    private static final int SIZE=1088, STEP=2, TEXTURE_SIZE=32;
     private final WorldEngine world;
     private final RenderProperties properties;
     private final ExecutorService worker=Executors.newSingleThreadExecutor(r->{var t=new Thread(r,"Vision hybrid surface WIP");t.setDaemon(true);return t;});
@@ -66,7 +67,7 @@ public final class HybridTerrain implements AutoCloseable {
                 world.acquireRef();
                 try{return sample(next);}finally{world.releaseRef();}
             },worker);
-            status="building cached terrain in background (768 blocks, 4-block grid)";
+            status="building cached terrain in background (1088 blocks, 2-block grid)";
             return status;
         } catch(Exception e){Logger.error("Hybrid surface preparation failed; keeping voxel terrain",e);return status="build failed: "+e.getMessage();}
     }
@@ -145,7 +146,7 @@ public final class HybridTerrain implements AutoCloseable {
                 int layer=layers.computeIfAbsent(s.getBlock().defaultBlockState(),unused->layers.size());
                 float offset=s.is(Blocks.SNOW)?s.getValue(SnowLayerBlock.LAYERS)/8f:1;
                 states[entry.id]=new State(layer,false,offset);
-            }else states[entry.id]=new State(-1,s.isAir()||s.getBlock() instanceof BushBlock,0);
+            }else states[entry.id]=new State(-1,s.isAir()||s.getBlock() instanceof BushBlock||s.is(BlockTags.LEAVES)||s.is(BlockTags.LOGS),0);
         }
         byte[] pixels=new byte[Math.max(1,layers.size())*TEXTURE_SIZE*TEXTURE_SIZE*4];
         float[] material=new float[layers.size()];int[][] tint=new int[layers.size()][biomes.length];
@@ -162,20 +163,21 @@ public final class HybridTerrain implements AutoCloseable {
                 for(int y=0;y<TEXTURE_SIZE;y++)for(int x=0;x<TEXTURE_SIZE;x++){
                     int rgba=image.getPixelRGBA(x*width/TEXTURE_SIZE,y*height/TEXTURE_SIZE);
                     int p=((layer*TEXTURE_SIZE+y)*TEXTURE_SIZE+x)*4;
-                    pixels[p]=(byte)rgba;pixels[p+1]=(byte)(rgba>>8);pixels[p+2]=(byte)(rgba>>16);pixels[p+3]=(byte)255;
+                    pixels[p]=(byte)rgba;pixels[p+1]=(byte)(rgba>>8);pixels[p+2]=(byte)(rgba>>16);pixels[p+3]=(byte)(tinted?255:0);
                 }
             }
             material[layer]=state.is(Blocks.GRASS_BLOCK)||state.is(Blocks.DIRT)||state.is(Blocks.MOSS_BLOCK)?3:0;
             for(var biome:biomes){
                 var b=registry.get(ResourceLocation.parse(biome.biome));
-                tint[layer][biome.id]=tinted&&b!=null?ModelFactory.captureSurfaceTint(state,b):0xffffff;
+                tint[layer][biome.id]=b!=null?ModelFactory.captureSurfaceTint(Blocks.GRASS_BLOCK.defaultBlockState(),b):0xffffff;
             }
         }
         return new Catalog(states,pixels,material,tint);
     }
     private Result sample(Request r) {
         long start=System.nanoTime();int n=SIZE/STEP+1,total=n*n,sampled=0;
-        float[] heights=new float[total];int[] layers=new int[total],tints=new int[total];boolean[] valid=new boolean[total],done=new boolean[total];
+        byte[] volume=new byte[total*(r.maxY-r.minY)];
+        float[] heights=new float[total];int[] layers=new int[total],baseLayers=new int[total],tints=new int[total];int[] topY=new int[total],light=new int[total],aboveLight=new int[total];Arrays.fill(aboveLight,15);boolean[] substrate=new boolean[total];boolean[] valid=new boolean[total],done=new boolean[total];
         for(int tz=r.z>>5;tz<=(r.z+SIZE)>>5;tz++)for(int tx=r.x>>5;tx<=(r.x+SIZE)>>5;tx++){
             if(Thread.currentThread().isInterrupted())throw new CancellationException();
             for(int ty=(r.maxY-1)>>5;ty>=r.minY>>5;ty--){
@@ -185,18 +187,34 @@ public final class HybridTerrain implements AutoCloseable {
                 for(int z=0;z<32;z+=STEP)for(int x=0;x<32;x+=STEP){
                     int gx=((tx<<5)+x-r.x)/STEP,gz=((tz<<5)+z-r.z)/STEP;
                     if(gx<0||gz<0||gx>=n||gz>=n)continue;
-                    int p=gz*n+gx;if(done[p])continue;
+                    int p=gz*n+gx;
+                    // Material columns retained only during CPU meshing; no 3D texture or runtime raymarch.
+                    for(int y=0;y<32;y++){
+                        int wy=(ty<<5)+y;if(wy<r.minY||wy>=r.maxY)continue;
+                        int id=Mapper.getBlockId(data[WorldSection.getIndex(x,y,z)]);
+                        if(id>0&&id<r.catalog.states.length){int layer=r.catalog.states[id].layer;
+                            if(layer>=0)volume[(wy-r.minY)*total+p]=(byte)(layer+1);
+                        }
+                    }
+                    if(done[p]&&(!valid[p]||substrate[p]))continue;
                     for(int y=31;y>=0;y--){
                         long voxel=data[WorldSection.getIndex(x,y,z)];int block=Mapper.getBlockId(voxel);
-                        if(block==0)continue;
+                        if(block==0){aboveLight[p]=Mapper.getLightId(voxel);continue;}
                         if(block>=r.catalog.states.length){done[p]=true;break;}
-                        State state=r.catalog.states[block];if(state.skip)continue;
+                        State state=r.catalog.states[block];if(state.skip){aboveLight[p]=Mapper.getLightId(voxel);continue;}
+                        if(done[p]){
+                            if(state.layer<0){substrate[p]=true;break;}
+                            // Preserve the material below the covering. Never paint snow down rock walls.
+                            if(((ty<<5)+y)<=topY[p]-3){baseLayers[p]=state.layer;substrate[p]=true;break;}
+                            continue;
+                        }
                         done[p]=true;
                         if(state.layer>=0){
                             heights[p]=(ty<<5)+y+state.topOffset;layers[p]=state.layer;
                             int biome=Mapper.getBiomeId(voxel);
                             int[] tint=r.catalog.tint[state.layer];tints[p]=biome<tint.length?tint[biome]:0xffffff;
-                            valid[p]=true;sampled++;
+                            light[p]=aboveLight[p];valid[p]=true;sampled++;topY[p]=(ty<<5)+y;baseLayers[p]=state.layer;
+                            continue;
                         }
                         break;
                     }
@@ -206,9 +224,12 @@ public final class HybridTerrain implements AutoCloseable {
         // Carve out a native-chunk safety region before meshing so its boundary also gets skirts.
         for(int z=0;z<n;z++)for(int x=0;x<n;x++)
             if(Math.max(Math.abs(r.x+x*STEP-r.eyeX),Math.abs(r.z+z*STEP-r.eyeZ))<=r.nativeRadius+48)valid[z*n+x]=false;
-        var mesh=HybridSurfaceMesh.build(new HybridSurfaceMesh.Grid(n,STEP,heights,layers,tints,valid));
-        float[] vertices=mesh.vertices();
-        for(int p=0;p<vertices.length;p+=HybridSurfaceMesh.FLOATS_PER_VERTEX)vertices[p+10]=r.catalog.material[(int)vertices[p+9]];
+        HybridSurfaceMesh.MaterialLookup lookup=(x,y,z)->{
+            int gx=Math.round(x/STEP),gz=Math.round(z/STEP),gy=(int)Math.floor(y)-r.minY;
+            if(gx<0||gz<0||gx>=n||gz>=n||gy<0||gy>=r.maxY-r.minY)return -1;
+            return (volume[gy*total+gz*n+gx]&255)-1;
+        };
+        var mesh=HybridSurfaceMesh.build(new HybridSurfaceMesh.Grid(n,STEP,heights,layers,baseLayers,tints,light,valid,lookup));
         return new Result(r,mesh,(System.nanoTime()-start)/1_000_000,sampled,total-sampled);
     }
     private void upload(Result result) {
@@ -219,8 +240,8 @@ public final class HybridTerrain implements AutoCloseable {
         if(vao==0){
             vao=glCreateVertexArrays();vbo=glCreateBuffers();
             glVertexArrayVertexBuffer(vao,0,vbo,0,HybridSurfaceMesh.FLOATS_PER_VERTEX*4);
-            int[] size={3,3,3,2},offset={0,12,24,36};
-            for(int i=0;i<4;i++){glEnableVertexArrayAttrib(vao,i);glVertexArrayAttribFormat(vao,i,size[i],GL_FLOAT,false,offset[i]);glVertexArrayAttribBinding(vao,i,0);}
+            int[] size={3,3,3,3,3,3,3,2},offset={0,12,24,36,48,60,72,84};
+            for(int i=0;i<size.length;i++){glEnableVertexArrayAttrib(vao,i);glVertexArrayAttribFormat(vao,i,size[i],GL_FLOAT,false,offset[i]);glVertexArrayAttribBinding(vao,i,0);}
         }
         glNamedBufferData(vbo,result.mesh.vertices(),GL_STATIC_DRAW);vertices=result.mesh.vertices().length/HybridSurfaceMesh.FLOATS_PER_VERTEX;
         if(coverage!=0)glDeleteTextures(coverage);

@@ -1,3 +1,5 @@
+> Историческое описание первой итерации. Текущие изменения: [revision-2.ru.md](revision-2.ru.md).
+
 # Hybrid terrain WIP: открытый рельеф поверх кэша Vision
 
 Экспериментальная ветка wip/hybrid-terrain основана на render-atmosphere
