@@ -68,10 +68,28 @@ public class VoxyCommands {
                 );
 
         return Commands.literal("voxy")//.requires((ctx)-> VoxyCommon.getInstance() != null)
+                .then(Commands.literal("hybrid")
+                        .executes(c -> hybrid(c, "status"))
+                        .then(Commands.literal("build").executes(c -> hybrid(c, "build")))
+                        .then(Commands.literal("on").executes(c -> hybrid(c, "on")))
+                        .then(Commands.literal("off").executes(c -> hybrid(c, "off"))))
                 .then(Commands.literal("reload")
                         .executes(VoxyCommands::reloadInstance))
                 .then(imports)
                 .then(debug);
+    }
+
+    private static int hybrid(CommandContext<CommandSourceStack> ctx, String action) {
+        var renderer = IGetVoxyRenderSystem.getNullable();
+        var surface = renderer == null ? null : renderer.getHybridTerrain();
+        String message = surface == null ? "Hybrid WIP unavailable in this renderer" : switch(action) {
+            case "build" -> surface.build();
+            case "on" -> surface.enabled(true);
+            case "off" -> surface.enabled(false);
+            default -> surface.status();
+        };
+        ctx.getSource().sendSuccess(() -> Component.literal(message), false);
+        return 1;
     }
 
     private static int reloadInstance(CommandContext<CommandSourceStack> ctx) {

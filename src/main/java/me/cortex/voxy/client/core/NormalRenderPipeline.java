@@ -32,6 +32,7 @@ import static org.lwjgl.opengl.GL45C.glBindTextureUnit;
 import static org.lwjgl.opengl.GL45C.glTextureParameterf;
 
 public class NormalRenderPipeline extends AbstractRenderPipeline {
+    public me.cortex.voxy.client.core.rendering.hybrid.HybridTerrain hybridTerrain;
     private GlTexture colourTex;
     private GlTexture colourSSAOTex;
     private final GlFramebuffer fbSSAO = new GlFramebuffer();
@@ -81,7 +82,16 @@ public class NormalRenderPipeline extends AbstractRenderPipeline {
     }
 
     @Override
+    public void preSetup(Viewport<?> viewport) {
+        if (hybridTerrain != null) hybridTerrain.prepare();
+    }
+
+    @Override
     protected void postOpaquePreTranslucent(Viewport<?> viewport, int sourceFrameBuffer) {
+        if (hybridTerrain != null) {
+            this.fb.bind();
+            hybridTerrain.render(viewport);
+        }
         GPUTiming.INSTANCE.marker("ao");
         this.ssao.computeSSAO(viewport, this.colourSSAOTex, this.colourTex, this.fb.getDepthTex(), sourceFrameBuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, this.fbSSAO.id);
@@ -153,6 +163,7 @@ public class NormalRenderPipeline extends AbstractRenderPipeline {
 
     @Override
     public void free() {
+        if (hybridTerrain != null) hybridTerrain.close();
         this.finalBlit.delete();
         this.ssao.free();
         this.fbSSAO.free();

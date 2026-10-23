@@ -35,6 +35,10 @@ out vec3 fr_BaseLight, fr_CanopyNormal;
 flat out float fr_LodMaterial;
 #endif
 layout(location = 0) out flat uvec4 interData;
+#ifdef FV_HYBRID_TERRAIN
+out vec3 fv_HybridPosition;
+flat out int fv_HybridNatural;
+#endif
 #ifndef USE_NV_BARRY
 layout(location = 1) out vec2 uv;
 #endif
@@ -64,6 +68,12 @@ void main() {
     setupQuad(quad, quadData[uint(gl_VertexID)>>2], pos, (gl_VertexID&3) == 1);
 
     uint cornerId = gl_VertexID&3;
+#ifdef FV_HYBRID_TERRAIN
+    Quad hybridRaw=quadData[uint(gl_VertexID)>>2];
+    fv_HybridNatural=int((modelData[extractStateId(hybridRaw)].flagsA>>8u)&1u);
+    vec2 hybridCorner=vec2((cornerId>>1)&1u,cornerId&1u)*quad.lodScale;
+    fv_HybridPosition=quad.basePoint+swizzelDataAxis(quad.axis,vec3(quad.quadSizeAddin*hybridCorner,0))-cameraSubPos;
+#endif
 #ifdef FR_LOD_MATERIAL
     Quad raw = quadData[uint(gl_VertexID)>>2];
     uint lighting = extractLightId(raw);

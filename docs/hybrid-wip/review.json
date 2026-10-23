@@ -1,0 +1,80 @@
+{
+  "result": "WIP visual prototype verified in Minecraft",
+  "branch": "wip/hybrid-terrain",
+  "bases": {
+    "Vision": "9a6e51b8",
+    "Render": "1e8eae5"
+  },
+  "scene": {
+    "world": "Sky_Art_Study",
+    "seed": 1234,
+    "camera": [
+      512.5,
+      150,
+      700.5
+    ],
+    "yaw": 0,
+    "pitch": 8,
+    "time": 4500,
+    "native_chunks": 8,
+    "vision_blocks": 512,
+    "fov": 90,
+    "preset": "HIGH",
+    "resolution": [
+      1280,
+      720
+    ],
+    "SMAA": true,
+    "server_ticks_frozen_between_comparison_frames": true,
+    "note": "Native F2 images without editing. Client foliage animation may continue despite server tick freeze."
+  },
+  "frames": {
+    "before.png": "2026-10-23_10.44.17.png, hybrid off",
+    "after.png": "2026-10-23_10.45.17.png, hybrid on"
+  },
+  "patch": {
+    "origin_xz": [
+      128,
+      288
+    ],
+    "size_blocks": 768,
+    "grid_spacing": 4,
+    "grid_points": 193,
+    "skirt_depth": 8,
+    "triangles_including_skirts": 13402,
+    "vertex_buffer_bytes": 1769064,
+    "coverage_bytes": 147456,
+    "raw_natural_samples": 19737,
+    "raw_missing_or_protected_samples": 17512,
+    "cpu_build_milliseconds": 3206,
+    "generation_threads": 1
+  },
+  "validation": {
+    "vision_build": "passed",
+    "cpu_mesher_checks": "passed: plane positions/normals, finite triangles, protected margin, missing data fallback",
+    "gpu_programs": 6,
+    "runtime_shader_errors": false,
+    "baseline_warnings": "existing RP lantern/redstone/stair models and unavailable audio",
+    "normal_shutdown": "verified in earlier iterations"
+  },
+  "performance": {
+    "hardware_FPS": "not measured; llvmpipe",
+    "added_mesh_draws_when_enabled": 1,
+    "original_voxel_quads_still_submitted": true,
+    "note": "Visual architecture pilot, no GPU speedup claimed"
+  },
+  "limitations": [
+    "Exterior heightfield, not full 3D meshing",
+    "Existing voxel trees retained",
+    "Opaque skirts/terrain material seams still visible",
+    "Narrow structures between grid samples and buildings made of natural blocks are not reliably classified",
+    "Camera movement over 8 blocks XZ requires rebuild",
+    "Snapshot updates use fallback, not automatic tile rebuilds",
+    "Occlusion hierarchy is still based on original voxel geometry"
+  ],
+  "lifecycle_note": "Final source also moves engine reference acquisition inside the worker to avoid a canceled queued-task reference leak; final build passed. Rendering and meshing source used for these frames is identical.",
+  "sha256": {
+    "after.png": "95a07cc11f38d9103705f2ff4cb2caa86fc90bfed47fb9b356b398de611d94df",
+    "before.png": "cb9156e7f8492e8368392cd2211ce6c4614fbc76c4a3c5c76738faa171b76457"
+  }
+}

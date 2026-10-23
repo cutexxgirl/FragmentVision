@@ -117,6 +117,11 @@ vec4 computeColour(vec2 texturePos, vec4 colour) {
 
 
 // FRAGMENT_MATERIAL_SOURCE
+#ifdef FV_HYBRID_TERRAIN
+in vec3 fv_HybridPosition;
+flat in int fv_HybridNatural;
+#import <voxy:lod/hybrid/coverage.glsl>
+#endif
 #ifdef FR_LOD_MATERIAL
 flat in float fr_LodMaterial;
 uniform int fr_LodDebug;
@@ -196,6 +201,9 @@ void main() {
     }
 
 
+#if defined(FV_HYBRID_TERRAIN) && !defined(TRANSLUCENT)
+    if(fv_HybridNatural!=0 && fv_hybridWeight(fv_HybridPosition)>0.5)discard;
+#endif
     //Also, small quad is really fking over the mipping level somehow
     float cutoutAlpha = 1.0;
 #ifndef TRANSLUCENT

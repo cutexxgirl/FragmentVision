@@ -110,6 +110,7 @@ public class MDICSectionRenderer extends AbstractSectionRenderer<MDICViewport, B
         }
         var builder = Shader.make()
                 .apply(this.properties::apply)
+                .defineIf("FV_HYBRID_TERRAIN", pipeline instanceof me.cortex.voxy.client.core.NormalRenderPipeline)
                 .defineIf("FR_LOD_MATERIAL", !material.isEmpty())
                 .defineIf("TAA_PATCH", taa != null)
                 .defineIf("DEBUG_RENDER", false)
@@ -206,8 +207,10 @@ public class MDICSectionRenderer extends AbstractSectionRenderer<MDICViewport, B
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         }
         FragmentAtmosphereCompat.bindMaterial(this.terrainShader.id());
+        if (this.pipeline instanceof me.cortex.voxy.client.core.NormalRenderPipeline normal && normal.hybridTerrain != null)
+            normal.hybridTerrain.bindMask(this.terrainShader.id(), viewport);
         try (var leaves = FragmentAtmosphereCompat.hasMaterial() ? this.modelStore.filteredLeaves() : null) { glMultiDrawElementsIndirectCountARB(GL_TRIANGLES, GL_UNSIGNED_SHORT, indirectOffset, drawCountOffset, maxDrawCount, 0); }
-        finally { FragmentAtmosphereCompat.releaseMaterial(); }
+        finally { FragmentAtmosphereCompat.releaseMaterial(); glBindTextureUnit(6, 0); glBindSampler(6, 0); }
         if (VoxyClient.getOcclusionDebugState()==3) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }

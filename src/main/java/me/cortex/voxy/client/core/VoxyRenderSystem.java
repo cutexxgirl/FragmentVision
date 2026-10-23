@@ -115,7 +115,11 @@ public class VoxyRenderSystem {
                 this.nodeCleaner = new NodeCleaner(this.nodeManager);
                 this.traversal = new HierarchicalOcclusionTraverser(this.nodeManager, this.nodeCleaner, this.renderGen);
 
-                world.setDirtyCallback(this.nodeManager::worldEvent);
+                world.setDirtyCallback((section, flags, neighbours) -> {
+                    this.nodeManager.worldEvent(section, flags, neighbours);
+                    var hybrid = this.getHybridTerrain();
+                    if (hybrid != null) hybrid.changed(section, flags);
+                });
 
                 Arrays.stream(world.getMapper().getBiomeEntries()).forEach(this.modelService::addBiome);
                 world.getMapper().setBiomeCallback(this.modelService::addBiome);
@@ -124,6 +128,8 @@ public class VoxyRenderSystem {
             }
 
             this.pipeline = RenderPipelineFactory.createPipeline(this.properties, this.nodeManager, this.nodeCleaner, this.traversal, this::frexStillHasWork);
+            if (this.pipeline instanceof NormalRenderPipeline normal)
+                normal.hybridTerrain = new me.cortex.voxy.client.core.rendering.hybrid.HybridTerrain(world, this.properties);
             this.pipeline.setupExtraModelBakeryData(this.modelService);//Configure the model service
 
             //Late stage traversal compile for shaders with taa
@@ -534,5 +540,8 @@ public class VoxyRenderSystem {
 
     public WorldEngine getEngine() {
         return this.worldIn;
+    }
+    public me.cortex.voxy.client.core.rendering.hybrid.HybridTerrain getHybridTerrain() {
+        return this.pipeline instanceof NormalRenderPipeline normal ? normal.hybridTerrain : null;
     }
 }

@@ -411,7 +411,7 @@ public class ModelFactory {
         ModelEntry entry;
         {//Deduplicate same entries
             entry = new ModelEntry(textureData, clientFluidStateId, isBiomeColourDependent||colourProvider==null?-1:captureColourConstant(colourProvider, blockState, DEFAULT_BIOME)|0xFF000000,
-                    fragmentMaterial, isBiomeColourDependent ? BuiltInRegistries.BLOCK.getId(blockState.getBlock()) : -1);
+                    fragmentMaterial | (me.cortex.voxy.client.core.rendering.hybrid.HybridTerrainMaterials.natural(blockState) ? 256 : 0), isBiomeColourDependent ? BuiltInRegistries.BLOCK.getId(blockState.getBlock()) : -1);
             int possibleDuplicate = this.modelTexture2id.getInt(entry);
             if (possibleDuplicate != -1) {//Duplicate found
                 this.idMappings[blockId] = possibleDuplicate;
@@ -622,6 +622,7 @@ public class ModelFactory {
         modelFlags |= isShaded?8:0;//model has AO and shade
         modelFlags |= isFluid?16:0;//model represents a fluid surface
         modelFlags |= fragmentMaterial << 5; // runtime model metadata, not persistent LOD format
+        if (me.cortex.voxy.client.core.rendering.hybrid.HybridTerrainMaterials.natural(blockState)) modelFlags |= 256;
 
         //modelFlags |= blockRenderLayer == RenderLayer.getSolid()?0:1;// should discard alpha
         MemoryUtil.memPutInt(uploadPtr, modelFlags); uploadPtr += 4;
@@ -814,6 +815,11 @@ public class ModelFactory {
     //TODO: add a method to detect biome dependent colours (can do by detecting if getColor is ever called)
     // if it is, need to add it to a list and mark it as biome colour dependent or something then the shader
     // will either use the uint as an index or a direct colour multiplier
+    public static int captureSurfaceTint(BlockState state, Biome biome) {
+        var provider = getColourProvider(state.getBlock());
+        return provider == null ? 0xffffff : captureColourConstant(provider, state, biome);
+    }
+
     private static int captureColourConstant(BlockColor colorProvider, BlockState state, Biome biome) {
         var getter = new BlockAndTintGetter() {
             @Override

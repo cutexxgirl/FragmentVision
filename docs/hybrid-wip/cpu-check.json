@@ -1,0 +1,9 @@
+{
+  "result": "passed",
+  "checks": [
+    "planar ramp and slope normals",
+    "finite complete triangles",
+    "protected area exclusion",
+    "empty cache produces no terrain"
+  ]
+}
