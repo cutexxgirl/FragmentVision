@@ -1,0 +1,161 @@
+{
+  "stage": "passed targeted bounded-memory, forced replacement rebuild, incremental movement and visual checks; terrain art remains WIP",
+  "date": "2026-10-24",
+  "first_full_run": {
+    "log": "/workspace/scratch/hybrid-tiles-shipping-client.log",
+    "resident_tiles": 213,
+    "fine_triangles": 4346506,
+    "coarse_triangles": 2478770,
+    "far_triangles": 1990784,
+    "total_build_wall_ms_including_queue_wait": 185260,
+    "max_tile_volume_bytes": 1843968,
+    "max_tile_mesh_KiB": 4804,
+    "max_observed_heap_MiB": 1877,
+    "CPU_budget_skips": 0,
+    "GPU_budget_fallbacks": 0,
+    "GPU_streams_MiB": 429,
+    "heap_failure": false
+  },
+  "bounds": {
+    "tile_blocks": 64,
+    "halo_blocks": 16,
+    "ready_streams_bytes": 16777216,
+    "queue_elements": 8,
+    "GPU_stream_budget_bytes": 536870912,
+    "source_vertices_per_tile": 65536,
+    "source_faces_per_tile": 98304
+  },
+  "validation": {
+    "CPU": "tiled-cpu-check.json",
+    "GPU_programs": "gpu-shaders.json",
+    "build": "successful; hybrid-tiles-shipping-build.log",
+    "worker_cancel": "interrupted earlier one-element-queue build saved and closed cleanly",
+    "runtime_hybrid_errors": false,
+    "final_guard_build": "passed: hybrid-tile-guard-build.log",
+    "shutdown": "All dimensions saved; renderer, worker and Voxy engine closed normally"
+  },
+  "limits": [
+    "Whole-client heap is larger than mesh working memory; 96MiB is only the CPU fixture heap",
+    "Observed heap is sampled at tile boundaries, not a complete JVM peak measurement",
+    "Topology totals are prepared index buffers, not simultaneous draw counts or hardware FPS",
+    "Voxel natural faces still submitted; trees retain old LODs; artistic terrain and native seam remain WIP"
+  ],
+  "second_full_run": {
+    "log": "/workspace/scratch/hybrid-tile126-client.log",
+    "resident_tiles": 213,
+    "fine_triangles": 4346506,
+    "coarse_triangles": 2478770,
+    "far_triangles": 1990784,
+    "total_build_wall_ms_including_queue_wait": 187192,
+    "max_tile_input_KiB": 1800,
+    "max_tile_mesh_KiB": 4804,
+    "max_observed_heap_MiB": 1848,
+    "CPU_budget_skips": 0,
+    "GPU_budget_fallbacks": 0,
+    "GPU_streams_MiB": 429,
+    "normal_view_new_surface_draw_triangles": 2498303,
+    "post_full_GC_heap_used_KiB": 997808,
+    "heap_max_bytes": 2147483648,
+    "heap_failure": false
+  },
+  "frames": {
+    "mountains-before.png": "2026-10-24_11.10.33.png",
+    "mountains-after.png": "2026-10-24_11.14.53.png",
+    "native-light.png": "2026-10-24_11.24.17.png"
+  },
+  "visual_assessment": [
+    "Actual F2 images inspected; terrain shape/material response retained and no new major crack observed in this view",
+    "Rounded terraces remain; this is not acceptance of the final stylized terrain",
+    "Old voxel trees remain",
+    "Shared Render lighting source unchanged in this revision"
+  ],
+  "sha256": {
+    "native-light.png": "0d798b72928fdbfe1b1f495c89b0d31bedf15ab85fea0c74585defd624b61132",
+    "mountains-after.png": "25ba5710164852f3051aad5b3b4ca268c7317154e471ba27e48238278d2e634d",
+    "mountains-before.png": "1562f24461d4d77ccd1e3ec5fb9b5cedce023ecc5fba672bf01aa4fe77cfc797"
+  },
+  "forced_same_process_rebuild": {
+    "resident_tiles": 213,
+    "fine_triangles": 4346506,
+    "coarse_triangles": 2478770,
+    "far_triangles": 1990784,
+    "build_wall_ms_including_queue_wait": 86968,
+    "camera_note": "Same position/FOV; looked upward while rebuilding to reduce software drawing cost. Tile input generation is independent of camera yaw/pitch. No FPS inference from build times.",
+    "max_observed_heap_MiB": 1848,
+    "heap_failure": false,
+    "CPU_budget_skips": 0,
+    "GPU_budget_fallbacks": 0,
+    "GPU_streams_MiB": 429,
+    "post_full_GC_heap_used_KiB": 998984,
+    "post_full_GC_change_KiB": 1176,
+    "GC_note": "Explicit jcmd full GC used only for retained-heap comparison. The mod does not force GC."
+  },
+  "movement_rebuild": {
+    "camera_before": [
+      512.5,
+      150,
+      700.5
+    ],
+    "camera_after": [
+      547.5,
+      150,
+      700.5
+    ],
+    "reused_tile_stamps": 225,
+    "total_tile_positions": 289,
+    "rebuilt_tile_positions": 64,
+    "build_wall_ms": 15948,
+    "resident_tiles": 209,
+    "fine_triangles": 4350112,
+    "coarse_triangles": 2468585,
+    "far_triangles": 1977495,
+    "max_observed_heap_MiB": 1730,
+    "max_tile_mesh_KiB": 4340,
+    "GPU_streams_MiB": 429,
+    "CPU_budget_skips": 0,
+    "GPU_budget_fallbacks": 0,
+    "heap_failure": false,
+    "view_note": "Looked upward during rebuild; no FPS or build-speed comparison to the normal-view pass.",
+    "normal_view_new_surface_draw_triangles": 2439167,
+    "excluded_frame": "2026-10-24_11.21.40.png contains command chat and is not published"
+  },
+  "native_light_scene": {
+    "position": [
+      612.5,
+      113,
+      564.5
+    ],
+    "yaw": 100,
+    "pitch": -10,
+    "time_requested": 9000,
+    "hybrid_enabled": false,
+    "note": "Native sun/sky, grass shadows and leaf shading checked independently of distant terrain. Render lighting source unchanged.",
+    "diagnostic": "HIGH enabled=true failed=false shadow=2048 sections=2228"
+  },
+  "runtime_artifact_sha256": "12550975568a44f9afdb751c20e7a917aae5a14b3ef1e3f64ae8c3d8fb8142a4",
+  "source_note": "After the in-game review, a final conservative sampling guard was tightened to require the immediately adjacent known-air voxel, rather than retaining an air flag across missing vertical sections. Only fallback eligibility changes; final Java build checked separately.",
+  "scene": {
+    "world": "Sky_Art_Study",
+    "seed": 1234,
+    "camera": [
+      512.5,
+      150,
+      700.5
+    ],
+    "yaw": 0,
+    "pitch": 8,
+    "time_requested": 4500,
+    "native_chunks": 8,
+    "Vision_blocks": 512,
+    "FOV": 90,
+    "preset": "HIGH",
+    "resolution": [
+      1280,
+      720
+    ],
+    "SMAA": true,
+    "ticks_frozen": true,
+    "capture_note": "Raw F2, no image edits. Client wind/cloud phases may differ."
+  },
+  "final_internal_artifact_sha256": "6f7ad3d3983455e5a78a346af2d17c9d289131be51e7108a57503c2ea760abb7"
+}

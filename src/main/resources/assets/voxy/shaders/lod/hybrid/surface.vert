@@ -6,6 +6,7 @@ uniform mat4 fv_SurfaceMVP;
 uniform vec3 fv_SurfaceOrigin;
 uniform float fv_HybridNear;
 uniform float fv_SurfacePixelScale;
+uniform int fv_SurfaceLevel;
 out vec3 fr_RelativePosition,fr_BaseLight,fr_CanopyNormal,fv_SurfaceNormal;
 out float fr_SkyLight,fr_BlockLight;
 out vec3 fv_OriginalPosition,fv_CoveragePosition,fv_Tint;
@@ -27,12 +28,20 @@ void main(){
     float distance=max(abs(fv_CoveragePosition.x),abs(fv_CoveragePosition.z));
     float rounded=smoothstep(fv_HybridNear,fv_HybridNear+96.0,distance)*(1.0-locks.x);
     float coarse=smoothstep(fv_HybridNear+96.0,fv_HybridNear+256.0,distance)*(1.0-locks.x);
-    float farCoarse=smoothstep(fv_HybridNear+256.0,fv_HybridNear+640.0,distance)*(1.0-locks.x);
+    // Every vertex collapsed onto the same parent follows the same next morph.
+    // This permits removing its degenerate triangles throughout the transition.
+    vec3 coarsePosition=parent4+fv_SurfaceOrigin;
+    float farDistance=max(abs(coarsePosition.x),abs(coarsePosition.z));
+    float farCoarse=smoothstep(fv_HybridNear+256.0,fv_HybridNear+640.0,farDistance)*(1.0-locks.x);
     // Retain geometry when the proposed simplification would visibly move its silhouette.
     // FOV/resolution affect the decision; distance alone is not a quality measure.
     float pixels=fv_SurfacePixelScale/max(length(fv_CoveragePosition),1.0);
-    coarse*=1.0-smoothstep(.75,2.0,length(parent4-smoothed)*pixels);
-    farCoarse*=1.0-smoothstep(.75,2.0,length(parent8-parent4)*pixels);
+    coarse*=1.0-smoothstep(2.0,3.0,length(parent4-smoothed)*pixels);
+    farCoarse*=1.0-smoothstep(2.0,3.0,length(parent8-parent4)*fv_SurfacePixelScale/max(length(coarsePosition),1.0));
+    // Compacted topology is selected only after every vertex in the tile reaches
+    // the corresponding target and its projected displacement stays within budget.
+    if(fv_SurfaceLevel>=1)coarse=1.0;
+    if(fv_SurfaceLevel>=2)farCoarse=1.0;
     vec3 p=mix(position,smoothed,rounded);
     p=mix(p,parent4,coarse);p=mix(p,parent8,farCoarse);
     fr_RelativePosition=p+fv_SurfaceOrigin;

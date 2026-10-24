@@ -1,0 +1,17 @@
+{
+  "result": "passed",
+  "heap_limit_bytes": 100663296,
+  "test": "tools/HybridTileMeshCheck.java",
+  "checks": [
+    "12 successive tiles at full 384-block world height",
+    "shared seam trajectories agree within 0.001 block",
+    "fine/coarse/far indexed topology has 3520/1106/504 triangles",
+    "removed coarse triangles remain degenerate through next LOD morph",
+    "pathological open-column volume stops at explicit mesh budget"
+  ],
+  "limits": [
+    "JVM heap limit is not whole process RSS",
+    "test fixture is not a hardware FPS measurement",
+    "not exhaustive topology or arbitrary-world verification"
+  ]
+}

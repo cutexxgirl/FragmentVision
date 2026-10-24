@@ -83,7 +83,7 @@ public class NormalRenderPipeline extends AbstractRenderPipeline {
 
     @Override
     public void preSetup(Viewport<?> viewport) {
-        if (hybridTerrain != null) hybridTerrain.prepare();
+        if (hybridTerrain != null) hybridTerrain.prepare(viewport);
     }
 
     @Override
