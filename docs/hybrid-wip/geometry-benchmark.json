@@ -1,0 +1,5 @@
+{"scope":"synthetic 64x64 blocks, 2x1x2 samples, solid terrain, uniform light/tint, 2 materials; shipping ScanMesher2D vs shipping hybrid builder; CPU stages differ, no game FPS","fixtures":[
+{"name":"flat","voxel_triangles":8,"unmerged_triangles":2048,"hybrid_fine_triangles":2048,"hybrid_coarse_triangles":638,"hybrid_far_triangles":254,"voxel_quad_payload_bytes":32,"hybrid_mesh_payload_bytes":192032,"scan_and_extract_median_ms":4.232,"hybrid_build_median_ms":7.139},
+{"name":"hills","voxel_triangles":3338,"unmerged_triangles":5022,"hybrid_fine_triangles":5022,"hybrid_coarse_triangles":2308,"hybrid_far_triangles":1623,"voxel_quad_payload_bytes":13352,"hybrid_mesh_payload_bytes":482076,"scan_and_extract_median_ms":4.340,"hybrid_build_median_ms":13.413},
+{"name":"rugged","voxel_triangles":6958,"unmerged_triangles":13142,"hybrid_fine_triangles":13142,"hybrid_coarse_triangles":9688,"hybrid_far_triangles":8983,"voxel_quad_payload_bytes":27832,"hybrid_mesh_payload_bytes":1351276,"scan_and_extract_median_ms":3.260,"hybrid_build_median_ms":17.729}
+]}

@@ -1,0 +1,90 @@
+{
+  "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+  "scope": "640x360, simple identical shader, expanded XYZ triangles, no textures/lighting/grass/occlusion/streaming; 16 clear+draw submissions then finish, wall time divided by 16; software raster microbenchmark, NOT full renderer comparison or hardware FPS",
+  "samples": [
+    {
+      "fixture": "flat",
+      "variant": "voxel",
+      "triangles": 8,
+      "median_clear_draw_finish_ms": 0.07069696875,
+      "p95_clear_draw_finish_ms": 0.08482425
+    },
+    {
+      "fixture": "flat",
+      "variant": "hybrid-0",
+      "triangles": 2048,
+      "median_clear_draw_finish_ms": 0.43306775,
+      "p95_clear_draw_finish_ms": 0.532557875
+    },
+    {
+      "fixture": "flat",
+      "variant": "hybrid-1",
+      "triangles": 638,
+      "median_clear_draw_finish_ms": 0.20546750000000003,
+      "p95_clear_draw_finish_ms": 0.327999375
+    },
+    {
+      "fixture": "flat",
+      "variant": "hybrid-2",
+      "triangles": 254,
+      "median_clear_draw_finish_ms": 0.14677006250000002,
+      "p95_clear_draw_finish_ms": 0.2265044375
+    },
+    {
+      "fixture": "hills",
+      "variant": "voxel",
+      "triangles": 3338,
+      "median_clear_draw_finish_ms": 0.759388125,
+      "p95_clear_draw_finish_ms": 0.830627375
+    },
+    {
+      "fixture": "hills",
+      "variant": "hybrid-0",
+      "triangles": 5022,
+      "median_clear_draw_finish_ms": 0.882515375,
+      "p95_clear_draw_finish_ms": 0.9993263125
+    },
+    {
+      "fixture": "hills",
+      "variant": "hybrid-1",
+      "triangles": 2308,
+      "median_clear_draw_finish_ms": 0.4856038125,
+      "p95_clear_draw_finish_ms": 0.5289584375
+    },
+    {
+      "fixture": "hills",
+      "variant": "hybrid-2",
+      "triangles": 1623,
+      "median_clear_draw_finish_ms": 0.40166765625,
+      "p95_clear_draw_finish_ms": 0.436274
+    },
+    {
+      "fixture": "rugged",
+      "variant": "voxel",
+      "triangles": 6958,
+      "median_clear_draw_finish_ms": 1.27969771875,
+      "p95_clear_draw_finish_ms": 1.6843234375
+    },
+    {
+      "fixture": "rugged",
+      "variant": "hybrid-0",
+      "triangles": 13142,
+      "median_clear_draw_finish_ms": 1.80333525,
+      "p95_clear_draw_finish_ms": 1.9018260625
+    },
+    {
+      "fixture": "rugged",
+      "variant": "hybrid-1",
+      "triangles": 9688,
+      "median_clear_draw_finish_ms": 1.4620243125,
+      "p95_clear_draw_finish_ms": 1.49458575
+    },
+    {
+      "fixture": "rugged",
+      "variant": "hybrid-2",
+      "triangles": 8983,
+      "median_clear_draw_finish_ms": 1.50549,
+      "p95_clear_draw_finish_ms": 1.6807444375
+    }
+  ]
+}
