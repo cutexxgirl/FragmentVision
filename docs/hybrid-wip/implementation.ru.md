@@ -1,4 +1,4 @@
-> Историческое описание первой итерации. Текущие изменения: [revision-2.ru.md](revision-2.ru.md).
+> Историческое описание первой итерации. Высотный подход отклонён. Новый эксперимент: [progressive-volume.ru.md](progressive-volume.ru.md).
 
 # Hybrid terrain WIP: открытый рельеф поверх кэша Vision
 

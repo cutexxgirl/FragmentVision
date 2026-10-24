@@ -1,0 +1,20 @@
+{
+  "result": "passed",
+  "test": "tools/HybridVoxelMeshCheck.java",
+  "checks": [
+    "real tunnel ceiling retained",
+    "snow and stone material identity retained",
+    "one morph trajectory per shared source vertex",
+    "finite positions and valid indices",
+    "coverage boundary locked through every morph target",
+    "surface relaxation displacement bounded to 1.25 blocks",
+    "fully invalid column mask produces no geometry",
+    "sealed interior cavity omitted while open tunnel retained"
+  ],
+  "limits": [
+    "not exhaustive topology validation",
+    "not a per-voxel missing-cache validation",
+    "not a native-to-LOD seam test",
+    "not a performance benchmark"
+  ]
+}

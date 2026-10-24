@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import static org.lwjgl.opengl.GL45C.*;
 
-/** Opt-in, bounded exterior-terrain experiment. Off until explicitly built and enabled. */
+/** Opt-in, bounded volumetric-terrain experiment. Off until explicitly built and enabled. */
 public final class HybridTerrain implements AutoCloseable {
     private static final int SIZE=1088, STEP=2, TEXTURE_SIZE=32;
     private final WorldEngine world;
@@ -41,19 +41,21 @@ public final class HybridTerrain implements AutoCloseable {
     private CompletableFuture<Result> pending;
     private volatile Request request;
     private boolean enabled,closed;
+    private long nextBuildNanos;
     private String status="not built (WIP is off)";
     private Shader shader;
-    private int vao,vbo,coverage,textures,vertices;
+    private int vao,vbo,ibo,morphBuffer,morphTexture,coverage,textures,vertices;
     private Result active;
     private record State(int layer, boolean skip, float topOffset) {}
     private record Catalog(State[] states, byte[] pixels, float[] material, int[][] tint) {}
     private record Request(int x,int z,int minY,int maxY,int nativeRadius,double eyeX,double eyeZ,Catalog catalog,long revision) {}
-    private record Result(Request request,HybridSurfaceMesh.Mesh mesh,long millis,int sampled,int missing) {}
+    private record Result(Request request,HybridVoxelMesh.Mesh mesh,long millis,int sampled,int missing) {}
     public HybridTerrain(WorldEngine world,RenderProperties properties){this.world=world;this.properties=properties;}
 
     public String build() {
         if(closed)return "renderer closed";
         if(pending!=null)return "surface build already running";
+        nextBuildNanos=System.nanoTime()+5_000_000_000L;
         if(!FragmentAtmosphereCompat.hasMaterial())return "WIP requires Fragment Render's shared lighting material";
         var mc=Minecraft.getInstance();var pos=mc.gameRenderer.getMainCamera().getPosition();
         try {
@@ -61,13 +63,13 @@ public final class HybridTerrain implements AutoCloseable {
             var next=new Request((Math.floorDiv((int)Math.floor(pos.x),32)<<5)-SIZE/2,
                     (Math.floorDiv((int)Math.floor(pos.z),32)<<5)-SIZE/2,
                     mc.level.getMinBuildHeight(),mc.level.getMaxBuildHeight(),mc.options.getEffectiveRenderDistance()*16,pos.x,pos.z,catalog,revision.get());
-            request=next;
+            request=next;nextBuildNanos=System.nanoTime()+5_000_000_000L;
             pending=CompletableFuture.supplyAsync(()->{
                 // Acquire inside the task: a queued task removed by shutdownNow must not leak a reference.
                 world.acquireRef();
                 try{return sample(next);}finally{world.releaseRef();}
             },worker);
-            status="building cached terrain in background (1088 blocks, 2-block grid)";
+            status="building volumetric terrain with continuous 2/4/8 morph targets";
             return status;
         } catch(Exception e){Logger.error("Hybrid surface preparation failed; keeping voxel terrain",e);return status="build failed: "+e.getMessage();}
     }
@@ -89,24 +91,31 @@ public final class HybridTerrain implements AutoCloseable {
         if(active!=null){
             var eye=Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
             Request r=active.request;
-            if(Math.max(Math.abs(eye.x-r.eyeX),Math.abs(eye.z-r.eyeZ))>8
-                    ||Minecraft.getInstance().options.getEffectiveRenderDistance()*16!=r.nativeRadius){
-                active=null;status="camera/render distance changed; voxel fallback active, rebuild required";
+            if(Minecraft.getInstance().options.getEffectiveRenderDistance()*16!=r.nativeRadius){
+                active=null;status="render distance changed; rebuilding volume";
+            }else if(enabled&&pending==null&&System.nanoTime()>nextBuildNanos
+                    &&Math.max(Math.abs(eye.x-r.eyeX),Math.abs(eye.z-r.eyeZ))>16){
+                build(); // Keep the previous snapshot until its replacement is ready.
             }
         }
         if(active!=null&&active.request.revision!=revision.get()) {
-            active=null;status="cache changed; voxel fallback active, rebuild required";
+            active=null;status="cache changed; rebuilding volume";
         }
+        if(enabled&&active==null&&pending==null&&request!=null&&System.nanoTime()>nextBuildNanos)build();
         if(pending==null||!pending.isDone())return;
         try {
             Result result=pending.join();
             if(result.request.revision!=revision.get()){status="cache changed during build; keeping voxel terrain, rebuild required";return;}
-            if(result.mesh.vertices().length==0){active=null;status="no eligible cached terrain; voxel fallback";return;}
-            upload(result);active=result;
-            status=result.mesh.vertices().length/HybridSurfaceMesh.FLOATS_PER_VERTEX/3+" triangles, "+result.sampled+
-                    " surface samples, "+result.missing+" missing/protected, "+result.millis+"ms CPU build";
+            if(result.mesh.vertices().length==0){active=null;enabled=false;status="no eligible cached terrain; voxel fallback";return;}
+            upload(result);
+            // GPU owns the mesh now. Retaining full CPU streams would double the next rebuild's peak heap.
+            active=new Result(result.request,new HybridVoxelMesh.Mesh(new float[0],new int[0],new int[0],
+                    new float[0],result.mesh.cells(),result.mesh.protectedCells(),result.mesh.sharedVertices()),
+                    result.millis,result.sampled,result.missing);
+            status=result.mesh.indices().length/3+" triangles, "+result.sampled+
+                    " surface samples, "+result.mesh.sharedVertices()+" shared vertices, "+result.missing+" missing/protected, "+result.millis+"ms CPU build";
             Logger.info("Hybrid terrain WIP ready: "+status);
-        }catch(Exception e){active=null;Logger.error("Hybrid terrain build/upload failed; keeping voxel terrain",e);status="build failed; voxel fallback";}
+        }catch(Exception e){active=null;enabled=false;Logger.error("Hybrid terrain build/upload failed; keeping voxel terrain",e);status="build failed; voxel fallback";}
         finally{pending=null;}
     }
     public void bindMask(int program,Viewport<?> view) {
@@ -122,6 +131,7 @@ public final class HybridTerrain implements AutoCloseable {
     public void render(Viewport<?> view) {
         if(!enabled||active==null||vertices==0)return;
         shader.bind();bindMask(shader.id(),view);
+        glUniform1f(glGetUniformLocation(shader.id(),"fv_SurfacePixelScale"),view.height*.5f*Math.abs(view.projection.m11()));
         glBindTextureUnit(0,textures);glBindSampler(0,0);
         glBindTextureUnit(2,view.depthBoundingBuffer.getDepthTex().id);
         glUniform1i(glGetUniformLocation(shader.id(),"fv_SurfaceTextures"),0);
@@ -131,10 +141,10 @@ public final class HybridTerrain implements AutoCloseable {
             glUniformMatrix4fv(glGetUniformLocation(shader.id(),"fv_SurfaceMVP"),false,view.MVP.get(stack.mallocFloat(16)));
         }
         glDisable(GL_BLEND);glDisable(GL_CULL_FACE);glEnable(GL_DEPTH_TEST);glDepthFunc(properties.closerEqualDepthCompare());glDepthMask(true);
-        glBindVertexArray(vao);
+        glBindVertexArray(vao);glBindTextureUnit(12,morphTexture);glBindSampler(12,0);
         FragmentAtmosphereCompat.bindMaterial(shader.id());
-        try{glDrawArrays(GL_TRIANGLES,0,vertices);}
-        finally{FragmentAtmosphereCompat.releaseMaterial();glBindVertexArray(0);glEnable(GL_CULL_FACE);glBindTextureUnit(0,0);glBindTextureUnit(6,0);}
+        try{glDrawElements(GL_TRIANGLES,vertices,GL_UNSIGNED_INT,0L);}
+        finally{FragmentAtmosphereCompat.releaseMaterial();glBindVertexArray(0);glBindTextureUnit(12,0);glEnable(GL_CULL_FACE);glBindTextureUnit(0,0);glBindTextureUnit(6,0);}
     }
     private Catalog catalog() throws Exception {
         var mc=Minecraft.getInstance();var entries=world.getMapper().getStateEntries();
@@ -176,7 +186,7 @@ public final class HybridTerrain implements AutoCloseable {
     }
     private Result sample(Request r) {
         long start=System.nanoTime();int n=SIZE/STEP+1,total=n*n,sampled=0;
-        byte[] volume=new byte[total*(r.maxY-r.minY)];
+        byte[] volume=new byte[total*(r.maxY-r.minY)],volumeLight=new byte[total*(r.maxY-r.minY)];
         float[] heights=new float[total];int[] layers=new int[total],baseLayers=new int[total],tints=new int[total];int[] topY=new int[total],light=new int[total],aboveLight=new int[total];Arrays.fill(aboveLight,15);boolean[] substrate=new boolean[total];boolean[] valid=new boolean[total],done=new boolean[total];
         for(int tz=r.z>>5;tz<=(r.z+SIZE)>>5;tz++)for(int tx=r.x>>5;tx<=(r.x+SIZE)>>5;tx++){
             if(Thread.currentThread().isInterrupted())throw new CancellationException();
@@ -191,9 +201,11 @@ public final class HybridTerrain implements AutoCloseable {
                     // Material columns retained only during CPU meshing; no 3D texture or runtime raymarch.
                     for(int y=0;y<32;y++){
                         int wy=(ty<<5)+y;if(wy<r.minY||wy>=r.maxY)continue;
-                        int id=Mapper.getBlockId(data[WorldSection.getIndex(x,y,z)]);
+                        long raw=data[WorldSection.getIndex(x,y,z)];
+                        int id=Mapper.getBlockId(raw);volumeLight[(wy-r.minY)*total+p]=(byte)Mapper.getLightId(raw);
                         if(id>0&&id<r.catalog.states.length){int layer=r.catalog.states[id].layer;
                             if(layer>=0)volume[(wy-r.minY)*total+p]=(byte)(layer+1);
+                            else if(!r.catalog.states[id].skip)volume[(wy-r.minY)*total+p]=(byte)255;
                         }
                     }
                     if(done[p]&&(!valid[p]||substrate[p]))continue;
@@ -221,15 +233,10 @@ public final class HybridTerrain implements AutoCloseable {
                 }
             }
         }
-        // Carve out a native-chunk safety region before meshing so its boundary also gets skirts.
+        // Carve out a native-chunk safety region before meshing; its boundary vertices stay fixed.
         for(int z=0;z<n;z++)for(int x=0;x<n;x++)
             if(Math.max(Math.abs(r.x+x*STEP-r.eyeX),Math.abs(r.z+z*STEP-r.eyeZ))<=r.nativeRadius+48)valid[z*n+x]=false;
-        HybridSurfaceMesh.MaterialLookup lookup=(x,y,z)->{
-            int gx=Math.round(x/STEP),gz=Math.round(z/STEP),gy=(int)Math.floor(y)-r.minY;
-            if(gx<0||gz<0||gx>=n||gz>=n||gy<0||gy>=r.maxY-r.minY)return -1;
-            return (volume[gy*total+gz*n+gx]&255)-1;
-        };
-        var mesh=HybridSurfaceMesh.build(new HybridSurfaceMesh.Grid(n,STEP,heights,layers,baseLayers,tints,light,valid,lookup));
+        var mesh=HybridVoxelMesh.build(new HybridVoxelMesh.Grid(n,STEP,r.minY,r.maxY-r.minY,volume,volumeLight,tints,valid,r.x,r.z));
         return new Result(r,mesh,(System.nanoTime()-start)/1_000_000,sampled,total-sampled);
     }
     private void upload(Result result) {
@@ -238,12 +245,15 @@ public final class HybridTerrain implements AutoCloseable {
                 .add(ShaderType.FRAGMENT,"voxy:lod/hybrid/surface.frag")
                 .replace("// FRAGMENT_MATERIAL_SOURCE",FragmentAtmosphereCompat.materialSource()).compile();
         if(vao==0){
-            vao=glCreateVertexArrays();vbo=glCreateBuffers();
-            glVertexArrayVertexBuffer(vao,0,vbo,0,HybridSurfaceMesh.FLOATS_PER_VERTEX*4);
-            int[] size={3,3,3,3,3,3,3,2},offset={0,12,24,36,48,60,72,84};
-            for(int i=0;i<size.length;i++){glEnableVertexArrayAttrib(vao,i);glVertexArrayAttribFormat(vao,i,size[i],GL_FLOAT,false,offset[i]);glVertexArrayAttribBinding(vao,i,0);}
+            vao=glCreateVertexArrays();vbo=glCreateBuffers();ibo=glCreateBuffers();morphBuffer=glCreateBuffers();morphTexture=glCreateTextures(GL_TEXTURE_BUFFER);glVertexArrayElementBuffer(vao,ibo);
+            glVertexArrayVertexBuffer(vao,0,vbo,0,16);
+            glEnableVertexArrayAttrib(vao,0);glVertexArrayAttribIFormat(vao,0,4,GL_UNSIGNED_INT,0);glVertexArrayAttribBinding(vao,0,0);
         }
-        glNamedBufferData(vbo,result.mesh.vertices(),GL_STATIC_DRAW);vertices=result.mesh.vertices().length/HybridSurfaceMesh.FLOATS_PER_VERTEX;
+        glNamedBufferData(vbo,result.mesh.vertices(),GL_STATIC_DRAW);vertices=result.mesh.indices().length;
+        if(result.mesh.positions().length/4>glGetInteger(GL_MAX_TEXTURE_BUFFER_SIZE))throw new IllegalStateException("Hybrid snapshot exceeds texture buffer capacity; needs tiled meshes");
+        glNamedBufferData(morphBuffer,result.mesh.positions(),GL_STATIC_DRAW);
+        glTextureBuffer(morphTexture,GL_RGBA32F,morphBuffer);
+        glNamedBufferData(ibo,result.mesh.indices(),GL_STATIC_DRAW);
         if(coverage!=0)glDeleteTextures(coverage);
         coverage=glCreateTextures(GL_TEXTURE_2D);glTextureStorage2D(coverage,1,GL_R32F,result.mesh.cells(),result.mesh.cells());
         glTextureSubImage2D(coverage,0,0,0,result.mesh.cells(),result.mesh.cells(),GL_RED,GL_FLOAT,result.mesh.coverage());
@@ -261,7 +271,7 @@ public final class HybridTerrain implements AutoCloseable {
     @Override public void close(){
         closed=true;enabled=false;active=null;worker.shutdownNow();
         try{if(!worker.awaitTermination(5,TimeUnit.SECONDS))Logger.warn("Hybrid worker still stopping; engine reference is held until completion");}catch(InterruptedException e){Thread.currentThread().interrupt();}
-        if(shader!=null)shader.free();if(vbo!=0)glDeleteBuffers(vbo);if(vao!=0)glDeleteVertexArrays(vao);
+        if(shader!=null)shader.free();if(vbo!=0)glDeleteBuffers(vbo);if(vao!=0)glDeleteVertexArrays(vao);if(ibo!=0)glDeleteBuffers(ibo);if(morphBuffer!=0)glDeleteBuffers(morphBuffer);if(morphTexture!=0)glDeleteTextures(morphTexture);
         if(coverage!=0)glDeleteTextures(coverage);if(textures!=0)glDeleteTextures(textures);
     }
 }

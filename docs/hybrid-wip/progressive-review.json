@@ -1,0 +1,103 @@
+{
+  "result": "Technical volume/morph WIP runs; visual target NOT accepted",
+  "date": "2026-10-24",
+  "archive_heightfield": "wip/hybrid-heightfield-v2 at e2b284af",
+  "scene": {
+    "world": "Sky_Art_Study",
+    "seed": 1234,
+    "native_chunks": 8,
+    "vision_blocks": 512,
+    "preset": "HIGH",
+    "fov": 90,
+    "resolution": [
+      1280,
+      720
+    ],
+    "SMAA": true,
+    "aerial_softness": 0,
+    "mountains": {
+      "position": [
+        512.5,
+        150,
+        700.5
+      ],
+      "yaw": 0,
+      "pitch": 8,
+      "time_requested": 4500
+    },
+    "hills": {
+      "position": [
+        512.5,
+        150,
+        700.5
+      ],
+      "yaw": 75,
+      "pitch": 12,
+      "time_requested": 4500
+    },
+    "native_light": {
+      "position": [
+        612.5,
+        113,
+        564.5
+      ],
+      "yaw": 100,
+      "pitch": -10,
+      "time_requested": 9000
+    },
+    "capture_note": "Raw F2 screenshots. Tick freeze between mesh toggles; step after camera/time changes. Cloud/wind phases are not pixel-identical. Earlier 06.09.48 image used a stale camera and is excluded."
+  },
+  "frames": {
+    "mountains-before.png": "2026-10-24_06.08.35.png",
+    "mountains-after.png": "2026-10-24_06.08.50.png",
+    "hills-before.png": "2026-10-24_06.13.12.png",
+    "hills-after.png": "2026-10-24_06.13.32.png",
+    "native-light.png": "2026-10-24_06.12.22.png"
+  },
+  "mesh": {
+    "size_blocks": 1088,
+    "samples_xz_step": 2,
+    "samples_y_step": 1,
+    "parent_target_cells": [
+      4,
+      8
+    ],
+    "triangles": 4087534,
+    "shared_vertices": 2331096,
+    "surface_samples": 210377,
+    "missing_or_protected_columns": 86648,
+    "cpu_build_ms": 32335,
+    "generation_threads": 1,
+    "closed_cavities": "omitted by exterior-air flood fill",
+    "camera_rebuild": "background snapshot after 16 blocks; not a tile hierarchy"
+  },
+  "validation": {
+    "vision_build": "passed",
+    "cpu_checks": "volume-cpu-check.json",
+    "gpu_programs": "6 passed; gpu-shaders.json",
+    "runtime_mesh_loaded": true,
+    "lighting_status": "HIGH enabled=true failed=false shadow=2048 sections=159",
+    "native_light": "sunlit and shadowed grass/foliage visibly present",
+    "previous_heap_failures": "recorded in intermediate logs; final fixture loaded, not proof of bounded memory for all worlds"
+  },
+  "assessment": [
+    "No claim of finished smooth LODs; rounded terraces and mixed old/new regions remain",
+    "Trees retain cubical Voxy LODs",
+    "Visible change in rock/snow shape and grass slopes, but not the desired final art quality",
+    "Native sun/sky and shadow rendering is active; distant directional shadows beyond the 160-block map are not provided by this change",
+    "Exact native-to-LOD and inter-tile seams still require implementation"
+  ],
+  "performance": {
+    "hardware_FPS": "not measured; llvmpipe",
+    "old_voxel_quads_still_submitted": true,
+    "collapsed_triangles_still_submitted": true,
+    "default_enabled": false
+  },
+  "sha256": {
+    "native-light.png": "dc04ab97ad163a0251bceb8c058757e984b147b08a2c58ed52230ab071000fd5",
+    "hills-before.png": "6fb4c6584f583132af035c011400465d45a00f2ac2d694b9707e0c1ce51a8116",
+    "mountains-after.png": "f0f77a00b4d0a84bcbabdcf56451c7461481dd368ea4b38abd849e7cb99653e6",
+    "mountains-before.png": "e91803ab0a4a99ab146e562c52871d37f955283b6a3ab67c008040dc680a3654",
+    "hills-after.png": "41370d5503b04a0281b71b1c99234458529cc913ebd96bff43dfdfc68831a21c"
+  }
+}
