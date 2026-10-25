@@ -74,15 +74,26 @@ public class VoxyCommands {
                         .then(Commands.literal("on").executes(c -> hybrid(c, "on")))
                         .then(Commands.literal("off").executes(c -> hybrid(c, "off")))
                         .then(Commands.literal("earlyCull").then(Commands.argument("enabled", BoolArgumentType.bool()).executes(c -> hybrid(c, BoolArgumentType.getBool(c, "enabled") ? "early-on" : "early-off")))))
+                .then(Commands.literal("mesh").executes(c->mesh(c,"status",null))
+                        .then(Commands.literal("off").executes(c->mesh(c,"off",null)))
+                        .then(Commands.literal("on").executes(c->mesh(c,"on",null)))
+                        .then(Commands.literal("load").then(Commands.argument("package",com.mojang.brigadier.arguments.StringArgumentType.word()).executes(c->mesh(c,"load",com.mojang.brigadier.arguments.StringArgumentType.getString(c,"package"))))))
                 .then(Commands.literal("reload")
                         .executes(VoxyCommands::reloadInstance))
                 .then(imports)
                 .then(debug);
     }
 
+    private static int mesh(CommandContext<CommandSourceStack> ctx,String action,String name) {
+        var renderer=IGetVoxyRenderSystem.getNullable();var backend=renderer==null?null:renderer.getBakedMeshBackend();
+        try{String message=backend==null?"Mesh backend unavailable":switch(action){case "load"->backend.load(name,2);case "on"->backend.enabled(true);case "off"->backend.enabled(false);default->backend.status();};ctx.getSource().sendSuccess(()->Component.literal(message),false);return 1;}
+        catch(Exception error){ctx.getSource().sendFailure(Component.literal("Mesh proof load failed: "+error));return 0;}
+    }
+
     private static int hybrid(CommandContext<CommandSourceStack> ctx, String action) {
         var renderer = IGetVoxyRenderSystem.getNullable();
         var surface = renderer == null ? null : renderer.getHybridTerrain();
+        if(renderer!=null && renderer.getBakedMeshBackend()!=null && renderer.getBakedMeshBackend().active() && (action.equals("on")||action.equals("build"))){ctx.getSource().sendFailure(Component.literal("Baked mesh backend active; use /voxy mesh off before enabling the legacy hybrid"));return 0;}
         String message = surface == null ? "Hybrid WIP unavailable in this renderer" : switch(action) {
             case "build" -> surface.build();
             case "on" -> surface.enabled(true);

@@ -33,6 +33,7 @@ import static org.lwjgl.opengl.GL45C.glTextureParameterf;
 
 public class NormalRenderPipeline extends AbstractRenderPipeline {
     public me.cortex.voxy.client.core.rendering.hybrid.HybridTerrain hybridTerrain;
+    public final me.cortex.voxy.client.core.rendering.lod.runtime.BakedMeshBackend bakedMesh;
     private GlTexture colourTex;
     private GlTexture colourSSAOTex;
     private final GlFramebuffer fbSSAO = new GlFramebuffer();
@@ -44,6 +45,7 @@ public class NormalRenderPipeline extends AbstractRenderPipeline {
 
     protected NormalRenderPipeline(RenderProperties properties, AsyncNodeManager nodeManager, NodeCleaner nodeCleaner, HierarchicalOcclusionTraverser traversal, BooleanSupplier frexSupplier) {
         super(properties, nodeManager, nodeCleaner, traversal, frexSupplier, false);
+        this.bakedMesh=new me.cortex.voxy.client.core.rendering.lod.runtime.BakedMeshBackend(properties);
         this.useEnvFog = VoxyConfig.CONFIG.useEnvironmentalFog;
         this.finalBlit = new FullscreenBlit(properties, "voxy:post/blit_texture_depth_cutout.frag",
                 a->a.defineIf("USE_ENV_FOG", this.useEnvFog).define("EMIT_COLOUR")
@@ -76,19 +78,23 @@ public class NormalRenderPipeline extends AbstractRenderPipeline {
             glTextureParameterf(this.fb.getDepthTex().id, GL_DEPTH_STENCIL_TEXTURE_MODE, GL_DEPTH_COMPONENT);
         }
 
+        if(bakedMesh.active()) org.lwjgl.opengl.GL45C.glClearNamedFramebufferfv(this.fb.framebuffer.id, GL_COLOR, 0, new float[]{0,0,0,0});
         this.initDepthStencil(sourceFB, this.fb.framebuffer.id, viewport.width, viewport.height, viewport.width, viewport.height);
 
         return this.fb.getDepthTex().id;
     }
 
+    @Override protected boolean replacesVoxelGeometry(){return bakedMesh.active();}
+
     @Override
     public void preSetup(Viewport<?> viewport) {
-        if (hybridTerrain != null) hybridTerrain.prepare(viewport);
+        if (!bakedMesh.active() && hybridTerrain != null) hybridTerrain.prepare(viewport);
     }
 
     @Override
     protected void postOpaquePreTranslucent(Viewport<?> viewport, int sourceFrameBuffer) {
-        if (hybridTerrain != null) {
+        if (bakedMesh.active()) {this.fb.bind();bakedMesh.render(viewport);}
+        else if (hybridTerrain != null) {
             this.fb.bind();
             hybridTerrain.render(viewport);
         }
@@ -163,6 +169,7 @@ public class NormalRenderPipeline extends AbstractRenderPipeline {
 
     @Override
     public void free() {
+        bakedMesh.close();
         if (hybridTerrain != null) hybridTerrain.close();
         this.finalBlit.delete();
         this.ssao.free();

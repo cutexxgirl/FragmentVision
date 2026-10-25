@@ -64,6 +64,7 @@ public class VoxyRenderSystem {
 
 
     private final RenderDistanceTracker renderDistanceTracker;
+    public me.cortex.voxy.client.core.rendering.lod.runtime.BakedMeshBackend getBakedMeshBackend(){return pipeline instanceof NormalRenderPipeline n?n.bakedMesh:null;}
     public final ChunkBoundRenderer chunkBoundRenderer;
 
     private final ViewportSelector<?> viewportSelector;
@@ -267,10 +268,11 @@ public class VoxyRenderSystem {
 
         //this.autoBalanceSubDivSize();
 
+        boolean bakedMeshActive = this.pipeline instanceof NormalRenderPipeline normal && normal.bakedMesh.active();
         this.pipeline.preSetup(viewport);
 
         TimingStatistics.E.start();
-        if ((!VoxyClient.disableSodiumChunkRender())&&!IrisUtil.irisShadowActive()) {
+        if (!bakedMeshActive && (!VoxyClient.disableSodiumChunkRender())&&!IrisUtil.irisShadowActive()) {
             this.chunkBoundRenderer.render(viewport);
         } else {
             viewport.depthBoundingBuffer.clear(this.properties.inverseClearDepth());
@@ -294,10 +296,10 @@ public class VoxyRenderSystem {
             //Tick upload stream (this is ok to do here as upload ticking is just memory management)
             UploadStream.INSTANCE.tick();
 
-            while (this.renderDistanceTracker.setCenterAndProcess(viewport.cameraX, viewport.cameraZ) && VoxyClient.isFrexActive());//While FF is active, run until everything is processed
+            if(!bakedMeshActive) while (this.renderDistanceTracker.setCenterAndProcess(viewport.cameraX, viewport.cameraZ) && VoxyClient.isFrexActive());//While FF is active, run until everything is processed
             TimingStatistics.H.start();
             //Done here as is allows less gl state resetup
-            do { this.modelService.tick(900_000); } while (VoxyClient.isFrexActive() && !this.modelService.areQueuesEmpty());
+            if(!bakedMeshActive) do { this.modelService.tick(900_000); } while (VoxyClient.isFrexActive() && !this.modelService.areQueuesEmpty());
             TimingStatistics.H.stop();
         }
         GPUTiming.INSTANCE.marker();

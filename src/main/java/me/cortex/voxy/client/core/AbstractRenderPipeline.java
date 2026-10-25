@@ -90,6 +90,8 @@ public abstract class AbstractRenderPipeline extends TrackedObject {
 
     }
 
+    protected boolean replacesVoxelGeometry(){return false;}
+
     protected abstract int setup(Viewport<?> viewport, int sourceFramebuffer, int srcWidth, int srcHeight);
     protected abstract void postOpaquePreTranslucent(Viewport<?> viewport, int sourceFrameBuffer);
     protected void finish(Viewport<?> viewport, int sourceFrameBuffer, int srcWidth, int srcHeight) {
@@ -100,6 +102,12 @@ public abstract class AbstractRenderPipeline extends TrackedObject {
     public void runPipeline(Viewport<?> viewport, int sourceFrameBuffer, int srcWidth, int srcHeight) {
         int depthTexture = this.setup(viewport, sourceFrameBuffer, srcWidth, srcHeight);
 
+        if(replacesVoxelGeometry()) {
+            this.postOpaquePreTranslucent(viewport,sourceFrameBuffer);
+            this.finish(viewport,sourceFrameBuffer,srcWidth,srcHeight);
+            glBindFramebuffer(GL_FRAMEBUFFER,sourceFrameBuffer);
+            return;
+        }
         var rs = ((AbstractSectionRenderer)this.sectionRenderer);
         GPUTiming.INSTANCE.marker("RO");
         rs.renderOpaque(viewport);

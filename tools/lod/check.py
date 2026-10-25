@@ -38,6 +38,8 @@ subprocess.run([java, "-Xmx256m", "-cp", str(classes), "LinkedSeamCheck"], check
 subprocess.run([java, "-Xmx256m", "-cp", str(classes), "HybridLodPolicyCheck"], check=True)
 subprocess.run([java, "-Xmx256m", "-cp", str(classes), "CoveragePrefixCheck"], check=True)
 subprocess.run([java, "-Xmx256m", "-cp", str(classes), "HybridGpuLayoutCheck"], check=True)
+subprocess.run([java, "-cp", str(classes), "MeshGpuLayoutCheck"], check=True)
+subprocess.run([java, "-cp", str(classes), "PackedQuadGpuCheck"], check=True)
 subprocess.run([sys.executable, "-m", "unittest", "discover", "-s", str(root / "tools/lod"), "-p", "test_*.py"], check=True)
 
 with tempfile.TemporaryDirectory(prefix="lod-anvil-check-") as temporary:

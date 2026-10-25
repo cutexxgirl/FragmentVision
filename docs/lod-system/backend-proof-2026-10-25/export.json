@@ -1,0 +1,18 @@
+{
+  "snapshot": "/workspace/scratch/mesh-package/source.fvvol.gz",
+  "origin": [
+    473,
+    -64,
+    889
+  ],
+  "size": [
+    46,
+    384,
+    46
+  ],
+  "palette": 224,
+  "unknown_voxels": 0,
+  "natural_voxels": 317116,
+  "saved_chunks_read": 16,
+  "source": "saved Anvil blocks; no regeneration; protected cube preview is diagnostic"
+}
