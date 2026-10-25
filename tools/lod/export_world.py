@@ -29,6 +29,23 @@ GROUND = {"minecraft:" + name for name in (
 ).split()}
 
 
+LEAVES = {"minecraft:" + species + "_leaves" for species in
+          ("oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry", "azalea", "flowering_azalea")}
+
+def simplifiable(state, simplify_leaves=False):
+    """Eligibility within an explicitly authorized natural box, never outside it.
+
+    Foliage is opt-in; persistent, waterlogged and unknown models stay protected.
+    This allows geometric experiments, not automatic identification of trees.
+    """
+    if state["Name"] in GROUND:
+        return True
+    props = state.get("Properties", {})
+    return (simplify_leaves and state["Name"] in LEAVES
+            and props.get("persistent") == "false"
+            and props.get("waterlogged", "false") == "false")
+
+
 def read_exact(stream, count):
     data = stream.read(count)
     if len(data) != count:
@@ -184,7 +201,7 @@ def state_key(state):
     return name + ("[" + ",".join(f"{k}={properties[k]}" for k in sorted(properties)) + "]" if properties else "")
 
 
-def export(region, output, origin, size, boxes, protected_boxes=()):
+def export(region, output, origin, size, boxes, protected_boxes=(), simplify_leaves=False):
     sx, sy, sz = size
     if min(size) < 1 or sx > 144 or sz > 144 or sy > 512 or sx * sy * sz > MAX_CELLS:
         raise ValueError("snapshot limit: 144 x 512 x 144, at most 8M voxels")
@@ -228,7 +245,7 @@ def export(region, output, origin, size, boxes, protected_boxes=()):
                         palette_ids[key] = len(palette)
                         palette.append(key)
                     ids[index] = palette_ids[key]
-                    natural[index] = state["Name"] in GROUND and any(
+                    natural[index] = simplifiable(state, simplify_leaves) and any(
                         a <= wx < d and b <= wy < e and c <= wz < f for a, b, c, d, e, f in boxes
                     ) and not any(a <= wx < d and b <= wy < e and c <= wz < f
                                   for a, b, c, d, e, f in protected_boxes)
@@ -274,10 +291,11 @@ def main():
                         help="author-approved natural volume: minXYZ maxXYZ (exclusive); repeatable")
     parser.add_argument("--protect-box", nargs=6, type=int, action="append", default=[],
                         help="protected volume, takes priority over natural boxes; repeatable")
+    parser.add_argument("--simplify-natural-leaves", action="store_true", help="Allow nonpersistent dry vanilla leaves inside natural boxes")
     args = parser.parse_args()
     if any(any(box[i] >= box[i + 3] for i in range(3)) for box in args.natural_box + args.protect_box):
         parser.error("boxes must have positive extents")
-    print(json.dumps(export(args.region, args.output, args.origin, args.size, args.natural_box, args.protect_box), indent=2))
+    print(json.dumps(export(args.region, args.output, args.origin, args.size, args.natural_box, args.protect_box, args.simplify_natural_leaves), indent=2))
 
 
 if __name__ == "__main__":

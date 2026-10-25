@@ -10,7 +10,7 @@ uniform vec3 u_Origin;
 out vec3 v_Position,v_Normal;
 void main(){
 #ifdef FV_PACKED_QUADS
- uvec2 q=quads[gl_InstanceID];uint lo=q.x,hi=q.y;
+ uvec2 q=quads[gl_BaseInstance+gl_InstanceID];uint lo=q.x,hi=q.y;
  uint face=(hi>>1u)&7u;float x=float(lo&63u),y=float((lo>>6u)&511u),z=float((lo>>15u)&63u);
  float u=float((lo>>21u)&63u)+1.,v=float(((lo>>27u)|(hi<<5u))&63u)+1.;
  uint light=(hi>>4u)&255u,material=(hi>>12u)&65535u;v_Attribute=(material<<11u)|(face<<8u)|light;

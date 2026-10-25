@@ -17,5 +17,9 @@ public record SurfaceMesh(float[] positions, float[] normals, int[] indices, int
     public int triangles() { return indices.length / 3; }
     /** v3 payload including the face-attribute dictionary; page header is separate. */
     public long packedBytes() { return MeshPage.payloadBytes(this); }
+    /** Actual buffers allocated by BakedMeshBackend, excluding shared material table. */
+    public long gpuBytes() {
+        return vertices()*8L + triangles()*4L + indices.length*(vertices()<=65536?2L:4L);
+    }
     public int attributeCount(){var values=new java.util.HashSet<Integer>();for(int data:faceData)values.add(data);return values.size();}
 }

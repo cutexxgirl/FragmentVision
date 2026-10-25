@@ -12,6 +12,8 @@ import java.util.*;
 public record PackedQuads(long[] data) {
     public PackedQuads { for(long q:data)validate(q); }
     public int triangles(){return Math.multiplyExact(data.length,2);}
+    /** Packed storage + shared six uint16 indices + seven indirect commands. */
+    public long gpuBytes(){return payloadBytes()+12+QuadFaceBuckets.COMMAND_BYTES;}
     public long payloadBytes(){return data.length*8L;}
     public static long encode(int x,int y,int z,int u,int v,int face,int material,int light) {
         if(x<0||x>63||y<0||y>511||z<0||z>63||u<1||u>64||v<1||v>64||face<0||face>5||material<1||material>65535||light<0||light>255)

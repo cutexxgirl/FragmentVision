@@ -1,0 +1,2 @@
+Shipping mesh shader: 6000 positions bit exact, all six normal axes correct; llvmpipe (LLVM 19.1.7, 256 bits)
+Shipping packed quad shader: all six faces, 2400 corners and material/light attributes bit-exact

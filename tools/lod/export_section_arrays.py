@@ -3,9 +3,9 @@ import sys,gzip,struct,json,os
 from pathlib import Path
 import numpy as np
 sys.path.insert(0,str(Path(__file__).resolve().parent))
-from export_world import Anvil,AIR,GROUND,state_key
+from export_world import Anvil,AIR,GROUND,state_key,simplifiable
 
-def export(region,output,origin,size,boxes):
+def export(region,output,origin,size,boxes,simplify_leaves=False):
  ox,oy,oz=origin;sx,sy,sz=size
  if sx<3 or sz<3 or sy<3 or sx>144 or sz>144 or sy>512 or sx*sy*sz>8*1024*1024:raise ValueError('Snapshot dimensions outside budget')
  if any(origin[i]+size[i]>2147483647 or origin[i]<-2147483648 for i in range(3)):raise ValueError('Snapshot coordinate range')
@@ -39,7 +39,7 @@ def export(region,output,origin,size,boxes):
      if not data:return np.zeros((16,16,16),dtype=np.uint8)
      d=np.frombuffer(bytes(data),dtype=np.uint8);v=np.empty(4096,dtype=np.uint8);v[::2]=d&15;v[1::2]=d>>4;return v.reshape(16,16,16)
     lights[dst]=(nibble(sky)[cut]<<4)|nibble(block)[cut]
-    ground=np.array([s['Name'] in GROUND for s in states],dtype=np.uint8)[b];allowed=np.zeros(b.shape,dtype=bool)
+    ground=np.array([simplifiable(s,simplify_leaves) for s in states],dtype=np.uint8)[b];allowed=np.zeros(b.shape,dtype=bool)
     ys=np.arange(wy+ay,wy+by)[:,None,None];zs=np.arange(wz+az,wz+bz)[None,:,None];xs=np.arange(wx+ax,wx+bx)[None,None,:]
     for a,bb,c,d,e,f in boxes:allowed|=(xs>=a)&(xs<d)&(ys>=bb)&(ys<e)&(zs>=c)&(zs<f)
     natural[dst]=ground&allowed
@@ -70,4 +70,5 @@ if __name__=='__main__':
  parser.add_argument('region',type=Path);parser.add_argument('output',type=Path)
  parser.add_argument('--origin',nargs=3,type=int,required=True);parser.add_argument('--size',nargs=3,type=int,required=True)
  parser.add_argument('--natural-box',nargs=6,type=int,action='append',default=[])
- args=parser.parse_args();print(json.dumps(export(args.region,args.output,args.origin,args.size,args.natural_box),indent=2))
+ parser.add_argument('--simplify-natural-leaves',action='store_true',help='Allow nonpersistent dry vanilla leaves inside natural boxes')
+ args=parser.parse_args();print(json.dumps(export(args.region,args.output,args.origin,args.size,args.natural_box,args.simplify_natural_leaves),indent=2))

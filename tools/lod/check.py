@@ -42,6 +42,7 @@ subprocess.run([java, "-cp", str(classes), "SurfaceDomainsCheck"], check=True)
 subprocess.run([java, "-cp", str(classes), "MeshLevelPolicyCheck"], check=True)
 subprocess.run([java, "-cp", str(classes), "MeshGpuLayoutCheck"], check=True)
 subprocess.run([java, "-cp", str(classes), "PackedQuadGpuCheck"], check=True)
+subprocess.run([java, "-cp", str(classes), "QuadFaceBucketsCheck"], check=True)
 subprocess.run([sys.executable, "-m", "unittest", "discover", "-s", str(root / "tools/lod"), "-p", "test_*.py"], check=True)
 
 with tempfile.TemporaryDirectory(prefix="lod-anvil-check-") as temporary:
@@ -63,6 +64,7 @@ with tempfile.TemporaryDirectory(prefix="lod-anvil-check-") as temporary:
         payload = first[page["file"]]
         assert page["bytes"] == len(payload)
         assert page["payload_bytes"] <= page["packed_payload_bytes"] <= page["voxy_quad_payload_bytes"]
+        assert page["gpu_geometry_bytes"] <= page["packed_payload_bytes"] + 152
         assert page["triangles"] <= page["packed_triangles"]
         if page["representation"] == "mesh":
             assert page["candidate_error"]["within_limit"]

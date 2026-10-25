@@ -58,7 +58,7 @@ public final class BakeProofMain {
                     else if(choice.quads().data().length<=32768)obj(staging.resolve(name+"-lod"+level+".obj"),choice.quads().mesh(x,z));
                     pages.add("{\"file\":"+json(file.getFileName().toString())+",\"sha256\":"+json(checksum)+",\"tile\":["+ox+","+oz+"],\"level\":"+level+
                             ",\"representation\":"+json(choice.isMesh()?"mesh":"quads")+",\"vertices\":"+(choice.isMesh()?choice.mesh().vertices():0)+
-                            ",\"triangles\":"+choice.triangles()+",\"payload_bytes\":"+choice.payloadBytes()+",\"bytes\":"+bytes+
+                            ",\"triangles\":"+choice.triangles()+",\"payload_bytes\":"+choice.payloadBytes()+",\"gpu_geometry_bytes\":"+(choice.isMesh()?choice.mesh().gpuBytes():choice.quads().gpuBytes())+",\"bytes\":"+bytes+
                             ",\"voxy_triangles\":"+baseline.triangles()+",\"voxy_quad_payload_bytes\":"+baseline.payloadBytes()+
                             ",\"packed_triangles\":"+ownExact.triangles()+",\"packed_payload_bytes\":"+ownExact.payloadBytes()+
                             ",\"error_limit_blocks\":"+TileBake.errorLimit(level)+",\"candidate_error\":"+errorJson(baked.errors()[level])+",\"reason\":"+json(choice.reason())+

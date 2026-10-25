@@ -23,7 +23,7 @@ public final class SurfaceDomainsCheck {
         }
         var s=LodComparisonCheck.fixture(1);var baked=TileBake.build(s,7,7,32,true);
         for(int l=0;l<3;l++)if(baked.choices()[l].isMesh()){
-            if(baked.choices()[l].triangles()>baked.exact().selected().triangles()*.75||baked.choices()[l].payloadBytes()>baked.exact().selected().payloadBytes()*2||!baked.errors()[l].withinLimit())throw new AssertionError("Triangle-priority gates");
+            if(baked.choices()[l].triangles()>baked.exact().selected().triangles()*.75||baked.choices()[l].payloadBytes()>baked.exact().selected().payloadBytes()*2||baked.choices()[l].mesh().gpuBytes()>baked.exact().selected().gpuBytes()*2||!baked.errors()[l].withinLimit())throw new AssertionError("Triangle-priority gates");
         }
         System.out.println("Visual surface domains and explicit triangle/memory trade: passed");
     }
