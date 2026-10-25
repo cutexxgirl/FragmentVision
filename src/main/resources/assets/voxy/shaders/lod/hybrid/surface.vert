@@ -6,6 +6,7 @@ uniform mat4 fv_SurfaceMVP;
 uniform vec3 fv_SurfaceOrigin;
 uniform float fv_HybridNear;
 uniform float fv_SurfacePixelScale;
+uniform vec3 fv_SurfaceBands;
 uniform int fv_SurfaceLevel;
 out vec3 fr_RelativePosition,fr_BaseLight,fr_CanopyNormal,fv_SurfaceNormal;
 out float fr_SkyLight,fr_BlockLight;
@@ -13,9 +14,13 @@ out vec3 fv_OriginalPosition,fv_CoveragePosition,fv_Tint;
 flat out vec3 fv_FaceNormal;
 flat out float fv_Material;
 void main(){
-    int address=int(faceVertex.x)*5;
-    MorphVertex point=MorphVertex(texelFetch(fv_MorphPositions,address),texelFetch(fv_MorphPositions,address+1),
-            texelFetch(fv_MorphPositions,address+2),texelFetch(fv_MorphPositions,address+3),texelFetch(fv_MorphPositions,address+4));
+    // HybridGpuLayout packs normal.xyz into the three morph targets' unused w slots.
+    int address=int(faceVertex.x)*4;
+    vec4 roundedPoint=texelFetch(fv_MorphPositions,address+1);
+    vec4 coarsePoint=texelFetch(fv_MorphPositions,address+2);
+    vec4 farPoint=texelFetch(fv_MorphPositions,address+3);
+    MorphVertex point=MorphVertex(texelFetch(fv_MorphPositions,address),roundedPoint,
+            coarsePoint,farPoint,vec4(roundedPoint.w,coarsePoint.w,farPoint.w,0));
     vec3 position=point.position.xyz,smoothed=point.smoothed.xyz,parent4=point.parent4.xyz,parent8=point.parent8.xyz,averagedNormal=point.normal.xyz;
     vec3 normals[6]=vec3[6](vec3(-1,0,0),vec3(1,0,0),vec3(0,-1,0),vec3(0,1,0),vec3(0,0,-1),vec3(0,0,1));
     vec3 faceNormal=normals[faceVertex.w&7u];
@@ -26,13 +31,13 @@ void main(){
 
     fv_CoveragePosition=position+fv_SurfaceOrigin;
     float distance=max(abs(fv_CoveragePosition.x),abs(fv_CoveragePosition.z));
-    float rounded=smoothstep(fv_HybridNear,fv_HybridNear+96.0,distance)*(1.0-locks.x);
-    float coarse=smoothstep(fv_HybridNear+96.0,fv_HybridNear+256.0,distance)*(1.0-locks.x);
+    float rounded=smoothstep(fv_HybridNear,fv_HybridNear+fv_SurfaceBands.x,distance)*(1.0-locks.x);
+    float coarse=smoothstep(fv_HybridNear+fv_SurfaceBands.x,fv_HybridNear+fv_SurfaceBands.y,distance)*(1.0-locks.x);
     // Every vertex collapsed onto the same parent follows the same next morph.
     // This permits removing its degenerate triangles throughout the transition.
     vec3 coarsePosition=parent4+fv_SurfaceOrigin;
     float farDistance=max(abs(coarsePosition.x),abs(coarsePosition.z));
-    float farCoarse=smoothstep(fv_HybridNear+256.0,fv_HybridNear+640.0,farDistance)*(1.0-locks.x);
+    float farCoarse=smoothstep(fv_HybridNear+fv_SurfaceBands.y,fv_HybridNear+fv_SurfaceBands.z,farDistance)*(1.0-locks.x);
     // Retain geometry when the proposed simplification would visibly move its silhouette.
     // FOV/resolution affect the decision; distance alone is not a quality measure.
     float pixels=fv_SurfacePixelScale/max(length(fv_CoveragePosition),1.0);

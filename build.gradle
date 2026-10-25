@@ -98,6 +98,17 @@ neoForge {
             client()
             gameDirectory = project.file('run')
             ideName = "NeoForge/Client"
+            if (project.hasProperty("lodSmoke")) {
+                systemProperty "fragment.lod.smoke", "true"
+            }
+            if (project.hasProperty("lodAerial")) {
+                systemProperty "fragment.lod.aerial", "true"
+                systemProperty "fragmentrender.renderDiagnostics", "true"
+                systemProperty "fragmentrender.shadowResolution", "1024"
+                jvmArguments.add('-Xmx4G')
+                if (project.hasProperty("lodWorld")) systemProperty "fragment.lod.world", project.property("lodWorld")
+                programArguments.addAll('--width', '960', '--height', '540')
+            }
         }
         server {
             server()
@@ -171,10 +182,23 @@ tasks.register('stripRocksDbJni', Jar) {
 }
 
 dependencies {
+    // Non-mod libraries are not discovered by FML from the dev runtime classpath.
+    // Keep them visible to development runs as documented by ModDevGradle.
+    additionalRuntimeClasspath 'org.rocksdb:rocksdbjni:10.2.1'
+    additionalRuntimeClasspath 'redis.clients:jedis:5.1.0'
+    additionalRuntimeClasspath 'org.apache.commons:commons-pool2:2.12.0'
+    additionalRuntimeClasspath 'org.tukaani:xz:1.10'
+    additionalRuntimeClasspath 'org.lz4:lz4-java:1.8.0'
+    additionalRuntimeClasspath 'org.xerial:sqlite-jdbc:3.49.1.0'
+    additionalRuntimeClasspath "org.lwjgl:lwjgl-lmdb:${project.lwjgl_version}"
+    additionalRuntimeClasspath "org.lwjgl:lwjgl-zstd:${project.lwjgl_version}"
+    additionalRuntimeClasspath "org.lwjgl:lwjgl-lmdb:${project.lwjgl_version}:natives-linux"
+    additionalRuntimeClasspath "org.lwjgl:lwjgl-zstd:${project.lwjgl_version}:natives-linux"
+    additionalRuntimeClasspath "org.lwjgl:lwjgl-lmdb:${project.lwjgl_version}:natives-windows"
+    additionalRuntimeClasspath "org.lwjgl:lwjgl-zstd:${project.lwjgl_version}:natives-windows"
     sodiumDistribution "maven.modrinth:sodium:${project.sodium_version_modrinth}"
     rocksdbJniDistribution 'org.rocksdb:rocksdbjni:10.2.1'
 
-    implementation "maven.modrinth:sodium:${project.sodium_version_modrinth}"
     compileOnly files(sodiumModJar)
 
     compileOnly "maven.modrinth:iris:${project.iris_version}"
@@ -183,8 +207,8 @@ dependencies {
     compileOnly "maven.modrinth:chunky:${project.chunky_version}"
 
     if (!isInGHA) {
-        runtimeOnly "maven.modrinth:sodium:${project.sodium_version_modrinth}"
-        runtimeOnly "maven.modrinth:iris:${project.iris_version}"
+        // Fragment Render owns terrain shaders in the aerial test pack.
+        if (!project.hasProperty("lodAerial")) runtimeOnly "maven.modrinth:iris:${project.iris_version}"
         runtimeOnly "maven.modrinth:lithium:${project.lithium_version}"
     }
 
@@ -329,4 +353,15 @@ tasks.named('jar', Jar) {
             archiveClassifier.set(hash.substring(0, 7))
         }
     }
+}
+
+// Sodium's bootstrap jar discovers its implementation through its early locator.
+// A normal mods-folder distribution avoids JarJar selecting the bootstrap itself
+// as the implementation when the distribution is on the development classpath.
+tasks.register('prepareSodiumRuntime', Copy) {
+    from configurations.sodiumDistribution
+    into layout.projectDirectory.dir('run/mods')
+}
+tasks.named('runClient') {
+    dependsOn tasks.named('prepareSodiumRuntime')
 }

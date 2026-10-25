@@ -1,0 +1,112 @@
+{
+  "date": "2026-10-24",
+  "scope": "first linked-history and bounded async implementation; full runtime renderer not implemented",
+  "compiler": "Temurin 21.0.8 --release 21; Java 25 allowed but not required",
+  "full_gradle_build": "passed; tests task has NO-SOURCE; separate standalone suite below",
+  "cpu_suite": {
+    "progressive_checks": 11678,
+    "linked_hill_triangles": [
+      1524,
+      942,
+      358
+    ],
+    "neighbour_level_pairs": 9,
+    "shared_contour_vertices": 43,
+    "existing_bake_invariants": 10088,
+    "existing_comparison_assertions": 245980,
+    "existing_direct_geometry_assertions": 3921906,
+    "python_tests": 9,
+    "max_heap_mib": 256,
+    "package_replay_and_refusal": "passed"
+  },
+  "client_smoke": {
+    "scope": "in-client CPU history/async integration on captured generated terrain; diagnostic cube input; no new terrain renderer",
+    "origin": [
+      -39,
+      22,
+      -7
+    ],
+    "steps": 455,
+    "source_triangles": 11962,
+    "linked_level_triangles": [
+      11660,
+      11356,
+      11052
+    ],
+    "exact_triangles": 10700,
+    "exact_payload_bytes": 42800,
+    "candidate_payload_bytes": [
+      132568,
+      129224,
+      125876
+    ],
+    "candidate_fits_own_geometry_budget": [
+      false,
+      false,
+      false
+    ],
+    "worker": "fragment-lod-worker-0"
+  },
+  "client_environment": {
+    "minecraft": "1.21.1",
+    "neoforge": "21.1.262",
+    "sodium": "0.8.13+mc1.21.1",
+    "renderer": "llvmpipe; Xvfb; Mesa GL/GLSL version overrides 4.6/460",
+    "legacy_lod_draw_enabled": false,
+    "native_sodium_draw_enabled": true,
+    "fragment_render_installed": false,
+    "checks": "generated-world capture -> background progressive builder -> client result; screenshot is native world",
+    "hardware_gpu_performance_test": false,
+    "shutdown": "client process terminated by test cleanup after success marker and screenshot; not asserted as a normal game exit"
+  },
+  "jar": {
+    "name": "voxy-0.2.16-beta-511b0f4.jar",
+    "sha256": "ed2828783a2b77e563c282683cd2ca1d8ad187730ef30d51c4159d7b4e3ac0c1",
+    "bytes": 12057319,
+    "new_backend_enabled": false
+  },
+  "source_sha256": {
+    "build.gradle": "9e54323a352f06559765021699bf24caa4bde31075b0db8a2dea200712048038",
+    "settings.gradle": "5dc3e8110802c58bb47bae44abfdb3b869d76ec330485fa5d15413ffb569952a",
+    "src/main/java/me/cortex/voxy/client/VoxyClient.java": "c91574773236d5e61b37f1947cfd44401a3a82960d55c3d2d593fd855f6e1970",
+    "src/main/java/me/cortex/voxy/client/core/rendering/lod/bake/ConformingSurface.java": "54233eb3769de2a4746970364fdf3a7c906aab85ab4385a65af971cc1d570b8d",
+    "src/main/java/me/cortex/voxy/client/core/rendering/lod/bake/GreedyQuadMesher.java": "f31a86ca4c2731a63012d1e2fc3e376a701375b245a0e8aa81c01f4187b37057",
+    "src/main/java/me/cortex/voxy/client/core/rendering/lod/bake/MeshPage.java": "c3274fa6169016426429957709e99d65d2f67ac8984283a7d160dd854ab10188",
+    "src/main/java/me/cortex/voxy/client/core/rendering/lod/bake/PackedQuads.java": "bb961bdffc58a07396ec0d56753fc4a41c122ce7d97d0526b7aa272df92ed0e8",
+    "src/main/java/me/cortex/voxy/client/core/rendering/lod/bake/ProgressiveMesh.java": "949df73d8fcd1069812ba74fe2d5fc7588bc5b77955babf3887da7b9bb741e43",
+    "src/main/java/me/cortex/voxy/client/core/rendering/lod/bake/QuadricSimplifier.java": "6269bf6bc7065ffba5d77ae5eced8712f02b985395b13d9fe54151c0e978abf1",
+    "src/main/java/me/cortex/voxy/client/core/rendering/lod/bake/RectangleMerger.java": "0ecfca2c8b47abace8e9315b3253e4fa67804efa4fdfb8780685dc7f7bf914ba",
+    "src/main/java/me/cortex/voxy/client/core/rendering/lod/bake/SurfaceError.java": "0a1221ab4ed23d3dbb1e9659449ba95b704b476cb3da2e001c739e2e2388f7d8",
+    "src/main/java/me/cortex/voxy/client/core/rendering/lod/bake/SurfaceExtractor.java": "3bb8f99b8a30ebcbdfaa96a396df9ebfb9b910d9286ed92909c6e3c00bf195a6",
+    "src/main/java/me/cortex/voxy/client/core/rendering/lod/bake/SurfaceMesh.java": "7557929396174845e536193b174be7c68abed690ccc9c6f03f91c8f40bece4a7",
+    "src/main/java/me/cortex/voxy/client/core/rendering/lod/bake/TileBake.java": "ed2839321c9cae3e621b864ed6582231454f38c24b91c028eeba932e2e1a8e75",
+    "src/main/java/me/cortex/voxy/client/core/rendering/lod/bake/VoxelSnapshot.java": "2e9d37868450b96831ba8a16850b8d8bfffd9f6d401046986d0e32d6efa97f88",
+    "src/main/java/me/cortex/voxy/client/core/rendering/lod/debug/LodClientSmoke.java": "7a82f854973e5bb590971eb02087afdb92efe89865907c1378382a861502eac8",
+    "src/main/java/me/cortex/voxy/client/core/rendering/lod/runtime/LodWorkQueue.java": "40a4de7039c620d7f4b3a7ca55dcc3e308d1649a3852b3487a926577718eeacc",
+    "tools/lod/BakeProofMain.java": "1f94b72be187ef3d7eed05a3b0f437b67f36359d797a45794bf8eb0fdd3db498",
+    "tools/lod/DirectGeometryCheck.java": "aecc099cc1dfefda104bdf79f9903f431e282c285add44a8d669b70c237552ba",
+    "tools/lod/LinkedSeamCheck.java": "2f116993b2de1971f172d402f0ad70cad67ea54c574b86420894fff9de8281ec",
+    "tools/lod/LodBakeCheck.java": "4d6b8beea9420760e4720e23e7c6dc07d25e89663198a2da46e5821e5555af4c",
+    "tools/lod/LodComparisonCheck.java": "ca42791951b57dd62ef2ec6176579de9eb93b673cd6787a65cf465a4e0fb6a62",
+    "tools/lod/ProgressiveRuntimeCheck.java": "7b9547cd4c01cde5ca9810f45a1eb591afb178e8fd265810e5071cceffc1660e",
+    "tools/lod/check.py": "a5e8c91b1b9e648aede7e72b43731c906a1e99d23ba58ef76d3b0773441be1a1",
+    "tools/lod/export_world.py": "5753f771fdd1677b19328255c050da7aa44b78fafc315c568062d36592b5e59d",
+    "tools/lod/preview.py": "8cddbc601dd0b5a7b07798a2adb49e70ccdbd531c2466554fa324c8c919e0d9b",
+    "tools/lod/test_export_world.py": "260bef74baaca37f622f37ab9363a35170e94efb1a6c12ae28615d48f59f2e98"
+  },
+  "artifacts_sha256": {
+    "client-smoke-result.json": "2faa426c224707fdee5f21a745a88ee000342af1dd5cad9e307eb6d9b9c08463",
+    "client-smoke.log": "9078f4adc19c7e3b2cd598134e46b4e715ae3968973eb319a4f6898f4b3b4b63",
+    "client-smoke.png": "dc08319265c37aec92c2cc2ed0ab482f2a275b603e0ac6b999b288852669951e"
+  },
+  "remaining": [
+    "swept intersection and full trajectory-distance verification",
+    "three accepted levels on real terrain at competitive total cost",
+    "versioned history package",
+    "coarse face/edge/corner hierarchy and parent stitching",
+    "native section ownership and new exclusive draw backend",
+    "GPU morph, streaming and edit integration",
+    "Fragment Render materials/lighting integration",
+    "hardware GPU A/B"
+  ]
+}

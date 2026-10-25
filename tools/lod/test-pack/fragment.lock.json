@@ -1,0 +1,14 @@
+{
+  "render": {
+    "commit": "0daec67a2e283b819a365b3f799ce85c789ea298",
+    "branch": "wip/hybrid-terrain",
+    "jar": "fragmentrender-1.1.0.jar",
+    "sha256": "419005d19bf29c57e1287aeb2b69b6b00b7be4099de2f5857612fb19a7be735a"
+  },
+  "grass": {
+    "commit": "52770fd3cd5277ebdc9f75db70eae2f5593a918d",
+    "branch": "final-grass",
+    "jar": "grassiergrass-private-1.4.5-private.2.jar",
+    "sha256": "a5d05f7e83206c2aac43ca8209f07eeeb963ff8a2d6852aa6787c8220be6eb23"
+  }
+}

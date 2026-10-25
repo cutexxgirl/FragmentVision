@@ -210,7 +210,12 @@ public class MDICSectionRenderer extends AbstractSectionRenderer<MDICViewport, B
         if (this.pipeline instanceof me.cortex.voxy.client.core.NormalRenderPipeline normal && normal.hybridTerrain != null)
             normal.hybridTerrain.bindMask(this.terrainShader.id(), viewport);
         try (var leaves = FragmentAtmosphereCompat.hasMaterial() ? this.modelStore.filteredLeaves() : null) { glMultiDrawElementsIndirectCountARB(GL_TRIANGLES, GL_UNSIGNED_SHORT, indirectOffset, drawCountOffset, maxDrawCount, 0); }
-        finally { FragmentAtmosphereCompat.releaseMaterial(); glBindTextureUnit(6, 0); glBindSampler(6, 0); }
+        finally {
+            FragmentAtmosphereCompat.releaseMaterial();
+            if (this.pipeline instanceof me.cortex.voxy.client.core.NormalRenderPipeline normal && normal.hybridTerrain != null)
+                normal.hybridTerrain.releaseMask();
+            glBindTextureUnit(6, 0); glBindSampler(6, 0);
+        }
         if (VoxyClient.getOcclusionDebugState()==3) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }

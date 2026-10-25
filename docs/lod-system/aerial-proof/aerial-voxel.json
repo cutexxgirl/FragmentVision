@@ -1,0 +1,619 @@
+{
+  "world": "lod-aerial-1792877016890",
+  "mode": "voxel",
+  "gpu": "llvmpipe (LLVM 19.1.7, 256 bits)",
+  "resolution": [
+    960,
+    540
+  ],
+  "camera": [
+    512.5,
+    180.0,
+    700.5,
+    0.0,
+    20.0
+  ],
+  "hybrid": "Hybrid WIP OFF: not built (WIP is off), GPU\u003d0MiB, last draw\u003d0 triangles, level tiles\u003d[0, 0, 0], early raster cull\u003dtrue",
+  "samples": [
+    {
+      "frame_ms": 1014.46494,
+      "lod_submit_cpu_ms": 739.905701,
+      "lod_gpu_ms": 736.26283
+    },
+    {
+      "frame_ms": 998.224574,
+      "lod_submit_cpu_ms": 710.217605,
+      "lod_gpu_ms": 706.825974
+    },
+    {
+      "frame_ms": 967.942512,
+      "lod_submit_cpu_ms": 692.722274,
+      "lod_gpu_ms": 688.349672
+    },
+    {
+      "frame_ms": 817.789625,
+      "lod_submit_cpu_ms": 547.905519,
+      "lod_gpu_ms": 544.562922
+    },
+    {
+      "frame_ms": 936.427211,
+      "lod_submit_cpu_ms": 662.750136,
+      "lod_gpu_ms": 659.206246
+    },
+    {
+      "frame_ms": 977.58169,
+      "lod_submit_cpu_ms": 693.463637,
+      "lod_gpu_ms": 687.655242
+    },
+    {
+      "frame_ms": 1032.672992,
+      "lod_submit_cpu_ms": 717.867564,
+      "lod_gpu_ms": 713.730734
+    },
+    {
+      "frame_ms": 886.533112,
+      "lod_submit_cpu_ms": 598.854984,
+      "lod_gpu_ms": 594.616404
+    },
+    {
+      "frame_ms": 959.849255,
+      "lod_submit_cpu_ms": 657.068331,
+      "lod_gpu_ms": 653.747523
+    },
+    {
+      "frame_ms": 980.536678,
+      "lod_submit_cpu_ms": 692.553829,
+      "lod_gpu_ms": 688.644031
+    },
+    {
+      "frame_ms": 854.334763,
+      "lod_submit_cpu_ms": 600.6392,
+      "lod_gpu_ms": 597.499134
+    },
+    {
+      "frame_ms": 935.968481,
+      "lod_submit_cpu_ms": 637.525974,
+      "lod_gpu_ms": 633.70131
+    },
+    {
+      "frame_ms": 1072.572705,
+      "lod_submit_cpu_ms": 783.669894,
+      "lod_gpu_ms": 780.078876
+    },
+    {
+      "frame_ms": 1009.214557,
+      "lod_submit_cpu_ms": 720.335276,
+      "lod_gpu_ms": 717.004051
+    },
+    {
+      "frame_ms": 984.821472,
+      "lod_submit_cpu_ms": 716.558483,
+      "lod_gpu_ms": 712.837725
+    },
+    {
+      "frame_ms": 1003.626636,
+      "lod_submit_cpu_ms": 716.019224,
+      "lod_gpu_ms": 712.687318
+    },
+    {
+      "frame_ms": 884.620061,
+      "lod_submit_cpu_ms": 624.799214,
+      "lod_gpu_ms": 605.748805
+    },
+    {
+      "frame_ms": 909.564848,
+      "lod_submit_cpu_ms": 631.489495,
+      "lod_gpu_ms": 612.169384
+    },
+    {
+      "frame_ms": 912.378002,
+      "lod_submit_cpu_ms": 641.499048,
+      "lod_gpu_ms": 638.29158
+    },
+    {
+      "frame_ms": 885.520775,
+      "lod_submit_cpu_ms": 588.547773,
+      "lod_gpu_ms": 585.271501
+    },
+    {
+      "frame_ms": 1027.491564,
+      "lod_submit_cpu_ms": 755.401221,
+      "lod_gpu_ms": 735.142994
+    },
+    {
+      "frame_ms": 1005.187402,
+      "lod_submit_cpu_ms": 694.468205,
+      "lod_gpu_ms": 690.101312
+    },
+    {
+      "frame_ms": 983.829825,
+      "lod_submit_cpu_ms": 690.425622,
+      "lod_gpu_ms": 686.4145
+    },
+    {
+      "frame_ms": 909.270194,
+      "lod_submit_cpu_ms": 629.241857,
+      "lod_gpu_ms": 625.983045
+    },
+    {
+      "frame_ms": 942.229318,
+      "lod_submit_cpu_ms": 659.637851,
+      "lod_gpu_ms": 655.659229
+    },
+    {
+      "frame_ms": 951.704981,
+      "lod_submit_cpu_ms": 670.189542,
+      "lod_gpu_ms": 667.196378
+    },
+    {
+      "frame_ms": 1051.677726,
+      "lod_submit_cpu_ms": 762.371535,
+      "lod_gpu_ms": 759.530636
+    },
+    {
+      "frame_ms": 1071.051869,
+      "lod_submit_cpu_ms": 748.275367,
+      "lod_gpu_ms": 744.868358
+    },
+    {
+      "frame_ms": 1050.532077,
+      "lod_submit_cpu_ms": 763.191965,
+      "lod_gpu_ms": 758.96362
+    },
+    {
+      "frame_ms": 913.899056,
+      "lod_submit_cpu_ms": 594.494429,
+      "lod_gpu_ms": 590.514764
+    },
+    {
+      "frame_ms": 962.992778,
+      "lod_submit_cpu_ms": 712.509035,
+      "lod_gpu_ms": 709.615164
+    },
+    {
+      "frame_ms": 868.607187,
+      "lod_submit_cpu_ms": 599.51471,
+      "lod_gpu_ms": 595.88256
+    },
+    {
+      "frame_ms": 992.19251,
+      "lod_submit_cpu_ms": 692.569004,
+      "lod_gpu_ms": 688.865512
+    },
+    {
+      "frame_ms": 1012.734078,
+      "lod_submit_cpu_ms": 740.860911,
+      "lod_gpu_ms": 737.520653
+    },
+    {
+      "frame_ms": 995.420363,
+      "lod_submit_cpu_ms": 713.891256,
+      "lod_gpu_ms": 710.482244
+    },
+    {
+      "frame_ms": 1009.394593,
+      "lod_submit_cpu_ms": 742.863326,
+      "lod_gpu_ms": 737.382785
+    },
+    {
+      "frame_ms": 1060.385314,
+      "lod_submit_cpu_ms": 751.269559,
+      "lod_gpu_ms": 747.774436
+    },
+    {
+      "frame_ms": 901.147092,
+      "lod_submit_cpu_ms": 607.759496,
+      "lod_gpu_ms": 604.545794
+    },
+    {
+      "frame_ms": 917.423327,
+      "lod_submit_cpu_ms": 629.06389,
+      "lod_gpu_ms": 625.701898
+    },
+    {
+      "frame_ms": 866.083381,
+      "lod_submit_cpu_ms": 599.424789,
+      "lod_gpu_ms": 595.900758
+    },
+    {
+      "frame_ms": 880.863363,
+      "lod_submit_cpu_ms": 621.286147,
+      "lod_gpu_ms": 618.521509
+    },
+    {
+      "frame_ms": 945.932324,
+      "lod_submit_cpu_ms": 669.399815,
+      "lod_gpu_ms": 666.158176
+    },
+    {
+      "frame_ms": 946.675677,
+      "lod_submit_cpu_ms": 621.116177,
+      "lod_gpu_ms": 617.865324
+    },
+    {
+      "frame_ms": 862.274977,
+      "lod_submit_cpu_ms": 587.453171,
+      "lod_gpu_ms": 584.033086
+    },
+    {
+      "frame_ms": 922.191544,
+      "lod_submit_cpu_ms": 640.430875,
+      "lod_gpu_ms": 637.102846
+    },
+    {
+      "frame_ms": 838.740003,
+      "lod_submit_cpu_ms": 584.49252,
+      "lod_gpu_ms": 581.084706
+    },
+    {
+      "frame_ms": 838.381627,
+      "lod_submit_cpu_ms": 570.81344,
+      "lod_gpu_ms": 567.558556
+    },
+    {
+      "frame_ms": 1011.544292,
+      "lod_submit_cpu_ms": 743.481033,
+      "lod_gpu_ms": 740.121609
+    },
+    {
+      "frame_ms": 1046.800146,
+      "lod_submit_cpu_ms": 775.438035,
+      "lod_gpu_ms": 771.505551
+    },
+    {
+      "frame_ms": 856.284172,
+      "lod_submit_cpu_ms": 582.361652,
+      "lod_gpu_ms": 578.482546
+    },
+    {
+      "frame_ms": 806.671934,
+      "lod_submit_cpu_ms": 587.603908,
+      "lod_gpu_ms": 584.483597
+    },
+    {
+      "frame_ms": 810.553995,
+      "lod_submit_cpu_ms": 589.955609,
+      "lod_gpu_ms": 586.774627
+    },
+    {
+      "frame_ms": 839.950785,
+      "lod_submit_cpu_ms": 595.580883,
+      "lod_gpu_ms": 592.374071
+    },
+    {
+      "frame_ms": 845.302957,
+      "lod_submit_cpu_ms": 542.338238,
+      "lod_gpu_ms": 538.325749
+    },
+    {
+      "frame_ms": 1007.15008,
+      "lod_submit_cpu_ms": 762.014752,
+      "lod_gpu_ms": 758.634613
+    },
+    {
+      "frame_ms": 900.897732,
+      "lod_submit_cpu_ms": 625.49826,
+      "lod_gpu_ms": 621.682128
+    },
+    {
+      "frame_ms": 833.842015,
+      "lod_submit_cpu_ms": 594.541896,
+      "lod_gpu_ms": 591.187555
+    },
+    {
+      "frame_ms": 924.439281,
+      "lod_submit_cpu_ms": 645.158459,
+      "lod_gpu_ms": 642.005067
+    },
+    {
+      "frame_ms": 863.315447,
+      "lod_submit_cpu_ms": 583.887858,
+      "lod_gpu_ms": 580.214025
+    },
+    {
+      "frame_ms": 970.190275,
+      "lod_submit_cpu_ms": 690.127593,
+      "lod_gpu_ms": 686.572359
+    },
+    {
+      "frame_ms": 936.148958,
+      "lod_submit_cpu_ms": 633.845715,
+      "lod_gpu_ms": 629.718398
+    },
+    {
+      "frame_ms": 887.180483,
+      "lod_submit_cpu_ms": 620.363202,
+      "lod_gpu_ms": 616.964464
+    },
+    {
+      "frame_ms": 850.134152,
+      "lod_submit_cpu_ms": 589.93632,
+      "lod_gpu_ms": 586.53844
+    },
+    {
+      "frame_ms": 990.543072,
+      "lod_submit_cpu_ms": 710.19134,
+      "lod_gpu_ms": 706.679953
+    },
+    {
+      "frame_ms": 1050.507646,
+      "lod_submit_cpu_ms": 726.777305,
+      "lod_gpu_ms": 722.844552
+    },
+    {
+      "frame_ms": 920.895534,
+      "lod_submit_cpu_ms": 655.139209,
+      "lod_gpu_ms": 651.542964
+    },
+    {
+      "frame_ms": 938.560549,
+      "lod_submit_cpu_ms": 655.754834,
+      "lod_gpu_ms": 652.601107
+    },
+    {
+      "frame_ms": 1055.528524,
+      "lod_submit_cpu_ms": 732.568484,
+      "lod_gpu_ms": 729.322924
+    },
+    {
+      "frame_ms": 1025.534632,
+      "lod_submit_cpu_ms": 720.403741,
+      "lod_gpu_ms": 716.874016
+    },
+    {
+      "frame_ms": 991.327073,
+      "lod_submit_cpu_ms": 723.138731,
+      "lod_gpu_ms": 719.673613
+    },
+    {
+      "frame_ms": 1061.826109,
+      "lod_submit_cpu_ms": 772.525236,
+      "lod_gpu_ms": 769.157836
+    },
+    {
+      "frame_ms": 950.223069,
+      "lod_submit_cpu_ms": 694.808656,
+      "lod_gpu_ms": 691.742226
+    },
+    {
+      "frame_ms": 922.411288,
+      "lod_submit_cpu_ms": 626.049623,
+      "lod_gpu_ms": 622.168332
+    },
+    {
+      "frame_ms": 933.380692,
+      "lod_submit_cpu_ms": 666.401085,
+      "lod_gpu_ms": 663.010906
+    },
+    {
+      "frame_ms": 983.481491,
+      "lod_submit_cpu_ms": 728.14499,
+      "lod_gpu_ms": 724.749478
+    },
+    {
+      "frame_ms": 931.498966,
+      "lod_submit_cpu_ms": 637.990108,
+      "lod_gpu_ms": 634.20308
+    },
+    {
+      "frame_ms": 849.992724,
+      "lod_submit_cpu_ms": 594.172794,
+      "lod_gpu_ms": 590.914098
+    },
+    {
+      "frame_ms": 842.325115,
+      "lod_submit_cpu_ms": 597.105085,
+      "lod_gpu_ms": 593.359534
+    },
+    {
+      "frame_ms": 884.599912,
+      "lod_submit_cpu_ms": 620.842621,
+      "lod_gpu_ms": 616.055767
+    },
+    {
+      "frame_ms": 1021.537762,
+      "lod_submit_cpu_ms": 741.385233,
+      "lod_gpu_ms": 738.483356
+    },
+    {
+      "frame_ms": 1013.941416,
+      "lod_submit_cpu_ms": 705.82201,
+      "lod_gpu_ms": 702.319426
+    },
+    {
+      "frame_ms": 1026.060243,
+      "lod_submit_cpu_ms": 744.850996,
+      "lod_gpu_ms": 738.453537
+    },
+    {
+      "frame_ms": 1046.302861,
+      "lod_submit_cpu_ms": 733.69352,
+      "lod_gpu_ms": 729.850763
+    },
+    {
+      "frame_ms": 994.36444,
+      "lod_submit_cpu_ms": 715.55291,
+      "lod_gpu_ms": 712.17829
+    },
+    {
+      "frame_ms": 981.040924,
+      "lod_submit_cpu_ms": 697.891003,
+      "lod_gpu_ms": 694.264477
+    },
+    {
+      "frame_ms": 964.673356,
+      "lod_submit_cpu_ms": 705.748462,
+      "lod_gpu_ms": 701.945996
+    },
+    {
+      "frame_ms": 946.394147,
+      "lod_submit_cpu_ms": 686.839833,
+      "lod_gpu_ms": 683.803137
+    },
+    {
+      "frame_ms": 969.016181,
+      "lod_submit_cpu_ms": 670.022034,
+      "lod_gpu_ms": 666.425924
+    },
+    {
+      "frame_ms": 1008.929004,
+      "lod_submit_cpu_ms": 724.348292,
+      "lod_gpu_ms": 721.02563
+    },
+    {
+      "frame_ms": 886.446499,
+      "lod_submit_cpu_ms": 615.201943,
+      "lod_gpu_ms": 611.962286
+    },
+    {
+      "frame_ms": 859.595466,
+      "lod_submit_cpu_ms": 600.088869,
+      "lod_gpu_ms": 580.027293
+    },
+    {
+      "frame_ms": 942.888934,
+      "lod_submit_cpu_ms": 675.949159,
+      "lod_gpu_ms": 672.727885
+    },
+    {
+      "frame_ms": 909.326294,
+      "lod_submit_cpu_ms": 591.242702,
+      "lod_gpu_ms": 588.458598
+    },
+    {
+      "frame_ms": 841.30146,
+      "lod_submit_cpu_ms": 565.42759,
+      "lod_gpu_ms": 561.956653
+    },
+    {
+      "frame_ms": 831.674985,
+      "lod_submit_cpu_ms": 562.959528,
+      "lod_gpu_ms": 559.620422
+    },
+    {
+      "frame_ms": 829.708781,
+      "lod_submit_cpu_ms": 570.849836,
+      "lod_gpu_ms": 567.197823
+    },
+    {
+      "frame_ms": 881.744594,
+      "lod_submit_cpu_ms": 607.67303,
+      "lod_gpu_ms": 603.094862
+    },
+    {
+      "frame_ms": 849.070365,
+      "lod_submit_cpu_ms": 596.442844,
+      "lod_gpu_ms": 593.125154
+    },
+    {
+      "frame_ms": 823.999501,
+      "lod_submit_cpu_ms": 588.073603,
+      "lod_gpu_ms": 584.928374
+    },
+    {
+      "frame_ms": 851.753696,
+      "lod_submit_cpu_ms": 599.558348,
+      "lod_gpu_ms": 596.449134
+    },
+    {
+      "frame_ms": 875.470557,
+      "lod_submit_cpu_ms": 608.246166,
+      "lod_gpu_ms": 604.972143
+    },
+    {
+      "frame_ms": 905.590888,
+      "lod_submit_cpu_ms": 606.301119,
+      "lod_gpu_ms": 602.43408
+    },
+    {
+      "frame_ms": 868.951363,
+      "lod_submit_cpu_ms": 582.876486,
+      "lod_gpu_ms": 578.98845
+    },
+    {
+      "frame_ms": 869.557047,
+      "lod_submit_cpu_ms": 597.886083,
+      "lod_gpu_ms": 594.597668
+    },
+    {
+      "frame_ms": 1077.361992,
+      "lod_submit_cpu_ms": 777.962446,
+      "lod_gpu_ms": 773.823016
+    },
+    {
+      "frame_ms": 1034.574603,
+      "lod_submit_cpu_ms": 759.018439,
+      "lod_gpu_ms": 755.263263
+    },
+    {
+      "frame_ms": 984.825293,
+      "lod_submit_cpu_ms": 709.220935,
+      "lod_gpu_ms": 705.516762
+    },
+    {
+      "frame_ms": 935.695162,
+      "lod_submit_cpu_ms": 648.132689,
+      "lod_gpu_ms": 643.893724
+    },
+    {
+      "frame_ms": 842.866007,
+      "lod_submit_cpu_ms": 566.948972,
+      "lod_gpu_ms": 563.087486
+    },
+    {
+      "frame_ms": 1119.152751,
+      "lod_submit_cpu_ms": 801.605054,
+      "lod_gpu_ms": 798.139275
+    },
+    {
+      "frame_ms": 994.616165,
+      "lod_submit_cpu_ms": 688.108327,
+      "lod_gpu_ms": 684.863679
+    },
+    {
+      "frame_ms": 1019.810837,
+      "lod_submit_cpu_ms": 744.581906,
+      "lod_gpu_ms": 741.09435
+    },
+    {
+      "frame_ms": 837.698585,
+      "lod_submit_cpu_ms": 593.165481,
+      "lod_gpu_ms": 589.014032
+    },
+    {
+      "frame_ms": 933.326406,
+      "lod_submit_cpu_ms": 662.841017,
+      "lod_gpu_ms": 658.392054
+    },
+    {
+      "frame_ms": 942.037108,
+      "lod_submit_cpu_ms": 681.89048,
+      "lod_gpu_ms": 678.435683
+    },
+    {
+      "frame_ms": 857.879351,
+      "lod_submit_cpu_ms": 598.136964,
+      "lod_gpu_ms": 594.823041
+    },
+    {
+      "frame_ms": 918.318784,
+      "lod_submit_cpu_ms": 623.427358,
+      "lod_gpu_ms": 620.018336
+    },
+    {
+      "frame_ms": 1043.700147,
+      "lod_submit_cpu_ms": 770.372575,
+      "lod_gpu_ms": 766.810346
+    },
+    {
+      "frame_ms": 1095.326956,
+      "lod_submit_cpu_ms": 819.836928,
+      "lod_gpu_ms": 816.041111
+    },
+    {
+      "frame_ms": 974.728248,
+      "lod_submit_cpu_ms": 698.334345,
+      "lod_gpu_ms": 694.644694
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+[21:03:54] [main/INFO] [cp.mo.mo.Launcher/MODLAUNCHER]: ModLauncher 11.0.5+main.901c6ea8 starting: java version 21.0.8 by Eclipse Adoptium; OS Linux arch amd64 version 6.18.55
+[21:03:55] [pool-2-thread-1/INFO] [EARLYDISPLAY/]: GL info: llvmpipe (LLVM 19.1.7, 256 bits) GL version 4.6 (Core Profile) Mesa 25.0.7-2+deb13u1, Mesa
+		Sodium 0.8.13+mc1.21.1 (sodium)
+		Voxy 0.2.16-beta (voxy)
+[21:04:18] [Server thread/INFO] [minecraft/IntegratedServer]: Starting integrated minecraft server version 1.21.1
+[21:04:40] [Render thread/INFO] [Voxy/]: [nt.mt.ct.rr.LevelRenderer]: Not creating renderer due to disabled rendering
+FRAGMENT_LOD_SMOKE_PASSED {"scope":"in-client CPU history/async integration on captured generated terrain; diagnostic cube input; no new terrain renderer","origin":[-39,22,-7],"steps":455,"source_triangles":11962,"linked_level_triangles":[11660, 11356, 11052],"exact_triangles":10700,"exact_payload_bytes":42800,"candidate_payload_bytes":[132568, 129224, 125876],"candidate_fits_own_geometry_budget":[false, false, false],"worker":"fragment-lod-worker-0"}
+Снимок экрана сохранён как lod-smoke.png

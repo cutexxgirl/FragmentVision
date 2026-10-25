@@ -8,3 +8,4 @@
 
 # Local caches, generated captures and reference checkouts
 /.vscode/
+/tools/lod/__pycache__/

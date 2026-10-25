@@ -1,0 +1,14 @@
+[05:32:55] [Render thread/INFO] [STDOUT/]: [me.cortex.voxy.client.core.rendering.lod.debug.LodAerialProbe:note:78]: FRAGMENT_AERIAL opening
+[05:32:57] [Render thread/INFO] [STDOUT/]: [me.cortex.voxy.client.core.rendering.lod.debug.LodAerialProbe:note:78]: FRAGMENT_AERIAL pregenerating
+[05:33:03] [Render thread/INFO] [co.fr.fr.wo.WorldPipeline/]: Fragment OpenGL world pipeline active: Sodium 0.8, no Iris, 960x540, 32 water mask frames
+[05:35:22] [Render thread/INFO] [STDOUT/]: [me.cortex.voxy.client.core.rendering.lod.debug.LodAerialProbe:note:78]: FRAGMENT_AERIAL saving-pregeneration
+[05:35:24] [Render thread/INFO] [STDOUT/]: [me.cortex.voxy.client.core.rendering.lod.debug.LodAerialProbe:note:78]: FRAGMENT_AERIAL importing
+[05:35:49] [Render thread/INFO] [STDOUT/]: [me.cortex.voxy.client.core.rendering.lod.debug.LodAerialProbe:note:78]: FRAGMENT_AERIAL ready
+[05:36:07] [Render thread/INFO] [STDOUT/]: [me.cortex.voxy.client.core.rendering.lod.debug.LodAerialProbe:note:78]: FRAGMENT_AERIAL ready
+[05:36:57] [Render thread/INFO] [STDOUT/]: [me.cortex.voxy.client.core.rendering.lod.debug.LodAerialProbe:frame:186]: FRAGMENT_AERIAL_MEASURED aerial-native 120
+[05:37:24] [Render thread/INFO] [STDOUT/]: [me.cortex.voxy.client.core.rendering.lod.debug.LodAerialProbe:note:78]: FRAGMENT_AERIAL ready
+[05:40:59] [Render thread/INFO] [STDOUT/]: [me.cortex.voxy.client.core.rendering.lod.debug.LodAerialProbe:frame:186]: FRAGMENT_AERIAL_MEASURED aerial-voxel 120
+[05:42:01] [Render thread/INFO] [STDOUT/]: [me.cortex.voxy.client.core.rendering.lod.debug.LodAerialProbe:tick:142]: FRAGMENT_AERIAL building 64-block tiles, ready payload budget 16MiB
+[05:42:01] [Render thread/INFO] [STDOUT/]: [me.cortex.voxy.client.core.rendering.lod.debug.LodAerialProbe:note:78]: FRAGMENT_AERIAL ready
+[05:45:14] [Render thread/INFO] [Voxy/]: [me.cx.vy.ct.ce.rg.hd.HybridTerrain]: Hybrid tiled terrain ready: Hybrid WIP ON: 213 tiles, indices fine/coarse/far=4642714/2629709/2104995, 190883ms CPU, max tile input=1800KiB, max tile mesh=4883KiB, observed heap=2344MiB, skipped=0, GPU fallback=0, reused=0, GPU=456MiB, last draw=2221241 triangles, level tiles=[43, 67, 7], early raster cull=true
+[05:48:48] [Render thread/INFO] [STDOUT/]: [me.cortex.voxy.client.core.rendering.lod.debug.LodAerialProbe:frame:186]: FRAGMENT_AERIAL_MEASURED aerial-hybrid-cull 60

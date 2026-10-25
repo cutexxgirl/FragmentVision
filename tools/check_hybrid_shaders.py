@@ -1,10 +1,14 @@
 """Compile the actual WIP and ordinary Vision shaders against the actual Render material files."""
 from pathlib import Path
-import re,json
+import re,json,argparse
 import moderngl
 root=Path(__file__).resolve().parents[1]
 v=root/'src/main/resources/assets/voxy/shaders'
-r=root.parent/'fragmentrender-sky/src/main/resources/assets/fragmentrender/shaders/world'
+parser=argparse.ArgumentParser()
+parser.add_argument('--render-root',type=Path,default=root.parent/'fragmentrender')
+parser.add_argument('--output',type=Path,default=root/'docs/hybrid-wip/gpu-shaders.json')
+args=parser.parse_args()
+r=args.render_root/'src/main/resources/assets/fragmentrender/shaders/world'
 def parse(path):
     s=(v/path).read_text()
     s=re.sub(r'^#version.*$','',s,flags=re.M)
@@ -23,6 +27,6 @@ for reverse in (False,True):
     p=ctx.program(vertex_shader=prefix+parse('lod/hybrid/surface.vert'),fragment_shader=prefix+parse('lod/hybrid/surface.frag').replace('// FRAGMENT_MATERIAL_SOURCE',material))
     programs.append(f'surface reverseZ={reverse}')
 report={'result':'passed','renderer':ctx.info['GL_RENDERER'],'programs':programs}
-out=root/'docs/hybrid-wip';out.mkdir(parents=True,exist_ok=True)
-(out/'gpu-shaders.json').write_text(json.dumps(report,indent=2)+'\n')
+args.output.parent.mkdir(parents=True,exist_ok=True)
+args.output.write_text(json.dumps(report,indent=2)+'\n')
 print(json.dumps(report,indent=2))

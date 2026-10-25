@@ -50,10 +50,15 @@ public final class HybridTerrain implements AutoCloseable {
     private boolean enabled;
     private volatile boolean closed;
     private long nextBuildNanos,gpuBytes,lastDrawTriangles;
+    private final int[] lastLevelTiles=new int[3];
     private float pixelScale=360;
     private String status="not built (WIP is off)";
     private Shader shader;
-    private int coverage,textures;
+    private int coverage,coverageSum,textures;
+    private CoveragePrefix prefix;
+    private boolean earlyCull=true;
+    private boolean prefixBound;
+    private int savedPrefixTexture,savedPrefixSampler;
     private int uploaded,gpuRejected;
     private record State(int layer,boolean skip,float topOffset) {}
     private record Catalog(State[] states,byte[] pixels,float[] material,int[][] tint) {}
@@ -96,7 +101,8 @@ public final class HybridTerrain implements AutoCloseable {
         }catch(Exception e){Logger.error("Hybrid tile preparation failed",e);return status="preparation failed; voxel fallback";}
     }
     public String enabled(boolean value){enabled=value;return status();}
-    public String status(){return "Hybrid WIP "+(enabled?"ON: ":"OFF: ")+status+", GPU="+(gpuBytes/1048576)+"MiB, last draw="+lastDrawTriangles+" triangles";}
+    public void earlyCull(boolean value){earlyCull=value;}
+    public String status(){return "Hybrid WIP "+(enabled?"ON: ":"OFF: ")+status+", GPU="+(gpuBytes/1048576)+"MiB, last draw="+lastDrawTriangles+" triangles, level tiles="+Arrays.toString(lastLevelTiles)+", early raster cull="+earlyCull;}
     public void changed(WorldSection section,int flags){
         Request r=request;if(r==null||(flags&WorldEngine.UPDATE_TYPE_BLOCK_BIT)==0||section.lvl!=0)return;
         int x=section.x<<5,z=section.z<<5;
@@ -221,15 +227,29 @@ public final class HybridTerrain implements AutoCloseable {
     public void bindMask(int program,Viewport<?> view){
         Request r=request;boolean use=enabled&&r!=null&&!tiles.isEmpty()&&!closed;
         glUniform1i(glGetUniformLocation(program,"fv_HybridEnabled"),use?1:0);
+        glUniform1i(glGetUniformLocation(program,"fv_HybridEarlyCull"),use&&earlyCull?1:0);
+        // Set the integer sampler even when disabled: aliasing a float sampler on unit 0 invalidates the draw.
+        glUniform1i(glGetUniformLocation(program,"fv_HybridCoverageSum"),13);
         glUniform1i(glGetUniformLocation(program,"fv_HybridCoverage"),6);if(!use)return;
+        if(prefix.dirty())glTextureSubImage2D(coverageSum,0,0,0,CELLS+1,CELLS+1,GL_RED_INTEGER,GL_UNSIGNED_INT,prefix.rebuild());
+        if(!prefixBound){
+            int active=glGetInteger(GL_ACTIVE_TEXTURE);glActiveTexture(GL_TEXTURE0+13);
+            savedPrefixTexture=glGetInteger(GL_TEXTURE_BINDING_2D);glActiveTexture(active);
+            savedPrefixSampler=glGetIntegeri(GL_SAMPLER_BINDING,13);prefixBound=true;
+        }
+        glBindTextureUnit(13,coverageSum);glBindSampler(13,0);
         glBindTextureUnit(6,coverage);glBindSampler(6,0);
         glUniform4f(glGetUniformLocation(program,"fv_HybridGrid"),(float)(r.x-view.cameraX),(float)(r.z-view.cameraZ),STEP,CELLS);
         glUniform1f(glGetUniformLocation(program,"fv_HybridNear"),Minecraft.getInstance().options.getEffectiveRenderDistance()*16f+48);
     }
+    public void releaseMask(){
+        if(prefixBound){glBindTextureUnit(13,savedPrefixTexture);glBindSampler(13,savedPrefixSampler);prefixBound=false;}
+    }
     public void render(Viewport<?> view){
-        lastDrawTriangles=0;if(!enabled||request==null||tiles.isEmpty())return;
+        lastDrawTriangles=0;Arrays.fill(lastLevelTiles,0);if(!enabled||request==null||tiles.isEmpty())return;
         shader.bind();bindMask(shader.id(),view);
         glUniform1f(glGetUniformLocation(shader.id(),"fv_SurfacePixelScale"),pixelScale);
+        glUniform3f(glGetUniformLocation(shader.id(),"fv_SurfaceBands"),HybridLodPolicy.ROUND_END,HybridLodPolicy.COARSE_END,HybridLodPolicy.FAR_END);
         glBindTextureUnit(0,textures);glBindSampler(0,0);glBindTextureUnit(2,view.depthBoundingBuffer.getDepthTex().id);
         glUniform1i(glGetUniformLocation(shader.id(),"fv_SurfaceTextures"),0);
         try(var stack=MemoryStack.stackPush()){glUniformMatrix4fv(glGetUniformLocation(shader.id(),"fv_SurfaceMVP"),false,view.MVP.get(stack.mallocFloat(16)));}
@@ -241,15 +261,17 @@ public final class HybridTerrain implements AutoCloseable {
                 float x=(float)(t.x-view.cameraX),z=(float)(t.z-view.cameraZ);
                 if(!view.frustum.testAab(x-4,t.minY-(float)view.cameraY-4,z-4,x+TILE+4,t.maxY-(float)view.cameraY+4,z+TILE+4))continue;
                 float dx=Math.max(0,Math.max(x,-(x+TILE))),dz=Math.max(0,Math.max(z,-(z+TILE)));
-                float minDistance=Math.max(dx,dz),projected=pixelScale/Math.max(1,minDistance);
-                int level=minDistance>=near+256&&t.coarseError*projected<=2?1:0;
-                if(level==1&&minDistance>=near+644&&t.farError*projected<=2)level=2;
+                float minDistance=Math.max(dx,dz);
+                float dy=Math.max(0,Math.max(t.minY-(float)view.cameraY,(float)view.cameraY-t.maxY));
+                float spatialDistance=Math.max(1,(float)Math.sqrt(dx*dx+dy*dy+dz*dz)-HybridLodPolicy.TARGET_MARGIN);
+                int level=HybridLodPolicy.level(minDistance,spatialDistance,near,pixelScale,t.coarseError,t.farError);
+                lastLevelTiles[level]++;
                 glUniform1i(glGetUniformLocation(shader.id(),"fv_SurfaceLevel"),level);
                 glUniform3f(glGetUniformLocation(shader.id(),"fv_SurfaceOrigin"),x-HALO,(float)-view.cameraY,z-HALO);
                 glBindVertexArray(t.vao);glVertexArrayElementBuffer(t.vao,t.ibo[level]);glBindTextureUnit(12,t.morphTexture);glBindSampler(12,0);
                 glDrawElements(GL_TRIANGLES,t.count[level],GL_UNSIGNED_INT,0L);lastDrawTriangles+=t.count[level]/3;
             }
-        }finally{FragmentAtmosphereCompat.releaseMaterial();glBindVertexArray(0);glBindTextureUnit(12,0);glEnable(GL_CULL_FACE);glBindTextureUnit(0,0);glBindTextureUnit(6,0);}
+        }finally{FragmentAtmosphereCompat.releaseMaterial();releaseMask();glBindVertexArray(0);glBindTextureUnit(12,0);glEnable(GL_CULL_FACE);glBindTextureUnit(0,0);glBindTextureUnit(6,0);}
     }
     private Catalog catalog() throws Exception {
         var mc=Minecraft.getInstance();var entries=world.getMapper().getStateEntries();
@@ -297,6 +319,10 @@ public final class HybridTerrain implements AutoCloseable {
         for(var it=tiles.values().iterator();it.hasNext();){GpuTile t=it.next();if(t.x<r.x||t.z<r.z||t.x>=r.x+SIZE||t.z>=r.z+SIZE){gpuBytes-=t.bytes;t.close();it.remove();}}
         completedTiles.keySet().removeIf(key->{int x=(int)(key>>32),z=(int)(long)key;return x<r.x||z<r.z||x>=r.x+SIZE||z>=r.z+SIZE;});
         if(coverage!=0)glDeleteTextures(coverage);
+        if(coverageSum!=0)glDeleteTextures(coverageSum);
+        prefix=new CoveragePrefix(CELLS);
+        coverageSum=glCreateTextures(GL_TEXTURE_2D);glTextureStorage2D(coverageSum,1,GL_R32UI,CELLS+1,CELLS+1);
+        glTextureParameteri(coverageSum,GL_TEXTURE_MIN_FILTER,GL_NEAREST);glTextureParameteri(coverageSum,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
         coverage=glCreateTextures(GL_TEXTURE_2D);glTextureStorage2D(coverage,1,GL_R32F,CELLS,CELLS);
         glTextureSubImage2D(coverage,0,0,0,CELLS,CELLS,GL_RED,GL_FLOAT,new float[CELLS*CELLS]);
         glTextureParameteri(coverage,GL_TEXTURE_MIN_FILTER,GL_NEAREST);glTextureParameteri(coverage,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
@@ -310,21 +336,23 @@ public final class HybridTerrain implements AutoCloseable {
         glTextureParameteri(textures,GL_TEXTURE_MAG_FILTER,GL_LINEAR);glTextureParameteri(textures,GL_TEXTURE_WRAP_S,GL_REPEAT);glTextureParameteri(textures,GL_TEXTURE_WRAP_T,GL_REPEAT);
     }
     private void publishCoverage(Request r,int x,int z,float[] values){
+        prefix.put((x-r.x)/STEP,(z-r.z)/STEP,TILE/STEP,TILE/STEP,values);
         glTextureSubImage2D(coverage,0,(x-r.x)/STEP,(z-r.z)/STEP,TILE/STEP,TILE/STEP,GL_RED,GL_FLOAT,values);
     }
     private void upload(TileResult result){
         HybridVoxelMesh.Mesh m=result.mesh;long key=key(result.x,result.z);GpuTile previous=tiles.get(key);
-        long bytes=m.bytes()-m.coverage().length*4L;
+        long bytes=m.bytes()-m.coverage().length*4L-m.positions().length*4L+HybridGpuLayout.positionBytes(m.positions().length);
         if(gpuBytes-(previous==null?0:previous.bytes)+bytes>GPU_BUDGET){gpuRejected++;if(gpuRejected==1)Logger.warn("Hybrid GPU budget reached; keeping fallback tiles");return;}
         GpuTile t=new GpuTile();t.x=result.x;t.z=result.z;t.bytes=bytes;t.coverage=m.coverage();t.coarseError=m.coarseError();t.farError=m.farError();
         t.minY=Float.POSITIVE_INFINITY;t.maxY=Float.NEGATIVE_INFINITY;
         for(int i=0;i<m.positions().length;i+=HybridVoxelMesh.STRIDE){t.minY=Math.min(t.minY,m.positions()[i+1]);t.maxY=Math.max(t.maxY,m.positions()[i+1]);}
         if(m.indices().length>0){
             try{
-                if(m.positions().length/4>glGetInteger(GL_MAX_TEXTURE_BUFFER_SIZE))throw new IllegalStateException("tile exceeds texture buffer limit");
+                var gpuPositions=HybridGpuLayout.compactPositions(m.positions());
+                if(gpuPositions.length/4>glGetInteger(GL_MAX_TEXTURE_BUFFER_SIZE))throw new IllegalStateException("tile exceeds texture buffer limit");
                 t.vao=glCreateVertexArrays();t.vbo=glCreateBuffers();t.morphBuffer=glCreateBuffers();t.morphTexture=glCreateTextures(GL_TEXTURE_BUFFER);
                 glVertexArrayVertexBuffer(t.vao,0,t.vbo,0,16);glEnableVertexArrayAttrib(t.vao,0);glVertexArrayAttribIFormat(t.vao,0,4,GL_UNSIGNED_INT,0);glVertexArrayAttribBinding(t.vao,0,0);
-                glNamedBufferData(t.vbo,m.vertices(),GL_STATIC_DRAW);glNamedBufferData(t.morphBuffer,m.positions(),GL_STATIC_DRAW);glTextureBuffer(t.morphTexture,GL_RGBA32F,t.morphBuffer);
+                glNamedBufferData(t.vbo,m.vertices(),GL_STATIC_DRAW);glNamedBufferData(t.morphBuffer,gpuPositions,GL_STATIC_DRAW);glTextureBuffer(t.morphTexture,GL_RGBA32F,t.morphBuffer);
                 int[][] indices={m.indices(),m.coarseIndices(),m.farIndices()};
                 for(int i=0;i<3;i++){t.ibo[i]=glCreateBuffers();t.count[i]=indices[i].length;glNamedBufferData(t.ibo[i],indices[i],GL_STATIC_DRAW);}
             }catch(Exception error){t.close();throw error;}
@@ -339,6 +367,6 @@ public final class HybridTerrain implements AutoCloseable {
         closed=true;enabled=false;worker.shutdownNow();drainReady();
         try{if(!worker.awaitTermination(5,TimeUnit.SECONDS))Logger.warn("Hybrid worker stopping; engine ref retained until completion");}catch(InterruptedException e){Thread.currentThread().interrupt();}
         drainReady();for(GpuTile t:tiles.values())t.close();tiles.clear();completedTiles.clear();gpuBytes=0;
-        if(shader!=null)shader.free();if(coverage!=0)glDeleteTextures(coverage);if(textures!=0)glDeleteTextures(textures);
+        if(shader!=null)shader.free();if(coverage!=0)glDeleteTextures(coverage);if(coverageSum!=0)glDeleteTextures(coverageSum);if(textures!=0)glDeleteTextures(textures);
     }
 }

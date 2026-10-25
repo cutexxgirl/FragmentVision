@@ -38,6 +38,9 @@ layout(location = 0) out flat uvec4 interData;
 #ifdef FV_HYBRID_TERRAIN
 out vec3 fv_HybridPosition;
 flat out int fv_HybridNatural;
+#if !defined(TRANSLUCENT)
+#import <voxy:lod/hybrid/early_cull.glsl>
+#endif
 #endif
 #ifndef USE_NV_BARRY
 layout(location = 1) out vec2 uv;
@@ -73,6 +76,13 @@ void main() {
     fv_HybridNatural=int((modelData[extractStateId(hybridRaw)].flagsA>>8u)&1u);
     vec2 hybridCorner=vec2((cornerId>>1)&1u,cornerId&1u)*quad.lodScale;
     fv_HybridPosition=quad.basePoint+swizzelDataAxis(quad.axis,vec3(quad.quadSizeAddin*hybridCorner,0))-cameraSubPos;
+#if !defined(TRANSLUCENT)
+    if(fv_HybridNatural!=0&&fv_hybridFullyCovered(quad.basePoint-cameraSubPos,
+            quad.basePoint+swizzelDataAxis(quad.axis,vec3(quad.quadSizeAddin*quad.lodScale,0))-cameraSubPos)){
+        // All four vertices take the same branch. Clip the whole quad before rasterization.
+        gl_Position=vec4(0,0,2,1);return;
+    }
+#endif
 #endif
 #ifdef FR_LOD_MATERIAL
     Quad raw = quadData[uint(gl_VertexID)>>2];

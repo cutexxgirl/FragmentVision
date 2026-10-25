@@ -62,6 +62,8 @@ public class VoxyClient {
 
     public static void onInitializeClient() {
         DebugEntries.init();
+        me.cortex.voxy.client.core.rendering.lod.debug.LodClientSmoke.install();
+        if (Boolean.getBoolean("fragment.lod.aerial")) me.cortex.voxy.client.core.rendering.lod.debug.LodAerialProbe.install();
 
         NeoForge.EVENT_BUS.addListener(VoxyClient::registerCommands);
     }

@@ -1,0 +1,577 @@
+{
+  "kind": "offline direct geometric simplification, not a hardware renderer result",
+  "date": "2026-10-24",
+  "base_commit": "511b0f41c85a1cce5fe8800603d9dc4a25cf2249",
+  "algorithm": "merged-boundary-edge-collapse-v1",
+  "pre_smoothing": false,
+  "world_error_caps_blocks": [
+    0.5,
+    1.0,
+    1.5
+  ],
+  "baseline": {
+    "source": "src/main/java/me/cortex/voxy/client/core/util/ScanMesher2D.java",
+    "unchanged_from_base": true,
+    "sha256": "7e078ae5ed25af53c763341414f1926d43fc28d0498a01a637738ff3a4d82853",
+    "scope": "same unit-resolution visible cube faces, state+biome+saved light, world-aligned 32 scan domains, max16 rectangles; not complete RenderDataFactory"
+  },
+  "compiler": "Temurin JDK 21.0.8+9 --release 21 -Xlint:all",
+  "checks": {
+    "java_surface_assertions": 10088,
+    "java_comparison_assertions": 245980,
+    "java_direct_geometry_assertions": 3921906,
+    "python_unittest_cases": 9,
+    "random_plane_coverage_cases": 100,
+    "heap_limit_mib": 256,
+    "scenes_compared": 7,
+    "exact_area_winding_per_face_state_biome_light": "passed",
+    "direct_source_and_selected_hills_no_t_junctions_incidence_euler": "passed",
+    "direct_arch_source_and_candidate_closed_incidence_euler": "passed",
+    "protected_voxel_inside_merged_rectangle": "passed",
+    "bidirectional_distance_parallel_planes_and_hole_detection": "passed",
+    "distance_depth_budget_fails_closed": "passed",
+    "anvil_to_snapshot_to_java_to_pages": "passed on generated modern Anvil",
+    "accepted_direct_mesh_publication": "passed with independent header/payload/hash verification",
+    "byte_identical_rebake": "passed for both packed and directly simplified mesh packages",
+    "page_and_palette_checksums": "passed",
+    "incomplete_source_and_overwrite_refusal": "passed",
+    "complexity_budget_refusal": "passed",
+    "mesh_64bit_index_attribute_word": "passed",
+    "wide_attribute_dictionary_and_oct8_normals": "passed",
+    "packed_direct_mesh_shared_contour": "passed"
+  },
+  "scenes": [
+    {
+      "name": "plane",
+      "voxy_triangles": 8,
+      "voxy_quad_payload_bytes": 32,
+      "packed_triangles": 2,
+      "packed_payload_bytes": 8,
+      "levels": [
+        {
+          "level": 0,
+          "representation": "quads",
+          "triangles": 2,
+          "payload_bytes": 8,
+          "error_limit_blocks": 0.5,
+          "candidate_error": null,
+          "candidate_triangles": 126,
+          "candidate_payload_bytes": 1150
+        },
+        {
+          "level": 1,
+          "representation": "quads",
+          "triangles": 2,
+          "payload_bytes": 8,
+          "error_limit_blocks": 1.0,
+          "candidate_error": null,
+          "candidate_triangles": 126,
+          "candidate_payload_bytes": 1150
+        },
+        {
+          "level": 2,
+          "representation": "quads",
+          "triangles": 2,
+          "payload_bytes": 8,
+          "error_limit_blocks": 1.5,
+          "candidate_error": null,
+          "candidate_triangles": 126,
+          "candidate_payload_bytes": 1150
+        }
+      ]
+    },
+    {
+      "name": "hills",
+      "voxy_triangles": 1676,
+      "voxy_quad_payload_bytes": 6704,
+      "packed_triangles": 1590,
+      "packed_payload_bytes": 6360,
+      "levels": [
+        {
+          "level": 0,
+          "representation": "quads",
+          "triangles": 1590,
+          "payload_bytes": 6360,
+          "error_limit_blocks": 0.5,
+          "candidate_error": {
+            "within_limit": false,
+            "upper_bound_blocks": null,
+            "sampled_max_blocks": 0.8317052245403377,
+            "queries": 91,
+            "reason": "geometric_error_exceeded"
+          },
+          "candidate_triangles": 358,
+          "candidate_payload_bytes": 3328
+        },
+        {
+          "level": 1,
+          "representation": "quads",
+          "triangles": 1590,
+          "payload_bytes": 6360,
+          "error_limit_blocks": 1.0,
+          "candidate_error": {
+            "within_limit": false,
+            "upper_bound_blocks": null,
+            "sampled_max_blocks": 1.125775431591872,
+            "queries": 94,
+            "reason": "geometric_error_exceeded"
+          },
+          "candidate_triangles": 358,
+          "candidate_payload_bytes": 3328
+        },
+        {
+          "level": 2,
+          "representation": "mesh",
+          "triangles": 358,
+          "payload_bytes": 3328,
+          "error_limit_blocks": 1.5,
+          "candidate_error": {
+            "within_limit": true,
+            "upper_bound_blocks": 1.4999895520272153,
+            "sampled_max_blocks": 1.2000420790038184,
+            "queries": 17283,
+            "reason": "within_bidirectional_bound"
+          },
+          "candidate_triangles": 358,
+          "candidate_payload_bytes": 3328
+        }
+      ]
+    },
+    {
+      "name": "rugged",
+      "voxy_triangles": 4542,
+      "voxy_quad_payload_bytes": 18168,
+      "packed_triangles": 4244,
+      "packed_payload_bytes": 16976,
+      "levels": [
+        {
+          "level": 0,
+          "representation": "quads",
+          "triangles": 4244,
+          "payload_bytes": 16976,
+          "error_limit_blocks": 0.5,
+          "candidate_error": {
+            "within_limit": false,
+            "upper_bound_blocks": null,
+            "sampled_max_blocks": 0.9122745912078735,
+            "queries": 108,
+            "reason": "geometric_error_exceeded"
+          },
+          "candidate_triangles": 1074,
+          "candidate_payload_bytes": 10710
+        },
+        {
+          "level": 1,
+          "representation": "quads",
+          "triangles": 4244,
+          "payload_bytes": 16976,
+          "error_limit_blocks": 1.0,
+          "candidate_error": {
+            "within_limit": false,
+            "upper_bound_blocks": null,
+            "sampled_max_blocks": 1.0,
+            "queries": 690,
+            "reason": "error_audit_depth_budget"
+          },
+          "candidate_triangles": 1074,
+          "candidate_payload_bytes": 10710
+        },
+        {
+          "level": 2,
+          "representation": "quads",
+          "triangles": 4244,
+          "payload_bytes": 16976,
+          "error_limit_blocks": 1.5,
+          "candidate_error": {
+            "within_limit": false,
+            "upper_bound_blocks": null,
+            "sampled_max_blocks": 1.641897826465977,
+            "queries": 896,
+            "reason": "geometric_error_exceeded"
+          },
+          "candidate_triangles": 1074,
+          "candidate_payload_bytes": 10710
+        }
+      ]
+    },
+    {
+      "name": "arch",
+      "voxy_triangles": 64,
+      "voxy_quad_payload_bytes": 256,
+      "packed_triangles": 28,
+      "packed_payload_bytes": 112,
+      "levels": [
+        {
+          "level": 0,
+          "representation": "quads",
+          "triangles": 28,
+          "payload_bytes": 112,
+          "error_limit_blocks": 0.5,
+          "candidate_error": null,
+          "candidate_triangles": 16,
+          "candidate_payload_bytes": 122
+        },
+        {
+          "level": 1,
+          "representation": "quads",
+          "triangles": 28,
+          "payload_bytes": 112,
+          "error_limit_blocks": 1.0,
+          "candidate_error": null,
+          "candidate_triangles": 16,
+          "candidate_payload_bytes": 122
+        },
+        {
+          "level": 2,
+          "representation": "quads",
+          "triangles": 28,
+          "payload_bytes": 112,
+          "error_limit_blocks": 1.5,
+          "candidate_error": null,
+          "candidate_triangles": 16,
+          "candidate_payload_bytes": 122
+        }
+      ]
+    },
+    {
+      "name": "protected",
+      "voxy_triangles": 8,
+      "voxy_quad_payload_bytes": 32,
+      "packed_triangles": 2,
+      "packed_payload_bytes": 8,
+      "levels": [
+        {
+          "level": 0,
+          "representation": "quads",
+          "triangles": 2,
+          "payload_bytes": 8,
+          "error_limit_blocks": 0.5,
+          "candidate_error": null,
+          "candidate_triangles": 126,
+          "candidate_payload_bytes": 1150
+        },
+        {
+          "level": 1,
+          "representation": "quads",
+          "triangles": 2,
+          "payload_bytes": 8,
+          "error_limit_blocks": 1.0,
+          "candidate_error": null,
+          "candidate_triangles": 126,
+          "candidate_payload_bytes": 1150
+        },
+        {
+          "level": 2,
+          "representation": "quads",
+          "triangles": 2,
+          "payload_bytes": 8,
+          "error_limit_blocks": 1.5,
+          "candidate_error": null,
+          "candidate_triangles": 126,
+          "candidate_payload_bytes": 1150
+        }
+      ]
+    },
+    {
+      "name": "material_light",
+      "voxy_triangles": 180,
+      "voxy_quad_payload_bytes": 720,
+      "packed_triangles": 180,
+      "packed_payload_bytes": 720,
+      "levels": [
+        {
+          "level": 0,
+          "representation": "quads",
+          "triangles": 180,
+          "payload_bytes": 720,
+          "error_limit_blocks": 0.5,
+          "candidate_error": null,
+          "candidate_triangles": 270,
+          "candidate_payload_bytes": 2296
+        },
+        {
+          "level": 1,
+          "representation": "quads",
+          "triangles": 180,
+          "payload_bytes": 720,
+          "error_limit_blocks": 1.0,
+          "candidate_error": null,
+          "candidate_triangles": 270,
+          "candidate_payload_bytes": 2296
+        },
+        {
+          "level": 2,
+          "representation": "quads",
+          "triangles": 180,
+          "payload_bytes": 720,
+          "error_limit_blocks": 1.5,
+          "candidate_error": null,
+          "candidate_triangles": 270,
+          "candidate_payload_bytes": 2296
+        }
+      ]
+    },
+    {
+      "name": "flat_step_neighbour",
+      "voxy_triangles": 8,
+      "voxy_quad_payload_bytes": 32,
+      "packed_triangles": 2,
+      "packed_payload_bytes": 8,
+      "levels": [
+        {
+          "level": 0,
+          "representation": "quads",
+          "triangles": 2,
+          "payload_bytes": 8,
+          "error_limit_blocks": 0.5,
+          "candidate_error": null,
+          "candidate_triangles": 126,
+          "candidate_payload_bytes": 1150
+        },
+        {
+          "level": 1,
+          "representation": "quads",
+          "triangles": 2,
+          "payload_bytes": 8,
+          "error_limit_blocks": 1.0,
+          "candidate_error": null,
+          "candidate_triangles": 126,
+          "candidate_payload_bytes": 1150
+        },
+        {
+          "level": 2,
+          "representation": "quads",
+          "triangles": 2,
+          "payload_bytes": 8,
+          "error_limit_blocks": 1.5,
+          "candidate_error": null,
+          "candidate_triangles": 126,
+          "candidate_payload_bytes": 1150
+        }
+      ]
+    }
+  ],
+  "packages": {
+    "hills": {
+      "format": "fragment-lod-proof-3",
+      "algorithm": "merged-boundary-edge-collapse-v1",
+      "snapshot_sha256": "a26e1cc66a78e5c0787cecc710b0ee06ffea29da9bbc882cc1bfa50c2cd0a1d8",
+      "palette_sha256": "47f2c3ba4ba4138327e1dc6a68810d3aee0407f77eacbaed7b391d7b5962822f",
+      "tile_width": 32,
+      "halo": 7,
+      "unknown_voxels": 0,
+      "prepared_unique_pages_bytes": 9764,
+      "material_input": "saved state+biome+face+light; no baked tint/albedo",
+      "cost_metric": "bidirectional world-space surface-distance bound; QEM is search only, not screen-space error",
+      "protected_models": "diagnostic full voxel cubes; NOT final baked-model geometry",
+      "pages": [
+        {
+          "file": "tile-0-0-lod0.fvquad",
+          "sha256": "72b6a59508bef815189b268c124a4800eab45e560a557bcff589b91137e44c33",
+          "tile": [
+            0,
+            0
+          ],
+          "level": 0,
+          "representation": "quads",
+          "vertices": 0,
+          "triangles": 1590,
+          "payload_bytes": 6360,
+          "bytes": 6384,
+          "voxy_triangles": 1676,
+          "voxy_quad_payload_bytes": 6704,
+          "packed_triangles": 1590,
+          "packed_payload_bytes": 6360,
+          "error_limit_blocks": 0.5,
+          "candidate_error": {
+            "within_limit": false,
+            "upper_bound_blocks": null,
+            "sampled_max_blocks": 0.8317052245403377,
+            "queries": 91,
+            "reason": "geometric_error_exceeded"
+          },
+          "reason": "geometric_error_unmet_exact_fallback",
+          "candidate_triangles": 358,
+          "candidate_payload_bytes": 3328
+        },
+        {
+          "file": "tile-0-0-lod0.fvquad",
+          "sha256": "72b6a59508bef815189b268c124a4800eab45e560a557bcff589b91137e44c33",
+          "tile": [
+            0,
+            0
+          ],
+          "level": 1,
+          "representation": "quads",
+          "vertices": 0,
+          "triangles": 1590,
+          "payload_bytes": 6360,
+          "bytes": 6384,
+          "voxy_triangles": 1676,
+          "voxy_quad_payload_bytes": 6704,
+          "packed_triangles": 1590,
+          "packed_payload_bytes": 6360,
+          "error_limit_blocks": 1.0,
+          "candidate_error": {
+            "within_limit": false,
+            "upper_bound_blocks": null,
+            "sampled_max_blocks": 1.125775431591872,
+            "queries": 94,
+            "reason": "geometric_error_exceeded"
+          },
+          "reason": "geometric_error_unmet_exact_fallback",
+          "candidate_triangles": 358,
+          "candidate_payload_bytes": 3328
+        },
+        {
+          "file": "tile-0-0-lod2.fvmesh",
+          "sha256": "2142e9e688257b04cb3e25e546d33db372fd9fcfec673c5fe3c6dd215636f5c0",
+          "tile": [
+            0,
+            0
+          ],
+          "level": 2,
+          "representation": "mesh",
+          "vertices": 268,
+          "triangles": 358,
+          "payload_bytes": 3328,
+          "bytes": 3380,
+          "voxy_triangles": 1676,
+          "voxy_quad_payload_bytes": 6704,
+          "packed_triangles": 1590,
+          "packed_payload_bytes": 6360,
+          "error_limit_blocks": 1.5,
+          "candidate_error": {
+            "within_limit": true,
+            "upper_bound_blocks": 1.4999895520272153,
+            "sampled_max_blocks": 1.2000420790038184,
+            "queries": 17283,
+            "reason": "within_bidirectional_bound"
+          },
+          "reason": "direct_simplification_within_geometry_and_distance_budgets",
+          "candidate_triangles": 358,
+          "candidate_payload_bytes": 3328
+        }
+      ]
+    },
+    "arch": {
+      "format": "fragment-lod-proof-3",
+      "algorithm": "merged-boundary-edge-collapse-v1",
+      "snapshot_sha256": "2cc690dc49c289ee58efa119b4c175d4523f85903ef61dffb15f6eba2474578b",
+      "palette_sha256": "47f2c3ba4ba4138327e1dc6a68810d3aee0407f77eacbaed7b391d7b5962822f",
+      "tile_width": 32,
+      "halo": 7,
+      "unknown_voxels": 0,
+      "prepared_unique_pages_bytes": 136,
+      "material_input": "saved state+biome+face+light; no baked tint/albedo",
+      "cost_metric": "bidirectional world-space surface-distance bound; QEM is search only, not screen-space error",
+      "protected_models": "diagnostic full voxel cubes; NOT final baked-model geometry",
+      "pages": [
+        {
+          "file": "tile-0-0-lod0.fvquad",
+          "sha256": "9f2021a0e422ab156d9cf7d3dea5b70689b486b52e6fb2cf2f2e8000002b0ba1",
+          "tile": [
+            0,
+            0
+          ],
+          "level": 0,
+          "representation": "quads",
+          "vertices": 0,
+          "triangles": 28,
+          "payload_bytes": 112,
+          "bytes": 136,
+          "voxy_triangles": 64,
+          "voxy_quad_payload_bytes": 256,
+          "packed_triangles": 28,
+          "packed_payload_bytes": 112,
+          "error_limit_blocks": 0.5,
+          "candidate_error": null,
+          "reason": "exact_is_cheaper_than_candidates",
+          "candidate_triangles": 16,
+          "candidate_payload_bytes": 122
+        },
+        {
+          "file": "tile-0-0-lod0.fvquad",
+          "sha256": "9f2021a0e422ab156d9cf7d3dea5b70689b486b52e6fb2cf2f2e8000002b0ba1",
+          "tile": [
+            0,
+            0
+          ],
+          "level": 1,
+          "representation": "quads",
+          "vertices": 0,
+          "triangles": 28,
+          "payload_bytes": 112,
+          "bytes": 136,
+          "voxy_triangles": 64,
+          "voxy_quad_payload_bytes": 256,
+          "packed_triangles": 28,
+          "packed_payload_bytes": 112,
+          "error_limit_blocks": 1.0,
+          "candidate_error": null,
+          "reason": "exact_is_cheaper_than_candidates",
+          "candidate_triangles": 16,
+          "candidate_payload_bytes": 122
+        },
+        {
+          "file": "tile-0-0-lod0.fvquad",
+          "sha256": "9f2021a0e422ab156d9cf7d3dea5b70689b486b52e6fb2cf2f2e8000002b0ba1",
+          "tile": [
+            0,
+            0
+          ],
+          "level": 2,
+          "representation": "quads",
+          "vertices": 0,
+          "triangles": 28,
+          "payload_bytes": 112,
+          "bytes": 136,
+          "voxy_triangles": 64,
+          "voxy_quad_payload_bytes": 256,
+          "packed_triangles": 28,
+          "packed_payload_bytes": 112,
+          "error_limit_blocks": 1.5,
+          "candidate_error": null,
+          "reason": "exact_is_cheaper_than_candidates",
+          "candidate_triangles": 16,
+          "candidate_payload_bytes": 122
+        }
+      ]
+    }
+  },
+  "source_sha256": {
+    "src/main/java/me/cortex/voxy/client/core/rendering/lod/bake/ConformingSurface.java": "54233eb3769de2a4746970364fdf3a7c906aab85ab4385a65af971cc1d570b8d",
+    "src/main/java/me/cortex/voxy/client/core/rendering/lod/bake/GreedyQuadMesher.java": "f31a86ca4c2731a63012d1e2fc3e376a701375b245a0e8aa81c01f4187b37057",
+    "src/main/java/me/cortex/voxy/client/core/rendering/lod/bake/MeshPage.java": "c3274fa6169016426429957709e99d65d2f67ac8984283a7d160dd854ab10188",
+    "src/main/java/me/cortex/voxy/client/core/rendering/lod/bake/PackedQuads.java": "bb961bdffc58a07396ec0d56753fc4a41c122ce7d97d0526b7aa272df92ed0e8",
+    "src/main/java/me/cortex/voxy/client/core/rendering/lod/bake/QuadricSimplifier.java": "6269bf6bc7065ffba5d77ae5eced8712f02b985395b13d9fe54151c0e978abf1",
+    "src/main/java/me/cortex/voxy/client/core/rendering/lod/bake/RectangleMerger.java": "0ecfca2c8b47abace8e9315b3253e4fa67804efa4fdfb8780685dc7f7bf914ba",
+    "src/main/java/me/cortex/voxy/client/core/rendering/lod/bake/SurfaceError.java": "0a1221ab4ed23d3dbb1e9659449ba95b704b476cb3da2e001c739e2e2388f7d8",
+    "src/main/java/me/cortex/voxy/client/core/rendering/lod/bake/SurfaceExtractor.java": "3bb8f99b8a30ebcbdfaa96a396df9ebfb9b910d9286ed92909c6e3c00bf195a6",
+    "src/main/java/me/cortex/voxy/client/core/rendering/lod/bake/SurfaceMesh.java": "7557929396174845e536193b174be7c68abed690ccc9c6f03f91c8f40bece4a7",
+    "src/main/java/me/cortex/voxy/client/core/rendering/lod/bake/TileBake.java": "ed2839321c9cae3e621b864ed6582231454f38c24b91c028eeba932e2e1a8e75",
+    "src/main/java/me/cortex/voxy/client/core/rendering/lod/bake/VoxelSnapshot.java": "2e9d37868450b96831ba8a16850b8d8bfffd9f6d401046986d0e32d6efa97f88",
+    "tools/lod/BakeProofMain.java": "1f94b72be187ef3d7eed05a3b0f437b67f36359d797a45794bf8eb0fdd3db498",
+    "tools/lod/DirectGeometryCheck.java": "aecc099cc1dfefda104bdf79f9903f431e282c285add44a8d669b70c237552ba",
+    "tools/lod/LodBakeCheck.java": "4d6b8beea9420760e4720e23e7c6dc07d25e89663198a2da46e5821e5555af4c",
+    "tools/lod/LodComparisonCheck.java": "ca42791951b57dd62ef2ec6176579de9eb93b673cd6787a65cf465a4e0fb6a62",
+    "tools/lod/check.py": "a5e8c91b1b9e648aede7e72b43731c906a1e99d23ba58ef76d3b0773441be1a1",
+    "tools/lod/export_world.py": "5753f771fdd1677b19328255c050da7aa44b78fafc315c568062d36592b5e59d",
+    "tools/lod/preview.py": "8cddbc601dd0b5a7b07798a2adb49e70ccdbd531c2466554fa324c8c919e0d9b",
+    "tools/lod/test_export_world.py": "260bef74baaca37f622f37ab9363a35170e94efb1a6c12ae28615d48f59f2e98",
+    "src/main/java/me/cortex/voxy/client/core/util/ScanMesher2D.java": "7e078ae5ed25af53c763341414f1926d43fc28d0498a01a637738ff3a4d82853"
+  },
+  "preview_sha256": "b39f11f1d27096b3f802361f4e07e8cfd2caa459c4a91437dbd4942458f36ad1",
+  "not_run": [
+    "real player map visual acceptance",
+    "Minecraft rendering/native transition",
+    "runtime edits/overlay",
+    "hardware GPU A/B and variable-word GPU decode profiling"
+  ],
+  "last_full_mod_build_attempt": {
+    "status": "passed",
+    "reason": "foojay 1.0.0; fixed dev dependencies; Gradle build successful"
+  },
+  "interpretation": "Selected triangles/payload must not regress own exact representation or shipping scan baseline and mesh must pass a conservative bidirectional world-space distance bound. QEM cost is search only. Geometry payload excludes metadata/alignment and is not complete VRAM or frame time. Source/mesh locks and tested topology checks are not full self-intersection or sub-error hole certification.",
+  "linked_runtime_implementation_report": "../runtime-proof/validation.json"
+}

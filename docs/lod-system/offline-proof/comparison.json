@@ -1,0 +1,314 @@
+{
+  "scope": "same unit faces/state/biome/light; shipping ScanMesher2D default16 vs packed32/direct QEM; no smoothing pass; world error caps 0.5/1/1.5 blocks; not game GPU timing",
+  "scenes": [
+    {
+      "name": "plane",
+      "voxy_triangles": 8,
+      "voxy_quad_payload_bytes": 32,
+      "packed_triangles": 2,
+      "packed_payload_bytes": 8,
+      "levels": [
+        {
+          "level": 0,
+          "representation": "quads",
+          "triangles": 2,
+          "payload_bytes": 8,
+          "error_limit_blocks": 0.5,
+          "candidate_error": null,
+          "candidate_triangles": 126,
+          "candidate_payload_bytes": 1150
+        },
+        {
+          "level": 1,
+          "representation": "quads",
+          "triangles": 2,
+          "payload_bytes": 8,
+          "error_limit_blocks": 1.0,
+          "candidate_error": null,
+          "candidate_triangles": 126,
+          "candidate_payload_bytes": 1150
+        },
+        {
+          "level": 2,
+          "representation": "quads",
+          "triangles": 2,
+          "payload_bytes": 8,
+          "error_limit_blocks": 1.5,
+          "candidate_error": null,
+          "candidate_triangles": 126,
+          "candidate_payload_bytes": 1150
+        }
+      ]
+    },
+    {
+      "name": "hills",
+      "voxy_triangles": 1676,
+      "voxy_quad_payload_bytes": 6704,
+      "packed_triangles": 1590,
+      "packed_payload_bytes": 6360,
+      "levels": [
+        {
+          "level": 0,
+          "representation": "quads",
+          "triangles": 1590,
+          "payload_bytes": 6360,
+          "error_limit_blocks": 0.5,
+          "candidate_error": {
+            "within_limit": false,
+            "upper_bound_blocks": null,
+            "sampled_max_blocks": 0.8317052245403377,
+            "queries": 91,
+            "reason": "geometric_error_exceeded"
+          },
+          "candidate_triangles": 358,
+          "candidate_payload_bytes": 3328
+        },
+        {
+          "level": 1,
+          "representation": "quads",
+          "triangles": 1590,
+          "payload_bytes": 6360,
+          "error_limit_blocks": 1.0,
+          "candidate_error": {
+            "within_limit": false,
+            "upper_bound_blocks": null,
+            "sampled_max_blocks": 1.125775431591872,
+            "queries": 94,
+            "reason": "geometric_error_exceeded"
+          },
+          "candidate_triangles": 358,
+          "candidate_payload_bytes": 3328
+        },
+        {
+          "level": 2,
+          "representation": "mesh",
+          "triangles": 358,
+          "payload_bytes": 3328,
+          "error_limit_blocks": 1.5,
+          "candidate_error": {
+            "within_limit": true,
+            "upper_bound_blocks": 1.4999895520272153,
+            "sampled_max_blocks": 1.2000420790038184,
+            "queries": 17283,
+            "reason": "within_bidirectional_bound"
+          },
+          "candidate_triangles": 358,
+          "candidate_payload_bytes": 3328
+        }
+      ]
+    },
+    {
+      "name": "rugged",
+      "voxy_triangles": 4542,
+      "voxy_quad_payload_bytes": 18168,
+      "packed_triangles": 4244,
+      "packed_payload_bytes": 16976,
+      "levels": [
+        {
+          "level": 0,
+          "representation": "quads",
+          "triangles": 4244,
+          "payload_bytes": 16976,
+          "error_limit_blocks": 0.5,
+          "candidate_error": {
+            "within_limit": false,
+            "upper_bound_blocks": null,
+            "sampled_max_blocks": 0.9122745912078735,
+            "queries": 108,
+            "reason": "geometric_error_exceeded"
+          },
+          "candidate_triangles": 1074,
+          "candidate_payload_bytes": 10710
+        },
+        {
+          "level": 1,
+          "representation": "quads",
+          "triangles": 4244,
+          "payload_bytes": 16976,
+          "error_limit_blocks": 1.0,
+          "candidate_error": {
+            "within_limit": false,
+            "upper_bound_blocks": null,
+            "sampled_max_blocks": 1.0,
+            "queries": 690,
+            "reason": "error_audit_depth_budget"
+          },
+          "candidate_triangles": 1074,
+          "candidate_payload_bytes": 10710
+        },
+        {
+          "level": 2,
+          "representation": "quads",
+          "triangles": 4244,
+          "payload_bytes": 16976,
+          "error_limit_blocks": 1.5,
+          "candidate_error": {
+            "within_limit": false,
+            "upper_bound_blocks": null,
+            "sampled_max_blocks": 1.641897826465977,
+            "queries": 896,
+            "reason": "geometric_error_exceeded"
+          },
+          "candidate_triangles": 1074,
+          "candidate_payload_bytes": 10710
+        }
+      ]
+    },
+    {
+      "name": "arch",
+      "voxy_triangles": 64,
+      "voxy_quad_payload_bytes": 256,
+      "packed_triangles": 28,
+      "packed_payload_bytes": 112,
+      "levels": [
+        {
+          "level": 0,
+          "representation": "quads",
+          "triangles": 28,
+          "payload_bytes": 112,
+          "error_limit_blocks": 0.5,
+          "candidate_error": null,
+          "candidate_triangles": 16,
+          "candidate_payload_bytes": 122
+        },
+        {
+          "level": 1,
+          "representation": "quads",
+          "triangles": 28,
+          "payload_bytes": 112,
+          "error_limit_blocks": 1.0,
+          "candidate_error": null,
+          "candidate_triangles": 16,
+          "candidate_payload_bytes": 122
+        },
+        {
+          "level": 2,
+          "representation": "quads",
+          "triangles": 28,
+          "payload_bytes": 112,
+          "error_limit_blocks": 1.5,
+          "candidate_error": null,
+          "candidate_triangles": 16,
+          "candidate_payload_bytes": 122
+        }
+      ]
+    },
+    {
+      "name": "protected",
+      "voxy_triangles": 8,
+      "voxy_quad_payload_bytes": 32,
+      "packed_triangles": 2,
+      "packed_payload_bytes": 8,
+      "levels": [
+        {
+          "level": 0,
+          "representation": "quads",
+          "triangles": 2,
+          "payload_bytes": 8,
+          "error_limit_blocks": 0.5,
+          "candidate_error": null,
+          "candidate_triangles": 126,
+          "candidate_payload_bytes": 1150
+        },
+        {
+          "level": 1,
+          "representation": "quads",
+          "triangles": 2,
+          "payload_bytes": 8,
+          "error_limit_blocks": 1.0,
+          "candidate_error": null,
+          "candidate_triangles": 126,
+          "candidate_payload_bytes": 1150
+        },
+        {
+          "level": 2,
+          "representation": "quads",
+          "triangles": 2,
+          "payload_bytes": 8,
+          "error_limit_blocks": 1.5,
+          "candidate_error": null,
+          "candidate_triangles": 126,
+          "candidate_payload_bytes": 1150
+        }
+      ]
+    },
+    {
+      "name": "material_light",
+      "voxy_triangles": 180,
+      "voxy_quad_payload_bytes": 720,
+      "packed_triangles": 180,
+      "packed_payload_bytes": 720,
+      "levels": [
+        {
+          "level": 0,
+          "representation": "quads",
+          "triangles": 180,
+          "payload_bytes": 720,
+          "error_limit_blocks": 0.5,
+          "candidate_error": null,
+          "candidate_triangles": 270,
+          "candidate_payload_bytes": 2296
+        },
+        {
+          "level": 1,
+          "representation": "quads",
+          "triangles": 180,
+          "payload_bytes": 720,
+          "error_limit_blocks": 1.0,
+          "candidate_error": null,
+          "candidate_triangles": 270,
+          "candidate_payload_bytes": 2296
+        },
+        {
+          "level": 2,
+          "representation": "quads",
+          "triangles": 180,
+          "payload_bytes": 720,
+          "error_limit_blocks": 1.5,
+          "candidate_error": null,
+          "candidate_triangles": 270,
+          "candidate_payload_bytes": 2296
+        }
+      ]
+    },
+    {
+      "name": "flat_step_neighbour",
+      "voxy_triangles": 8,
+      "voxy_quad_payload_bytes": 32,
+      "packed_triangles": 2,
+      "packed_payload_bytes": 8,
+      "levels": [
+        {
+          "level": 0,
+          "representation": "quads",
+          "triangles": 2,
+          "payload_bytes": 8,
+          "error_limit_blocks": 0.5,
+          "candidate_error": null,
+          "candidate_triangles": 126,
+          "candidate_payload_bytes": 1150
+        },
+        {
+          "level": 1,
+          "representation": "quads",
+          "triangles": 2,
+          "payload_bytes": 8,
+          "error_limit_blocks": 1.0,
+          "candidate_error": null,
+          "candidate_triangles": 126,
+          "candidate_payload_bytes": 1150
+        },
+        {
+          "level": 2,
+          "representation": "quads",
+          "triangles": 2,
+          "payload_bytes": 8,
+          "error_limit_blocks": 1.5,
+          "candidate_error": null,
+          "candidate_triangles": 126,
+          "candidate_payload_bytes": 1150
+        }
+      ]
+    }
+  ]
+}

@@ -46,6 +46,7 @@ public abstract class MixinDefaultChunkRenderer extends ShaderChunkRenderer {
 
     @Unique
     private void doRender(ChunkRenderMatrices matrices, TerrainRenderPass renderPass, CameraTransform camera) {
+        if (me.cortex.voxy.client.core.rendering.lod.debug.LodAerialProbe.skipLodDraw()) return;
         if (renderPass == DefaultTerrainRenderPasses.CUTOUT) {
             var renderer = ((IGetVoxyRenderSystem) Minecraft.getInstance().levelRenderer).voxy$getRenderSystem();
             if (renderer != null) {
@@ -56,7 +57,9 @@ public abstract class MixinDefaultChunkRenderer extends ShaderChunkRenderer {
                     var fogParameters = VoxyFogParameters.fromRenderSystem(Minecraft.getInstance().gameRenderer.getRenderDistance());
                     viewport = renderer.setupViewport(matrices.projection(), matrices.modelView(), fogParameters, camera.x, camera.y, camera.z);
                 }
-                renderer.renderOpaque(viewport);
+                var probe = me.cortex.voxy.client.core.rendering.lod.debug.LodAerialProbe.beginLod();
+                try { renderer.renderOpaque(viewport); }
+                finally { me.cortex.voxy.client.core.rendering.lod.debug.LodAerialProbe.endLod(probe); }
             }
         }
     }

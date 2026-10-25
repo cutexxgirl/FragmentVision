@@ -1,0 +1,46 @@
+{
+  "date_utc": "2026-10-25",
+  "source_base": "511b0f41c85a1cce5fe8800603d9dc4a25cf2249",
+  "source_was_dirty": true,
+  "capture_gpu_vertex_bytes": 80,
+  "current_gpu_vertex_bytes": 64,
+  "current_layout_runtime_tested": false,
+  "note": "Captures predate final GPU packing and probe/script edits. No new tests or game runs after user instruction. Software llvmpipe, not hardware GPU.",
+  "artifacts": {
+    "aerial-hybrid-cull.json": "32d78c7cf590af4d2e212d687277ac915f2464a7cf6b6ddffe47fa4e77e2830b",
+    "aerial-hybrid-cull.png": "130a6b3cac75f2b600e3bca24e26a4dab9cb1a70134de82d293f1998c404638a",
+    "aerial-native.json": "7622ad5c805b82ae8292113f04c68499cc53f97c7486811d7f5a39fe3413230b",
+    "aerial-native.png": "b48bf0f3dc675f47d020dfbace51d01b5d337518192a1329179ae0609b2e8bc6",
+    "aerial-voxel.json": "1c332cd5f4e34ab3e1a1ceb5063adbb6969cf023f28c50fc871fb3635831f7bb",
+    "aerial-voxel.png": "4721b92fa4522a1631238d787b55236014fd6f7cf0f0d0517fb31f1bf28f50af",
+    "previous-client.log": "9cd27f617c8bee0d9f7a6d35c7589ff991811a25a6a1e9e54a9075a2d471781d",
+    "previous-shaders.json": "3e021da2d6a430f3d52dcf5222372d78cc2427d50b0f043eba54ef1ba14b43c7",
+    "source-chunks.json": "ac135b79a3c550306f5afef4b8be7c98b7990b8ecb065b4819b9bc08982caa51"
+  },
+  "medians": {
+    "aerial-native": {
+      "frames": 120,
+      "frame_ms": 280.0344215,
+      "lod_submit_cpu_ms": 0.0,
+      "lod_gpu_ms": null
+    },
+    "aerial-voxel": {
+      "frames": 120,
+      "frame_ms": 940.2988285,
+      "lod_submit_cpu_ms": 661.1939935,
+      "lod_gpu_ms": 657.0256415
+    },
+    "aerial-hybrid-cull": {
+      "frames": 60,
+      "frame_ms": 2136.0195255,
+      "lod_submit_cpu_ms": 1869.1077755000001,
+      "lod_gpu_ms": 1865.8091775
+    }
+  },
+  "final_assembly": {
+    "command": "assemble -x test",
+    "successful": true,
+    "tests_run": false,
+    "log_sha256": "c0cf676c84ec7fbce4efc83a080a3547cdc86d70faf83dd8859742e373aad581"
+  }
+}
