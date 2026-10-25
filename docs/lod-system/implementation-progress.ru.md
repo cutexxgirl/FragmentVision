@@ -1,5 +1,7 @@
 # Реализация связанного LOD: состояние работ
 
+> [Полный кадр нового backend](full-frame-2026-10-25/README.ru.md):256 страниц на512блоков дальности; все страницы пока exact packed fallback, не progressive/QEM сглаживание.
+
 > Следующий шаг выполнен частично: [отдельный baked-page backend](backend-proof-2026-10-25/README.ru.md) рисует принятый QEM и packed pages в игре с bypass старых terrain draws. Полноценная world hierarchy/streaming/edits всё ещё не подключены.
 
 > Новая проверка и доработка на исходном мире: [Sky_Art_Study, 2026-10-25](sky-art-review-2026-10-25/README.ru.md). Исторические ограничения тестирования ниже относятся к исходной ревизии d8bf9085.
