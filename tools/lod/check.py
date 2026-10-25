@@ -23,7 +23,7 @@ if not javac or not java:
     sys.exit("Install/select JDK 21 (JAVA_HOME); a runtime-only JRE is insufficient.")
 sources = sorted((root / "src/main/java/me/cortex/voxy/client/core/rendering/lod/bake").glob("*.java"))
 sources += sorted((root / "tools/lod").glob("*.java"))
-sources += sorted((root / "src/main/java/me/cortex/voxy/client/core/rendering/lod/runtime").glob("*.java"))
+sources += [root / "src/main/java/me/cortex/voxy/client/core/rendering/lod/runtime" / name for name in ("LodWorkQueue.java", "MeshLevelPolicy.java")]
 sources += [root / "src/main/java/me/cortex/voxy/client/core/util/ScanMesher2D.java"]
 sources += [root / "src/main/java/me/cortex/voxy/client/core/rendering/hybrid/HybridLodPolicy.java"]
 sources += [root / "src/main/java/me/cortex/voxy/client/core/rendering/hybrid/CoveragePrefix.java"]
@@ -31,13 +31,15 @@ sources += [root / "src/main/java/me/cortex/voxy/client/core/rendering/hybrid/Hy
 subprocess.run([javac, "--release", "21", "-Xlint:all", "-d", str(classes), *map(str, sources)], check=True)
 subprocess.run([java, "-Xmx256m", "-cp", str(classes), "LodBakeCheck", str(root / "build/lod-proof/check")], check=True)
 subprocess.run([java, "-Xmx256m", "-cp", str(classes), "LodComparisonCheck", str(root / "build/lod-proof/comparison")], check=True)
-subprocess.run([java, "-Xmx256m", "-cp", str(classes), "DirectGeometryCheck"], check=True)
+subprocess.run([java, "-ea", "-Xmx256m", "-cp", str(classes), "DirectGeometryCheck"], check=True)
 subprocess.run([java, "-Xmx256m", "-cp", str(classes), "ProgressiveRuntimeCheck"], check=True)
 subprocess.run([java, "-Xmx256m", "-cp", str(classes), "ProgressiveFileCheck"], check=True)
 subprocess.run([java, "-Xmx256m", "-cp", str(classes), "LinkedSeamCheck"], check=True)
 subprocess.run([java, "-Xmx256m", "-cp", str(classes), "HybridLodPolicyCheck"], check=True)
 subprocess.run([java, "-Xmx256m", "-cp", str(classes), "CoveragePrefixCheck"], check=True)
 subprocess.run([java, "-Xmx256m", "-cp", str(classes), "HybridGpuLayoutCheck"], check=True)
+subprocess.run([java, "-cp", str(classes), "SurfaceDomainsCheck"], check=True)
+subprocess.run([java, "-cp", str(classes), "MeshLevelPolicyCheck"], check=True)
 subprocess.run([java, "-cp", str(classes), "MeshGpuLayoutCheck"], check=True)
 subprocess.run([java, "-cp", str(classes), "PackedQuadGpuCheck"], check=True)
 subprocess.run([sys.executable, "-m", "unittest", "discover", "-s", str(root / "tools/lod"), "-p", "test_*.py"], check=True)

@@ -36,6 +36,13 @@ public final class QuadricSimplifier {
             throw new IllegalArgumentException("Invalid simplification settings");
         return new QuadricSimplifier(source,true).run(ratio,maxCostDistance);
     }
+    /** Input must come from ConformingSurface: its locks already encode visual material domains.
+     * In particular leaf simulation properties may differ without introducing a geometric seam. */
+    public static Result simplifyExtracted(SurfaceMesh source,double ratio,double maxCostDistance){
+        if(!Double.isFinite(ratio)||ratio<=0||ratio>1||!Double.isFinite(maxCostDistance)||maxCostDistance<0)
+            throw new IllegalArgumentException("Invalid simplification settings");
+        return new QuadricSimplifier(source,true,true).run(ratio,maxCostDistance);
+    }
     public static ProgressiveMesh progressive(SurfaceMesh source,double ratio,double maxCostDistance) {
         if(!Double.isFinite(ratio)||ratio<=0||ratio>1||!Double.isFinite(maxCostDistance)||maxCostDistance<0)
             throw new IllegalArgumentException("Invalid simplification settings");
@@ -48,10 +55,43 @@ public final class QuadricSimplifier {
     private final boolean guardContacts;
     private static final long CONTACT_WORK_LIMIT=100_000_000L;
     private long contactWork;
+    private SpatialBins pointBins,faceBins;
+    /** Conservative broad phase. Membership is removed before a collapse and rebuilt after it.
+     * Giant AABBs live in the overflow set, so a long edge can never evade a query. */
+    private static final class SpatialBins {
+        private record Cell(int x,int y,int z) {}
+        private final Map<Cell,Set<Integer>> cells=new HashMap<>();
+        private final Map<Integer,List<Cell>> membership=new HashMap<>();
+        private final Set<Integer> overflow=new HashSet<>();
+        private static int cell(double v){return (int)Math.floor(v/4.);}
+        void remove(int id){var old=membership.remove(id);if(old!=null)for(Cell key:old){var bin=cells.get(key);bin.remove(id);if(bin.isEmpty())cells.remove(key);}overflow.remove(id);}
+        void put(int id,double ax,double ay,double az,double bx,double by,double bz){
+            remove(id);int x0=cell(Math.min(ax,bx)-1e-8),y0=cell(Math.min(ay,by)-1e-8),z0=cell(Math.min(az,bz)-1e-8);
+            int x1=cell(Math.max(ax,bx)+1e-8),y1=cell(Math.max(ay,by)+1e-8),z1=cell(Math.max(az,bz)+1e-8);
+            if((long)(x1-x0+1)*(y1-y0+1)*(z1-z0+1)>4096){overflow.add(id);return;}
+            var keys=new ArrayList<Cell>();for(int z=z0;z<=z1;z++)for(int y=y0;y<=y1;y++)for(int x=x0;x<=x1;x++){
+                var key=new Cell(x,y,z);keys.add(key);cells.computeIfAbsent(key,k->new HashSet<>()).add(id);
+            }membership.put(id,keys);
+        }
+        Set<Integer> query(double ax,double ay,double az,double bx,double by,double bz){
+            int x0=cell(Math.min(ax,bx)-1e-8),y0=cell(Math.min(ay,by)-1e-8),z0=cell(Math.min(az,bz)-1e-8);
+            int x1=cell(Math.max(ax,bx)+1e-8),y1=cell(Math.max(ay,by)+1e-8),z1=cell(Math.max(az,bz)+1e-8);
+            var found=new TreeSet<Integer>(overflow);
+            if((long)(x1-x0+1)*(y1-y0+1)*(z1-z0+1)>4096){found.addAll(membership.keySet());return found;}
+            for(int z=z0;z<=z1;z++)for(int y=y0;y<=y1;y++)for(int x=x0;x<=x1;x++){var bin=cells.get(new Cell(x,y,z));if(bin!=null)found.addAll(bin);}return found;
+        }
+    }
+    private void indexFace(int id){
+        Face f=faces[id];if(!f.alive){faceBins.remove(id);return;}
+        Vertex a=vertices[f.v[0]],b=vertices[f.v[1]],c=vertices[f.v[2]];
+        faceBins.put(id,Math.min(a.x,Math.min(b.x,c.x)),Math.min(a.y,Math.min(b.y,c.y)),Math.min(a.z,Math.min(b.z,c.z)),
+                Math.max(a.x,Math.max(b.x,c.x)),Math.max(a.y,Math.max(b.y,c.y)),Math.max(a.z,Math.max(b.z,c.z)));
+    }
     private final Vertex[] vertices;
     private final Face[] faces;
     private int triangleCount;
-    private QuadricSimplifier(SurfaceMesh source,boolean guardContacts) {
+    private QuadricSimplifier(SurfaceMesh source,boolean guardContacts){this(source,guardContacts,false);}
+    private QuadricSimplifier(SurfaceMesh source,boolean guardContacts,boolean domainsPrelocked) {
         this.guardContacts=guardContacts;
         vertices=new Vertex[source.vertices()];faces=new Face[source.triangles()];triangleCount=faces.length;
         for(int i=0;i<vertices.length;i++) {
@@ -67,7 +107,7 @@ public final class QuadricSimplifier {
             double[] q={a*a,a*b,a*c,a*d,b*b,b*c,b*d,c*c,c*d,d*d};
             for(int id:f.v) { Vertex v=vertices[id];v.faces.add(i);for(int k=0;k<10;k++)v.q[k]+=q[k]; }
         }
-        for(Vertex v:vertices) {
+        if(!domainsPrelocked)for(Vertex v:vertices) {
             int material=-1;
             for(int id:v.faces) {
                 int next=faces[id].data>>>11;
@@ -78,6 +118,10 @@ public final class QuadricSimplifier {
     }
 
     private Result run(double ratio,double error) {
+        if(guardContacts){pointBins=new SpatialBins();faceBins=new SpatialBins();
+            for(int i=0;i<vertices.length;i++){Vertex v=vertices[i];pointBins.put(i,v.x,v.y,v.z,v.x,v.y,v.z);}
+            for(int i=0;i<faces.length;i++)indexFace(i);
+        }
         var queue=new PriorityQueue<Edge>(Comparator.comparingDouble(Edge::cost).thenComparingInt(Edge::a).thenComparingInt(Edge::b));
         refill(queue);
         int target=(int)Math.ceil(faces.length*ratio),collapses=0,rejected=0,peak=queue.size();double maxCost=0;
@@ -175,24 +219,44 @@ public final class QuadricSimplifier {
         double bx=p[2][0]-p[0][0],by=p[2][1]-p[0][1],bz=p[2][2]-p[0][2];
         return new double[]{ay*bz-az*by,az*bx-ax*bz,ax*by-ay*bx};
     }
-    private boolean contactsValid(Edge e) {
+    private boolean contactsValid(Edge e){
+        boolean result=contactsIndexed(e);
+        assert contactWork>CONTACT_WORK_LIMIT||result==contactsExhaustive(e):"Spatial contact index disagrees with exhaustive guard";
+        return result;
+    }
+    /** Assertion oracle used in CPU checks, disabled in normal bakes. */
+    private boolean contactsExhaustive(Edge e){
+        var adjacent=neighbours(e.a);adjacent.addAll(neighbours(e.b));adjacent.remove(e.a);adjacent.remove(e.b);
+        for(int other:adjacent){Vertex end=vertices[other];
+            for(int i=0;i<vertices.length;i++)if(i!=e.a&&i!=e.b&&i!=other&&vertices[i].alive&&!vertices[i].faces.isEmpty()){
+                Vertex p=vertices[i];if(onSegment(p.x,p.y,p.z,e.x,e.y,e.z,end.x,end.y,end.z))return false;
+            }
+        }
+        for(Face f:faces)if(f.alive)for(int k=0;k<3;k++){
+            int a=f.v[k],b=f.v[(k+1)%3];if(a==e.a||a==e.b||b==e.a||b==e.b)continue;
+            Vertex va=vertices[a],vb=vertices[b];if(onSegment(e.x,e.y,e.z,va.x,va.y,va.z,vb.x,vb.y,vb.z))return false;
+        }return true;
+    }
+    private boolean contactsIndexed(Edge e) {
         // A topologically valid collapse can still put a new edge through an unrelated
         // locked contour point, or its vertex on another edge. Reject those contacts.
         var neighbours=neighbours(e.a);neighbours.addAll(neighbours(e.b));neighbours.remove(e.a);neighbours.remove(e.b);
-        contactWork+=(long)neighbours.size()*vertices.length+faces.length*3L;
-        if(contactWork>CONTACT_WORK_LIMIT)return false;
+
         for(int other:neighbours) {
             Vertex end=vertices[other];
-            for(int i=0;i<vertices.length;i++)if(i!=e.a&&i!=e.b&&i!=other&&vertices[i].alive&&!vertices[i].faces.isEmpty()) {
+            for(int i:pointBins.query(e.x,e.y,e.z,end.x,end.y,end.z))if(i!=e.a&&i!=e.b&&i!=other&&vertices[i].alive&&!vertices[i].faces.isEmpty()) {
+                if(++contactWork>CONTACT_WORK_LIMIT)return false;
                 Vertex p=vertices[i];
                 if(onSegment(p.x,p.y,p.z,e.x,e.y,e.z,end.x,end.y,end.z))return false;
             }
         }
-        for(Face f:faces)if(f.alive)for(int k=0;k<3;k++) {
+        for(int id:faceBins.query(e.x,e.y,e.z,e.x,e.y,e.z)){Face f=faces[id];if(!f.alive)continue;for(int k=0;k<3;k++) {
+            if(++contactWork>CONTACT_WORK_LIMIT)return false;
             int a=f.v[k],b=f.v[(k+1)%3];
             if(a==e.a||a==e.b||b==e.a||b==e.b)continue;
             Vertex va=vertices[a],vb=vertices[b];
             if(onSegment(e.x,e.y,e.z,va.x,va.y,va.z,vb.x,vb.y,vb.z))return false;
+        }
         }
         return true;
     }
@@ -218,6 +282,7 @@ public final class QuadricSimplifier {
         a.x=e.x;a.y=e.y;a.z=e.z;a.locked|=b.locked;
         for(int k=0;k<10;k++)a.q[k]+=b.q[k];
         a.version++;b.version++;b.alive=false;b.faces.clear();
+        if(guardContacts){pointBins.remove(e.b);pointBins.put(e.a,a.x,a.y,a.z,a.x,a.y,a.z);for(int id:affected)indexFace(id);}
         if(history!=null) {
             double length=Math.sqrt(a.nx*a.nx+a.ny*a.ny+a.nz*a.nz);
             history.add(new ProgressiveMesh.Step(e.a,e.b,(float)a.x,(float)a.y,(float)a.z,

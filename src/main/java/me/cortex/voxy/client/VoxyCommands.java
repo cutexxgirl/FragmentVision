@@ -86,7 +86,7 @@ public class VoxyCommands {
 
     private static int mesh(CommandContext<CommandSourceStack> ctx,String action,String name) {
         var renderer=IGetVoxyRenderSystem.getNullable();var backend=renderer==null?null:renderer.getBakedMeshBackend();
-        try{String message=backend==null?"Mesh backend unavailable":switch(action){case "load"->backend.load(name,2);case "on"->backend.enabled(true);case "off"->backend.enabled(false);default->backend.status();};ctx.getSource().sendSuccess(()->Component.literal(message),false);return 1;}
+        try{String message=backend==null?"Mesh backend unavailable":switch(action){case "load"->backend.load(name,-1);case "on"->backend.enabled(true);case "off"->backend.enabled(false);default->backend.status();};ctx.getSource().sendSuccess(()->Component.literal(message),false);return 1;}
         catch(Exception error){ctx.getSource().sendFailure(Component.literal("Mesh proof load failed: "+error));return 0;}
     }
 

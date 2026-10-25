@@ -28,36 +28,48 @@ import static org.lwjgl.opengl.GL45C.*;
  * fallback pages keep 8-byte quads and decode through instancing, without expansion.
  */
 public final class BakedMeshBackend implements AutoCloseable {
-    private record Page(int vao,int vertex,int index,int attributes,int indexType,int count,boolean quads,int x,int y,int z,float[] bounds) {}
+    private record Page(int vao,int vertex,int index,int attributes,int indexType,int count,boolean quads,int x,int y,int z,float[] bounds,int levelMask,int width) {}
     private final List<Page> pages=new ArrayList<>();
     private final RenderProperties properties;
+    private boolean automaticLevels;
     private Shader shader,quadShader;private int table;private boolean active;private long gpuBytes,triangles,drawn;
     public BakedMeshBackend(RenderProperties properties){this.properties=properties;}
     public boolean active(){return active;}
     public String enabled(boolean enabled){if(enabled&&pages.isEmpty())return "No baked pages loaded";active=enabled;return status();}
-    public String status(){return "Baked mesh proof "+(active?"ON":"OFF")+": pages="+pages.size()+", GPU="+gpuBytes+" bytes, triangles="+triangles+", submitted="+drawn+"; old Voxy geometry draws/traversal="+(active?"BYPASSED":"normal")+"; loaded package coverage only";}
+    public String status(){return "Baked mesh proof "+(active?"ON":"OFF")+": pages="+pages.size()+", GPU="+gpuBytes+" bytes, triangles="+triangles+", submitted="+drawn+"; old Voxy geometry draws/traversal="+(active?"BYPASSED":"normal")+"; levels="+(automaticLevels?"distance 0/1/2":"fixed")+"; loaded package coverage only";}
     public String load(String name,int level)throws Exception {
-        if(!name.matches("[a-zA-Z0-9_-]+")||level<0||level>2)throw new IllegalArgumentException("Invalid package/level");
+        if(!name.matches("[a-zA-Z0-9_-]+")||level< -1||level>2)throw new IllegalArgumentException("Invalid package/level");
         if(!FragmentAtmosphereCompat.hasMaterial())throw new IllegalStateException("Fragment Render material required");
         Path root=Minecraft.getInstance().gameDirectory.toPath().resolve("lod-packages").resolve(name);
         JsonObject manifest=JsonParser.parseString(readSmall(root.resolve("manifest.json"),8<<20)).getAsJsonObject();
         if(!manifest.get("format").getAsString().equals("fragment-lod-proof-3")||manifest.get("unknown_voxels").getAsInt()!=0)throw new IllegalArgumentException("Unsupported/incomplete package");
         byte[] palette=Files.readAllBytes(checked(root.resolve("palette.json"),4<<20));
         verify(palette,manifest.get("palette_sha256").getAsString());
-        var selected=new ArrayList<JsonObject>();long total=0;
-        for(var element:manifest.getAsJsonArray("pages")){var p=element.getAsJsonObject();if(p.get("level").getAsInt()!=level)continue;selected.add(p);total+=p.get("bytes").getAsLong();}
-        if(selected.isEmpty()||selected.size()>512||total>128L<<20)throw new IllegalArgumentException("Package budget exceeded (512 pages/128MiB encoded)");
+        var unique=new LinkedHashMap<String,JsonObject>();var coverage=new HashMap<String,Integer>();
+        for(var element:manifest.getAsJsonArray("pages")){var p=element.getAsJsonObject().deepCopy();int l=p.get("level").getAsInt();
+            if(l<0||l>2)throw new IllegalArgumentException("Invalid level");if(level>=0&&l!=level)continue;
+            String tile=p.getAsJsonArray("tile").toString();int mask=1<<l;
+            if((coverage.getOrDefault(tile,0)&mask)!=0)throw new IllegalArgumentException("Duplicate tile level");coverage.merge(tile,mask,(a,b)->a|b);
+            String key=tile+"/"+p.get("file").getAsString();var old=unique.get(key);
+            if(old==null){p.addProperty("level_mask",mask);unique.put(key,p);}else{if(!old.get("sha256").equals(p.get("sha256")))throw new IllegalArgumentException("Conflicting page hashes");old.addProperty("level_mask",old.get("level_mask").getAsInt()|mask);}
+        }
+        if(level<0&&coverage.values().stream().anyMatch(m->m!=7))throw new IllegalArgumentException("All three levels required per tile");
+        var selected=new ArrayList<>(unique.values());long total=0;for(var p:selected)total+=p.get("bytes").getAsLong();
+        if(selected.isEmpty()||selected.size()>4096||total>128L<<20)throw new IllegalArgumentException("Package budget exceeded (4096 pages/128MiB encoded)");
         // Validate every page before disturbing the currently visible package.
-        record Cpu(SurfaceMesh mesh,PackedQuads quads,int x,int y,int z){}
+        record Cpu(SurfaceMesh mesh,PackedQuads quads,int x,int y,int z,int mask,int width){}
         var decoded=new ArrayList<Cpu>();long vertices=0;
         for(var p:selected){String file=p.get("file").getAsString();if(!file.matches("[a-zA-Z0-9_.-]+"))throw new IllegalArgumentException("Invalid page name");Path path=checked(root.resolve(file),8<<20);byte[] bytes=Files.readAllBytes(path);verify(bytes,p.get("sha256").getAsString());
             SurfaceMesh mesh=null;PackedQuads quads=null;int x,y,z;
             if(p.get("representation").getAsString().equals("mesh")){var d=MeshPage.read(path);mesh=d.mesh();x=d.originX();y=d.originY();z=d.originZ();}
             else {var d=PackedQuads.read(path);quads=d.quads();x=d.originX();y=d.originY();z=d.originZ();}
-            vertices+=mesh!=null?mesh.indices().length:0;if(vertices>1200000)throw new IllegalArgumentException("Decoded proof GPU budget");decoded.add(new Cpu(mesh,quads,x,y,z));}
+            vertices+=mesh!=null?mesh.indices().length:0;if(vertices>1200000)throw new IllegalArgumentException("Decoded proof GPU budget");int pageWidth=p.has("tile_width")?p.get("tile_width").getAsInt():manifest.get("tile_width").getAsInt();
+            if(pageWidth<4||pageWidth>64)throw new IllegalArgumentException("Invalid page width");
+            decoded.add(new Cpu(mesh,quads,x,y,z,p.get("level_mask").getAsInt(),pageWidth));}
         JsonArray entries=JsonParser.parseString(new String(palette,java.nio.charset.StandardCharsets.UTF_8)).getAsJsonArray();
         if(entries.size()>8192)throw new IllegalArgumentException("Material budget");
-        close();
+        int width=manifest.get("tile_width").getAsInt();if(width<4||width>64)throw new IllegalArgumentException("Invalid tile width");
+        close();automaticLevels=level<0;
         try {
             shader=Shader.make().apply(properties::apply).define("FR_HYBRID_SURFACE")
                 .add(ShaderType.VERTEX,"voxy:lod/mesh/terrain.vert").add(ShaderType.FRAGMENT,"voxy:lod/mesh/terrain.frag")
@@ -66,7 +78,7 @@ public final class BakedMeshBackend implements AutoCloseable {
                 .add(ShaderType.VERTEX,"voxy:lod/mesh/terrain.vert").add(ShaderType.FRAGMENT,"voxy:lod/mesh/terrain.frag")
                 .replace("// FRAGMENT_MATERIAL_SOURCE",primitiveMaterialSource()).compile();
             float[] materials=materials(entries);table=glCreateBuffers();glNamedBufferData(table,materials,GL_STATIC_DRAW);gpuBytes=materials.length*4L;
-            for(var cpu:decoded){if(cpu.mesh!=null)upload(cpu.mesh,cpu.x,cpu.y,cpu.z,entries.size());else uploadQuads(cpu.quads,cpu.x,cpu.y,cpu.z,entries.size());if(gpuBytes>192L*1024*1024)throw new IllegalArgumentException("Resident GPU budget exceeded");}
+            for(var cpu:decoded){if(cpu.mesh!=null)upload(cpu.mesh,cpu.x,cpu.y,cpu.z,entries.size(),cpu.mask,cpu.width);else uploadQuads(cpu.quads,cpu.x,cpu.y,cpu.z,entries.size(),cpu.mask,cpu.width);if(gpuBytes>192L*1024*1024)throw new IllegalArgumentException("Resident GPU budget exceeded");}
             active=true;return status();
         }catch(Exception error){close();throw error;}
     }
@@ -84,19 +96,19 @@ public final class BakedMeshBackend implements AutoCloseable {
         return result;}
     /** Adapt existing receiver inputs to explicit per-primitive inputs, without double lightmap tint. */
     public static String primitiveMaterialSource(){return FragmentAtmosphereCompat.materialSource().replaceAll("(?m)^in (vec3|float) (fr_RelativePosition|fr_SkyLight|fr_BlockLight|fr_BaseLight|fr_CanopyNormal|fv_SurfaceNormal);", "$1 $2;");}
-    private void upload(SurfaceMesh mesh,int x,int y,int z,int paletteSize){
+    private void upload(SurfaceMesh mesh,int x,int y,int z,int paletteSize,int mask,int width){
         int[] attributes=mesh.faceData();for(int attribute:attributes)if((attribute>>>11)>=paletteSize||((attribute>>>8)&7)>5)throw new IllegalArgumentException("Invalid face material");
         long[] positions=new long[mesh.vertices()];for(int i=0;i<positions.length;i++)positions[i]=MeshGpuLayout.pack(mesh.positions()[i*3],mesh.positions()[i*3+1],mesh.positions()[i*3+2],mesh.normals()[i*3],mesh.normals()[i*3+1],mesh.normals()[i*3+2]);
         int vao=glCreateVertexArrays(),vbo=glCreateBuffers(),ebo=glCreateBuffers(),attr=glCreateBuffers();boolean shortIndex=mesh.vertices()<=65536;
-        pages.add(new Page(vao,vbo,ebo,attr,shortIndex?GL_UNSIGNED_SHORT:GL_UNSIGNED_INT,mesh.indices().length,false,x,y,z,bounds(mesh)));
+        pages.add(new Page(vao,vbo,ebo,attr,shortIndex?GL_UNSIGNED_SHORT:GL_UNSIGNED_INT,mesh.indices().length,false,x,y,z,bounds(mesh),mask,width));
         glNamedBufferData(vbo,positions,GL_STATIC_DRAW);glNamedBufferData(attr,attributes,GL_STATIC_DRAW);
         if(shortIndex){short[] ix=new short[mesh.indices().length];for(int j=0;j<ix.length;j++)ix[j]=(short)mesh.indices()[j];glNamedBufferData(ebo,ix,GL_STATIC_DRAW);}else glNamedBufferData(ebo,mesh.indices(),GL_STATIC_DRAW);
         glVertexArrayVertexBuffer(vao,0,vbo,0,8);glVertexArrayElementBuffer(vao,ebo);glEnableVertexArrayAttrib(vao,0);glVertexArrayAttribBinding(vao,0,0);glVertexArrayAttribIFormat(vao,0,2,GL_UNSIGNED_INT,0);
         gpuBytes+=positions.length*8L+attributes.length*4L+mesh.indices().length*(shortIndex?2L:4L);triangles+=mesh.triangles();
     }
-    private void uploadQuads(PackedQuads quads,int x,int y,int z,int paletteSize){
+    private void uploadQuads(PackedQuads quads,int x,int y,int z,int paletteSize,int mask,int width){
         for(long q:quads.data())if(PackedQuads.material(q)>=paletteSize)throw new IllegalArgumentException("Invalid quad material");
-        int vao=glCreateVertexArrays(),data=glCreateBuffers(),index=glCreateBuffers();pages.add(new Page(vao,data,index,0,GL_UNSIGNED_SHORT,quads.data().length,true,x,y,z,bounds(quads)));
+        int vao=glCreateVertexArrays(),data=glCreateBuffers(),index=glCreateBuffers();pages.add(new Page(vao,data,index,0,GL_UNSIGNED_SHORT,quads.data().length,true,x,y,z,bounds(quads),mask,width));
         glNamedBufferData(data,quads.data(),GL_STATIC_DRAW);glNamedBufferData(index,new short[]{0,1,2,0,2,3},GL_STATIC_DRAW);glVertexArrayElementBuffer(vao,index);
         gpuBytes+=quads.payloadBytes()+12;triangles+=quads.triangles();
     }
@@ -105,10 +117,14 @@ public final class BakedMeshBackend implements AutoCloseable {
     private static float[] bounds(SurfaceMesh mesh){float[] b=emptyBounds();for(int i=0;i<mesh.positions().length;i+=3)extend(b,mesh.positions()[i],mesh.positions()[i+1],mesh.positions()[i+2]);return b;}
     private static float[] bounds(PackedQuads quads){float[] b=emptyBounds();for(long q:quads.data()){int x=PackedQuads.x(q),y=PackedQuads.y(q),z=PackedQuads.z(q),f=PackedQuads.face(q),u=PackedQuads.u(q),v=PackedQuads.v(q);extend(b,x,y,z);extend(b,x+(f<2?1:u),y+(f<2?v:f<4?1:v),z+(f<2?u:f<4?v:1));}return b;}
     public void render(Viewport<?> view){if(!active)return;drawn=0;
+        int nativeDistance=Minecraft.getInstance().options.getEffectiveRenderDistance()*16;
         glBindTextureUnit(0,Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).getId());glBindSampler(0,0);glBindBufferBase(GL_SHADER_STORAGE_BUFFER,14,table);
         glEnable(GL_DEPTH_TEST);glDepthFunc(properties.closerEqualDepthCompare());glDepthMask(true);glDisable(GL_BLEND);glDisable(GL_CULL_FACE);
         Shader bound=null;
-        try{for(Page page:pages){float x=(float)(page.x-view.cameraX),y=(float)(page.y-view.cameraY),z=(float)(page.z-view.cameraZ);float[] b=page.bounds;
+        try{for(Page page:pages){
+            if(automaticLevels){double dx=Math.max(Math.max(page.x-view.cameraX,view.cameraX-page.x-page.width),0),dz=Math.max(Math.max(page.z-view.cameraZ,view.cameraZ-page.z-page.width),0);
+                int chosen=MeshLevelPolicy.level(dx*dx+dz*dz,nativeDistance);if((page.levelMask&(1<<chosen))==0)continue;}
+            float x=(float)(page.x-view.cameraX),y=(float)(page.y-view.cameraY),z=(float)(page.z-view.cameraZ);float[] b=page.bounds;
             if(page.count==0||!view.frustum.testAab(x+b[0]-.01f,y+b[1]-.01f,z+b[2]-.01f,x+b[3]+.01f,y+b[4]+.01f,z+b[5]+.01f))continue;
             Shader program=page.quads?quadShader:shader;
             if(program!=bound){

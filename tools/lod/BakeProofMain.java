@@ -9,14 +9,15 @@ import java.util.*;
 /** Standalone Java 21 tool. Deliberately no dependency on Minecraft, GL, Gradle or native libraries. */
 public final class BakeProofMain {
     public static void main(String[] args) throws Exception {
-        if(args.length<2||args.length>3)throw new IllegalArgumentException("Usage: BakeProofMain input.fvvol.gz output-directory [tileWidth=32]");
-        int tile=args.length==3?Integer.parseInt(args[2]):32,halo=SurfaceExtractor.REQUIRED_HALO;
+        if(args.length<2||args.length>4)throw new IllegalArgumentException("Usage: BakeProofMain input.fvvol.gz output-directory [tileWidth=32] [triangle-priority]");
+        int tile=args.length>=3?Integer.parseInt(args[2]):32,halo=SurfaceExtractor.REQUIRED_HALO;
         if(tile<4||tile>64)throw new IllegalArgumentException("Tile width must be 4..64");
         VoxelSnapshot source=VoxelSnapshot.read(Path.of(args[0]));
         if(Arrays.stream(source.blocks()).anyMatch(v->v<0))
             throw new IOException("Incomplete source: proof packages require known chunks throughout every tile and halo");
         if((source.sizeX()-halo*2)%tile!=0||(source.sizeZ()-halo*2)%tile!=0||source.sizeX()<=halo*2||source.sizeZ()<=halo*2)
             throw new IllegalArgumentException("Snapshot XZ must be N*tileWidth + 2*halo (halo="+halo+")");
+        if(args.length==4&&!args[3].equals("triangle-priority"))throw new IllegalArgumentException("Unknown bake policy");
         Path target=Path.of(args[1]).toAbsolutePath();
         if(Files.exists(target))throw new IOException("Refusing to overwrite a proof package: "+target);
         Files.createDirectories(target.getParent());
@@ -32,7 +33,7 @@ public final class BakeProofMain {
             long preparedBytes=0;
             for(int z=halo;z+tile<=source.sizeZ()-halo;z+=tile)for(int x=halo;x+tile<=source.sizeX()-halo;x+=tile) {
                 long tileStart=System.nanoTime();
-                var baked=TileBake.build(source,x,z,tile);
+                var baked=TileBake.build(source,x,z,tile,args.length==4&&args[3].equals("triangle-priority"));
                 var baseline=baked.exact().baseline();
                 var ownExact=baked.exact().selected();
                 String name="tile-"+(x-halo)/tile+"-"+(z-halo)/tile;
