@@ -72,7 +72,8 @@ public class VoxyCommands {
                         .executes(c -> hybrid(c, "status"))
                         .then(Commands.literal("build").executes(c -> hybrid(c, "build")))
                         .then(Commands.literal("on").executes(c -> hybrid(c, "on")))
-                        .then(Commands.literal("off").executes(c -> hybrid(c, "off"))))
+                        .then(Commands.literal("off").executes(c -> hybrid(c, "off")))
+                        .then(Commands.literal("earlyCull").then(Commands.argument("enabled", BoolArgumentType.bool()).executes(c -> hybrid(c, BoolArgumentType.getBool(c, "enabled") ? "early-on" : "early-off")))))
                 .then(Commands.literal("reload")
                         .executes(VoxyCommands::reloadInstance))
                 .then(imports)
@@ -86,6 +87,8 @@ public class VoxyCommands {
             case "build" -> surface.build();
             case "on" -> surface.enabled(true);
             case "off" -> surface.enabled(false);
+            case "early-on" -> {surface.earlyCull(true);yield surface.status();}
+            case "early-off" -> {surface.earlyCull(false);yield surface.status();}
             default -> surface.status();
         };
         ctx.getSource().sendSuccess(() -> Component.literal(message), false);

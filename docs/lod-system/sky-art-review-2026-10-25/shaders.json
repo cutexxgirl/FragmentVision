@@ -1,0 +1,12 @@
+{
+  "result": "passed",
+  "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+  "programs": [
+    "voxel material=False,translucent=False",
+    "voxel material=False,translucent=True",
+    "voxel material=True,translucent=False",
+    "voxel material=True,translucent=True",
+    "surface reverseZ=False",
+    "surface reverseZ=True"
+  ]
+}

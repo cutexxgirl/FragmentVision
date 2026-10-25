@@ -136,10 +136,14 @@ public final class HybridTerrain implements AutoCloseable {
                 BuildStats stats=pending.join();
                 long fine=0,coarse=0,far=0;for(GpuTile t:tiles.values()){fine+=t.count[0]/3;coarse+=t.count[1]/3;far+=t.count[2]/3;}
                 status=tiles.size()+" tiles, indices fine/coarse/far="+fine+"/"+coarse+"/"+far+
-                        ", "+stats.millis+"ms CPU, max tile input="+stats.maxVolumeBytes/1024+"KiB, max tile mesh="+
+                        ", "+stats.millis+"ms elapsed (including queue wait), max tile input="+stats.maxVolumeBytes/1024+"KiB, max tile mesh="+
                         stats.maxMeshBytes/1024+"KiB, observed heap="+stats.maxObservedHeap/1048576+"MiB, skipped="+stats.skipped+", GPU fallback="+gpuRejected+", reused="+stats.reused;
                 Logger.info("Hybrid tiled terrain ready: "+status());
             }catch(CancellationException ignored){status="build superseded";}
+            catch(CompletionException error){
+                if(error.getCause() instanceof CancellationException)status="build superseded";
+                else {Logger.error("Hybrid tile build failed; retaining completed tiles",error);status="tile build failed; completed tiles retained";}
+            }
             catch(Exception e){Logger.error("Hybrid tile build failed; retaining completed tiles",e);status="tile build failed; completed tiles retained";}
             finally{pending=null;}
         }

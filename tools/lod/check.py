@@ -33,6 +33,7 @@ subprocess.run([java, "-Xmx256m", "-cp", str(classes), "LodBakeCheck", str(root 
 subprocess.run([java, "-Xmx256m", "-cp", str(classes), "LodComparisonCheck", str(root / "build/lod-proof/comparison")], check=True)
 subprocess.run([java, "-Xmx256m", "-cp", str(classes), "DirectGeometryCheck"], check=True)
 subprocess.run([java, "-Xmx256m", "-cp", str(classes), "ProgressiveRuntimeCheck"], check=True)
+subprocess.run([java, "-Xmx256m", "-cp", str(classes), "ProgressiveFileCheck"], check=True)
 subprocess.run([java, "-Xmx256m", "-cp", str(classes), "LinkedSeamCheck"], check=True)
 subprocess.run([java, "-Xmx256m", "-cp", str(classes), "HybridLodPolicyCheck"], check=True)
 subprocess.run([java, "-Xmx256m", "-cp", str(classes), "CoveragePrefixCheck"], check=True)

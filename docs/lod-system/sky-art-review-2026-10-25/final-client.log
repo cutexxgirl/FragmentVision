@@ -1,0 +1,1013 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :createMinecraftArtifacts UP-TO-DATE
+> Task :compileJava UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :classes UP-TO-DATE
+> Task :downloadAssets UP-TO-DATE
+> Task :writeClientLegacyClasspath UP-TO-DATE
+> Task :prepareClientRun UP-TO-DATE
+> Task :prepareWaterTestMods
+
+> Task :runClient
+WARN StatusConsoleListener Advanced terminal features are not available in this environment
+[07:19:02] [main/INFO] [cp.mo.mo.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, forgeclientdev, --version, 21.1.262, --assetIndex, 17, --assetsDir, /home/agent/.gradle/caches/neoformruntime/assets, --gameDir, ., --fml.fmlVersion, 4.0.45, --fml.mcVersion, 1.21.1, --fml.neoForgeVersion, 21.1.262, --fml.neoFormVersion, 20240808.144430, --width, 1280, --height, 720, --username, WaterStudy, --uuid, 00000000-0000-0000-0000-000000000001, --accessToken, ❄❄❄❄❄❄❄❄, --quickPlaySingleplayer, Sky_Art_Study]
+[07:19:02] [main/INFO] [cp.mo.mo.Launcher/MODLAUNCHER]: JVM identified as Eclipse Adoptium OpenJDK 64-Bit Server VM 21.0.12.1+1-LTS
+[07:19:02] [main/INFO] [cp.mo.mo.Launcher/MODLAUNCHER]: ModLauncher 11.0.5+main.901c6ea8 starting: java version 21.0.12.1 by Eclipse Adoptium; OS Linux arch amd64 version 6.18.55
+[07:19:02] [main/INFO] [Sodium-GraphicsAdapterProbe/]: Searching for graphics cards...
+[07:19:02] [main/WARN] [Sodium-GraphicsAdapterProbe/]: Could not find any graphics adapters! Probably the device is not on a bus we can probe, or there are no devices supporting 3D acceleration.
+[07:19:02] [main/WARN] [Sodium-Workarounds/]: Sodium has applied one or more workarounds to prevent crashes or other issues on your system: [NO_ERROR_CONTEXT_UNSUPPORTED]
+[07:19:02] [main/WARN] [Sodium-Workarounds/]: This is not necessarily an issue, but it may result in certain features or optimizations being disabled. You can sometimes fix these issues by upgrading your graphics driver.
+[07:19:02] [main/INFO] [ne.ne.fm.lo.ImmediateWindowHandler/]: ImmediateWindowProvider not loading because splash screen is disabled
+[07:19:02] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=union:/home/agent/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.16.4+mixin.0.8.7/26d01f0567ab46e9ca0d2ed89d0ecc11aadbd433/sponge-mixin-0.16.4+mixin.0.8.7.jar%23126!/ Service=ModLauncher Env=CLIENT
+[07:19:03] [main/INFO] [ne.ne.fm.lo.mo.lo.JarInJarDependencyLocator/]: Found 21 dependencies adding them to mods collection
+[07:19:03] [main/INFO] [ne.ne.fm.lo.mo.ModDiscoverer/]: 
+     Mod List:
+		Name Version (Mod Id)
+
+		Chunky 1.4.23 (chunky)
+		Forgified Fabric API Base 0.4.42+d1308ded19 (fabric_api_base)
+		Forgified Fabric BlockView API (v2) 1.0.10+9afaaf8c19 (fabric_block_view_api_v2)
+		Forgified Fabric Renderer API (v1) 3.4.1+9125b6dc19 (fabric_renderer_api_v1)
+		Forgified Fabric Rendering Data Attachment (v1) 0.3.48+73761d2e19 (fabric_rendering_data_attachment_v1)
+		FragmentRender 1.1.0 (fragmentrender)
+		Fzzy Config 0.7.6+1.21+neoforge (fzzy_config)
+		Grassier Grass - Private Fields 1.4.5-private.2 (grassiergrass)
+		Kotlin For Forge 5.12.0 (kotlinforforge)
+		Minecraft 1.21.1 (minecraft)
+		NeoForge 21.1.262 (neoforge)
+		Sodium 0.8.13+mc1.21.1 (sodium)
+		Voxy 0.2.16-beta (voxy)
+[07:19:04] [main/INFO] [mixin/]: Compatibility level set to JAVA_21
+[07:19:04] [main/INFO] [cp.mo.mo.LaunchServiceHandler/MODLAUNCHER]: Launching target 'forgeclientdev' with arguments [--version, 21.1.262, --gameDir, ., --assetsDir, /home/agent/.gradle/caches/neoformruntime/assets, --uuid, 00000000-0000-0000-0000-000000000001, --assetIndex, 17, --width, 1280, --height, 720, --username, WaterStudy, --accessToken, ❄❄❄❄❄❄❄❄, --quickPlaySingleplayer, Sky_Art_Study]
+[07:19:04] [main/INFO] [Sodium/]: Loaded configuration file for Sodium: 45 options available, 0 override(s) found
+[07:19:05] [main/INFO] [MixinExtras|Service/]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.5).
+[07:19:08] [Datafixer Bootstrap/INFO] [mojang/DataFixerBuilder]: 229 Datafixer optimizations took 1045 milliseconds
+[07:19:13] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, location] and [teleport, destination] with inputs: [0.1 -0.5 .9, 0 0 0]
+[07:19:13] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, location] and [teleport, targets] with inputs: [0.1 -0.5 .9, 0 0 0]
+[07:19:13] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, destination] and [teleport, targets] with inputs: [Player, 0123, @e, dd12be42-52a9-4a91-a8a1-11c01849e498]
+[07:19:13] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, targets] and [teleport, destination] with inputs: [Player, 0123, dd12be42-52a9-4a91-a8a1-11c01849e498]
+[07:19:13] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, targets, location] and [teleport, targets, destination] with inputs: [0.1 -0.5 .9, 0 0 0]
+[07:19:13] [Render thread/WARN] [minecraft/VanillaPackResourcesBuilder]: Assets URL 'union:/workspace/fragmentrender-sky/build/moddev/artifacts/neoforge-21.1.262.jar%23184!/assets/.mcassetsroot' uses unexpected schema
+[07:19:13] [Render thread/WARN] [minecraft/VanillaPackResourcesBuilder]: Assets URL 'union:/workspace/fragmentrender-sky/build/moddev/artifacts/neoforge-21.1.262.jar%23184!/data/.mcassetsroot' uses unexpected schema
+[07:19:13] [Render thread/INFO] [mojang/YggdrasilAuthenticationService]: Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, name=PROD]
+[07:19:13] [Render thread/INFO] [minecraft/Minecraft]: Setting user: WaterStudy
+[07:19:14] [Render thread/WARN] [minecraft/Options]: Skipping bad option: 
+[07:19:14] [Render thread/INFO] [minecraft/Minecraft]: Backend library: LWJGL version 3.3.3+5
+[07:19:14] [Render thread/INFO] [ModernUI-MC/Init]: Created MuiForgeAPI
+[07:19:14] [Render thread/INFO] [ModernUI-MC/Init]: Promoted to OpenGL 4.6 Core Profile
+[07:19:14] [Render thread/INFO] [mojang/Window]: OpenGL Vendor: Mesa
+[07:19:14] [Render thread/INFO] [mojang/Window]: OpenGL Renderer: llvmpipe (LLVM 19.1.7, 256 bits)
+[07:19:14] [Render thread/INFO] [mojang/Window]: OpenGL Version: 4.6 (Core Profile) Mesa 25.0.7-2+deb13u1
+[07:19:14] [Render thread/WARN] [Voxy/]: [me.cx.vy.ct.VoxyClient]: GPU does not support subgroup operations, expect some performance degradation
+[07:19:14] [Render thread/INFO] [Arc3D/]: Use KHR_blend_equation_advanced_coherent
+[07:19:14] [Render thread/INFO] [ModernUI/Core]: OpenGL vendor: Mesa
+[07:19:14] [Render thread/INFO] [ModernUI/Core]: OpenGL renderer: llvmpipe (LLVM 19.1.7, 256 bits)
+[07:19:14] [Render thread/INFO] [ModernUI/Core]: OpenGL version: 4.6 (Core Profile) Mesa 25.0.7-2+deb13u1
+[07:19:14] [Render thread/INFO] [ModernUI/Core]: OpenGL caps: 
+AnisotropySupport: true
+GpuTracingSupport: false
+ConservativeRasterSupport: false
+TextureBarrierSupport: true
+DepthClipNegativeOneToOne: true
+BlendEquationSupport: ADVANCED_COHERENT
+ClampToBorderSupport: true
+MaxRenderTargetSize: 16384
+MaxPreferredRenderTargetSize: 16384
+MaxVertexAttributes: 16
+MaxVertexBindings: 8
+MaxTextureSize: 16384
+MaxPushConstantsSize: 0
+MaxColorAttachments: 8
+MinUniformBufferOffsetAlignment: 16
+MinStorageBufferOffsetAlignment: 16
+ShaderCaps:
+	TargetAPI: OPENGL_4_5
+	GLSLVersion: GLSL_450
+	SPIRVVersion: null
+	FMASupport: true
+	DualSourceBlendingSupport: true
+	PreferFlatInterpolation: true
+	VertexIDSupport: true
+	InfinitySupport: true
+	NonConstantArrayIndexSupport: true
+	BitManipulationSupport: true
+	NoPerspectiveInterpolationSupport: true
+	ReducedShaderMode: false
+	TextureQueryLod: true
+	UniformBindingSupport: true
+	VaryingLocationSupport: true
+	UseBlockMemberOffset: true
+	UsePrecisionModifiers: false
+	RequiresLocalOutputColorForFBFetch: false
+	MustObfuscateUniformColor: false
+	MustWriteToFragColor: false
+	ColorSpaceMathNeedsFloat: false
+	AvoidDfDxForGradientsWhenPossible: false
+	SecondaryOutputExtension: null
+	AdvBlendEqInteraction: 2
+	MaxFragmentSamplers: 32
+Vendor: OTHER
+Driver: MESA
+MaxFragmentUniformVectors: 4096
+MaxTextureMaxAnisotropy: 16.0
+SupportsProtected: false
+SkipErrorChecks: false
+MaxLabelLength: 256
+DebugSupport: true
+BufferStorageSupport: true
+DrawElementsBaseVertexSupport: true
+BaseInstanceSupport: true
+DSASupport: true
+InvalidateBufferType: 2
+InvalidateFramebufferSupport: true
+ShaderBinarySupport: true
+UseStagingBuffers: false
+MustHaveFragmentShader: false
+VertexAttribBindingSupport: true
+CopyImageSupport: true
+SPIRVSupport: false
+ViewCompatibilityClassSupport: true
+TexStorageSupport: true
+ProgramBinarySupport: true
+ProgramBinaryFormats: [34655]
+GLSLVersion: 460
+ColorTypeToFormat:
+	UNKNOWN=>Unsupported
+	R_8=>R8
+	RG_88=>RG8
+	RGBA_8888=>RGBA8
+	R_16=>R16
+	RG_1616=>RG16
+	RGBA_16161616=>RBGA16
+	R_F16=>R16F
+	RG_F16=>RG16F
+	RGBA_F16=>RGBA16F
+	R_F32=>Unsupported
+	RG_F32=>Unsupported
+	RGBA_F32=>Unsupported
+	ALPHA_8=>R8
+	ALPHA_16=>R16
+	ALPHA_F16=>R16F
+	GRAY_8=>R8
+	GRAY_16=>R16
+	GRAY_ALPHA_88=>RG8
+	GRAY_ALPHA_1616=>RG16
+	BGRA_8888=>BGRA8
+	BGR_565=>B5_G6_R5
+	BGRA_5551=>BGR5_A1
+	RGBA_1010102=>RGB10_A2
+	BGRA_1010102=>BGR10_A2
+	RGBE_9995=>Unsupported
+	RGB_888=>RGB8
+	RGB_161616=>RGB16
+	RGBX_8888=>RGBA8
+CompressionTypeToBackendFormat: [null, {mBackend=OpenGL, mFormat=ETC2}, {mBackend=OpenGL, mFormat=RGB8_BC1}, {mBackend=OpenGL, mFormat=RGBA8_BC1}]
+
+[07:19:15] [modloading-worker-0/INFO] [ModernUI-MC/Init]: Initialized Modern UI
+[07:19:15] [modloading-worker-0/INFO] [Voxy/]: [me.cx.vy.cn.cg.Serialization]: Registered Config as Serializer for config type SectionStorageConfig
+[07:19:15] [modloading-worker-0/INFO] [Voxy/]: [me.cx.vy.cn.cg.Serialization]: Registered Config as LZ4 for config type CompressorConfig
+[07:19:15] [modloading-worker-0/INFO] [Voxy/]: [me.cx.vy.cn.cg.Serialization]: Registered Config as ZSTD for config type CompressorConfig
+[07:19:15] [modloading-worker-0/INFO] [Voxy/]: [me.cx.vy.cn.cg.Serialization]: Registered Config as Redis for config type StorageConfig
+[07:19:15] [modloading-worker-0/INFO] [Voxy/]: [me.cx.vy.cn.cg.Serialization]: Registered Config as Memory for config type StorageConfig
+[07:19:15] [modloading-worker-0/INFO] [Voxy/]: [me.cx.vy.cn.cg.Serialization]: Registered Config as RocksDB for config type StorageConfig
+[07:19:15] [modloading-worker-0/INFO] [Voxy/]: [me.cx.vy.cn.cg.Serialization]: Registered Config as FragmentationAdaptor for config type StorageConfig
+[07:19:15] [modloading-worker-0/INFO] [Voxy/]: [me.cx.vy.cn.cg.Serialization]: Registered BasicPathInsertionConfig as BasicPathConfig for config type StorageConfig
+[07:19:15] [modloading-worker-0/INFO] [Voxy/]: [me.cx.vy.cn.cg.Serialization]: Registered Config as ReadonlyCachingLayer for config type StorageConfig
+[07:19:15] [modloading-worker-0/INFO] [Voxy/]: [me.cx.vy.cn.cg.Serialization]: Registered Config as CompressionAdaptor for config type StorageConfig
+[07:19:15] [modloading-worker-0/INFO] [Voxy/]: [me.cx.vy.cn.cg.Serialization]: Registered Config2 as AutoFragmentationAdaptor for config type StorageConfig
+[07:19:15] [modloading-worker-0/INFO] [Voxy/]: [me.cx.vy.cn.cg.Serialization]: Registered ConditionalStorageBackendConfig as ConditionalConfig for config type StorageConfig
+[07:19:15] [modloading-worker-0/INFO] [Voxy/]: [me.cx.vy.cn.cg.Serialization]: Registered Config as LMDB for config type StorageConfig
+[07:19:15] [modloading-worker-0/INFO] [Voxy/]: [me.cx.vy.cn.cg.Serialization]: Registered 13 config types
+[07:19:15] [modloading-worker-0/INFO] [ModernUI-MC/UIManager]: UI manager initialized
+[07:19:15] [modloading-worker-0/INFO] [ModernUI-MC/Init]: Created TextLayoutEngine
+[07:19:15] [modloading-worker-0/INFO] [ModernUI-MC/Init]: Initialized Modern UI text engine
+[07:19:15] [modloading-worker-0/INFO] [ModernUI-MC/Init]: Initialized Modern UI client
+[07:19:16] [modloading-worker-0/INFO] [th.ko.ne.te.KotlinForForge/]: Kotlin For Forge Enabled!
+[07:19:16] [modloading-worker-0/INFO] [ne.ne.ne.co.NeoForgeMod/NEOFORGE-MOD]: NeoForge mod loading, version 21.1.262, for MC 1.21.1
+[07:19:16] [UI thread/INFO] [ModernUI-MC/UIManager]: UI thread initialized in 1239ms
+[07:19:16] [modloading-worker-0/INFO] [fzzy_config/]: Loaded config fzzy_config:keybinds in 615ms
+[07:19:16] [modloading-worker-0/INFO] [fzzy_config/]: Loaded config grassiergrass:client in 127ms
+[W][07:19:17.224684] pw.conf      | [          conf.c: 1204 pw_conf_load_conf_for_context()] setting config.name to client-rt.conf is deprecated, using client.conf
+[W][07:19:17.224768] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][07:19:17.224772] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[07:19:17] [Render thread/INFO] [ne.ne.ne.ga.GameTestHooks/]: Enabled Gametest Namespaces: []
+[07:19:17] [Render thread/INFO] [ModernUI-MC/TextLayout]: Preloaded modern text shaders
+[07:19:17] [Render thread/INFO] [minecraft/ReloadableResourceManager]: Reloading ResourceManager: vanilla, file/Fragment_NatureX_Render_Foliage.zip, mod_resources, mod/sodium, mod/fabric_api_base, mod/fabric_renderer_api_v1, mod/fragmentrender,modernui, mod/chunky, mod/fabric_rendering_data_attachment_v1, mod/voxy, mod/kotlinforforge, mod/fzzy_config, mod/grassiergrass, mod/neoforge, mod/fabric_block_view_api_v2, mod/fragmentrender:resourcepacks/fragment_foliage
+[07:19:18] [Render thread/INFO] [ModernUI-MC/TextLayout]: Loaded smart SDF text shaders
+[07:19:18] [Render thread/INFO] [ModernUI-MC/TextLayout]: Reloaded text layout engine, res level: 2 to 2, locale: en_US, layout RTL: false
+[07:19:18] [Worker-Main-1/ERROR] [minecraft/Util]: Invalid path in pack: modernui:font/OFL-Mogra.txt, ignoring
+[07:19:18] [Worker-Main-1/ERROR] [minecraft/Util]: Invalid path in pack: modernui:font/muii18ncompat/OFL.txt, ignoring
+[07:19:18] [Worker-Main-1/ERROR] [minecraft/Util]: Invalid path in pack: modernui:font/touchconcrete-README.txt, ignoring
+[07:19:18] [Worker-Main-1/ERROR] [minecraft/Util]: Invalid path in pack: modernui:font/OFL-Inter.txt, ignoring
+[07:19:18] [Thread-5/INFO] [ModernUI-MC/TextLayout]: Redirect registered font 'Colus Lowercase' to 'modernui:colus-lowercase'
+[07:19:18] [Thread-5/INFO] [ModernUI-MC/Init]: Registered font 'Colus Lowercase', location 'modernui:font/coluslowercase-light.otf' in pack: 'mod/fragmentrender,modernui'
+[07:19:18] [Thread-6/INFO] [ModernUI-MC/Init]: Registered font 'Colus Lowercase', location 'modernui:font/coluslowercase-regular.otf' in pack: 'mod/fragmentrender,modernui'
+[07:19:18] [Thread-7/INFO] [ModernUI-MC/TextLayout]: Redirect registered font 'Inter' to 'modernui:inter'
+[07:19:18] [Thread-7/INFO] [ModernUI-MC/Init]: Registered font 'Inter', location 'modernui:font/inter-bold.ttf' in pack: 'mod/fragmentrender,modernui'
+[07:19:18] [Thread-8/INFO] [ModernUI-MC/TextLayout]: Redirect registered font 'Inter Frozen Medium' to 'modernui:inter-frozen-medium'
+[07:19:18] [Thread-8/INFO] [ModernUI-MC/Init]: Registered font 'Inter Frozen Medium', location 'modernui:font/inter-frozen-medium-italic.otf' in pack: 'mod/fragmentrender,modernui'
+[07:19:18] [Thread-11/INFO] [ModernUI-MC/TextLayout]: Redirect registered font 'JetBrains Mono Medium' to 'modernui:jetbrains-mono-medium'
+[07:19:18] [Thread-11/INFO] [ModernUI-MC/Init]: Registered font 'JetBrains Mono Medium', location 'modernui:font/jetbrains-mono-medium.ttf' in pack: 'mod/fragmentrender,modernui'
+[07:19:18] [Thread-9/INFO] [ModernUI-MC/Init]: Registered font 'Inter Frozen Medium', location 'modernui:font/inter-frozen-medium.otf' in pack: 'mod/fragmentrender,modernui'
+[07:19:18] [Thread-13/INFO] [ModernUI-MC/TextLayout]: Redirect registered font 'mui-i18n-compat' to 'modernui:mui-i18n-compat'
+[07:19:18] [Thread-13/INFO] [ModernUI-MC/Init]: Registered font 'mui-i18n-compat', location 'modernui:font/muii18ncompat/muii18ncompat.ttf' in pack: 'mod/fragmentrender,modernui'
+[07:19:18] [Thread-10/INFO] [ModernUI-MC/TextLayout]: Redirect registered font 'Inter Medium' to 'modernui:inter-medium'
+[07:19:18] [Thread-10/INFO] [ModernUI-MC/Init]: Registered font 'Inter Medium', location 'modernui:font/inter-medium.ttf' in pack: 'mod/fragmentrender,modernui'
+[07:19:18] [Thread-12/INFO] [ModernUI-MC/TextLayout]: Redirect registered font 'Mogra' to 'modernui:mogra'
+[07:19:18] [Thread-12/INFO] [ModernUI-MC/Init]: Registered font 'Mogra', location 'modernui:font/mogra-regular.ttf' in pack: 'mod/fragmentrender,modernui'
+[07:19:18] [Worker-Main-2/INFO] [ModernUI-MC/Glyph]: Scanned emoji map size: 0
+[07:19:18] [Worker-Main-2/INFO] [ModernUI-MC/Glyph]: No Emoji font was found
+[07:19:18] [Thread-15/INFO] [ModernUI-MC/TextLayout]: Redirect registered font 'TOUCHCONCRETE' to 'modernui:touchconcrete'
+[07:19:18] [Thread-15/INFO] [ModernUI-MC/Init]: Registered font 'TOUCHCONCRETE', location 'modernui:font/touchconcrete.otf' in pack: 'mod/fragmentrender,modernui'
+[07:19:18] [Worker-Main-2/INFO] [ModernUI-MC/Glyph]: Scanned emoji shortcodes: 6923
+[07:19:18] [Thread-14/INFO] [ModernUI-MC/TextLayout]: Redirect registered font 'Source Han Sans CN Medium' to 'modernui:source-han-sans-cn-medium'
+[07:19:18] [Thread-14/INFO] [ModernUI-MC/Init]: Registered font 'Source Han Sans CN Medium', location 'modernui:font/source-han-sans-cn-medium.otf' in pack: 'mod/fragmentrender,modernui'
+[07:19:18] [Worker-Main-1/INFO] [ModernUI-MC/Init]: Font 'Segoe UI Variable' failed to load or invalid
+[07:19:18] [Worker-Main-1/INFO] [ModernUI-MC/Init]: Font 'Segoe UI' failed to load or invalid
+[07:19:18] [Worker-Main-1/INFO] [ModernUI-MC/Init]: Font 'San Francisco' failed to load or invalid
+[07:19:18] [Worker-Main-2/WARN] [minecraft/FilePackResources]: Invalid path in datapack: minecraft:models/block/deepslate/New folder/deepslate1.json, ignoring
+[07:19:18] [Worker-Main-2/WARN] [minecraft/FilePackResources]: Invalid path in datapack: minecraft:models/block/deepslate/New folder/deepslate2.json, ignoring
+[07:19:18] [Worker-Main-2/WARN] [minecraft/FilePackResources]: Invalid path in datapack: minecraft:models/block/deepslate/New folder/deepslate3.json, ignoring
+[07:19:18] [Worker-Main-2/WARN] [minecraft/FilePackResources]: Invalid path in datapack: minecraft:models/block/deepslate/New folder/deepslate4.json, ignoring
+[07:19:18] [Worker-Main-2/WARN] [minecraft/FilePackResources]: Invalid path in datapack: minecraft:models/block/deepslate/New folder/deepslate5.json, ignoring
+[07:19:18] [Worker-Main-2/WARN] [minecraft/FilePackResources]: Invalid path in datapack: minecraft:models/block/deepslate/New folder/deepslate6.json, ignoring
+[07:19:18] [Worker-Main-2/WARN] [minecraft/FilePackResources]: Invalid path in datapack: minecraft:models/block/deepslate/New folder/deepslate7.json, ignoring
+[07:19:18] [Worker-Main-2/WARN] [minecraft/FilePackResources]: Invalid path in datapack: minecraft:models/block/deepslate/New folder/deepslate_mirrored1.json, ignoring
+[07:19:18] [Worker-Main-2/WARN] [minecraft/FilePackResources]: Invalid path in datapack: minecraft:models/block/deepslate/New folder/deepslate_mirrored2.json, ignoring
+[07:19:18] [Worker-Main-2/WARN] [minecraft/FilePackResources]: Invalid path in datapack: minecraft:models/block/deepslate/New folder/deepslate_mirrored3.json, ignoring
+[07:19:18] [Worker-Main-2/WARN] [minecraft/FilePackResources]: Invalid path in datapack: minecraft:models/block/deepslate/New folder/deepslate_mirrored4.json, ignoring
+[07:19:18] [Worker-Main-2/WARN] [minecraft/FilePackResources]: Invalid path in datapack: minecraft:models/block/deepslate/New folder/deepslate_mirrored5.json, ignoring
+[07:19:18] [Worker-Main-2/WARN] [minecraft/FilePackResources]: Invalid path in datapack: minecraft:models/block/deepslate/New folder/deepslate_mirrored6.json, ignoring
+[07:19:18] [Worker-Main-2/WARN] [minecraft/FilePackResources]: Invalid path in datapack: minecraft:models/block/deepslate/New folder/deepslate_mirrored7.json, ignoring
+[07:19:18] [Worker-Main-2/WARN] [minecraft/FilePackResources]: Invalid path in datapack: minecraft:models/block/oak/stairs/New folder/oak_outer_stairs_rotated.json, ignoring
+[07:19:18] [Worker-Main-1/INFO] [ModernUI-MC/Init]: Font 'SimHei' failed to load or invalid
+[07:19:18] [Worker-Main-2/WARN] [minecraft/FilePackResources]: Invalid path in datapack: minecraft:models/block/oak/stairs/New folder/oak_outer_stairs_up.json, ignoring
+[07:19:18] [Worker-Main-1/INFO] [ModernUI-MC/Init]: Font 'STHeiti' failed to load or invalid
+[07:19:18] [Worker-Main-1/INFO] [ModernUI-MC/Init]: Font 'Segoe UI Symbol' failed to load or invalid
+[07:19:18] [Worker-Main-1/INFO] [ModernUI-MC/Init]: Loaded typeface: FontCollection{mFamilies=[Inter Frozen Medium, Source Han Sans CN Medium, Noto Sans, Open Sans, mui-i18n-compat], mExclusiveEastAsianBits=null}
+[07:19:18] [Worker-Main-1/ERROR] [minecraft/Util]: Invalid path in pack: modernui:font/OFL-Mogra.txt, ignoring
+[07:19:18] [Worker-Main-1/ERROR] [minecraft/Util]: Invalid path in pack: modernui:font/muii18ncompat/OFL.txt, ignoring
+[07:19:18] [Worker-Main-1/ERROR] [minecraft/Util]: Invalid path in pack: modernui:font/touchconcrete-README.txt, ignoring
+[07:19:18] [Worker-Main-1/ERROR] [minecraft/Util]: Invalid path in pack: modernui:font/OFL-Inter.txt, ignoring
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font 'minecraft:alt' in pack: 'vanilla'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font bundle: 'minecraft:font/alt.json', font set: [minecraft:include/space,minecraft:font/ascii_sga.png]
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Ignore 'size=8.0' of providers[0] in font 'fragmentrender:colus_light' in pack: 'mod/fragmentrender,modernui'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Ignore 'oversample=4.0' of providers[0] in font 'fragmentrender:colus_light' in pack: 'mod/fragmentrender,modernui'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Ignore 'shift=Shift[x=0.0, y=0.0]' of providers[0] in font 'fragmentrender:colus_light' in pack: 'mod/fragmentrender,modernui'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font 'fragmentrender:colus_light' in pack: 'mod/fragmentrender,modernui'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font bundle: 'fragmentrender:font/colus_light.json', font set: [Colus Lowercase]
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Ignore 'size=8.0' of providers[0] in font 'fragmentrender:colus_regular' in pack: 'mod/fragmentrender,modernui'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Ignore 'oversample=4.0' of providers[0] in font 'fragmentrender:colus_regular' in pack: 'mod/fragmentrender,modernui'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Ignore 'shift=Shift[x=0.0, y=0.0]' of providers[0] in font 'fragmentrender:colus_regular' in pack: 'mod/fragmentrender,modernui'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font 'fragmentrender:colus_regular' in pack: 'mod/fragmentrender,modernui'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font bundle: 'fragmentrender:font/colus_regular.json', font set: [Colus Lowercase]
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font 'minecraft:default' in pack: 'vanilla'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font bundle: 'minecraft:font/default.json', font set: [minecraft:include/space,minecraft:include/default]
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font 'minecraft:illageralt' in pack: 'vanilla'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font bundle: 'minecraft:font/illageralt.json', font set: [minecraft:include/space,minecraft:font/asciillager.png]
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font 'minecraft:include/default' in pack: 'vanilla'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font bundle: 'minecraft:font/include/default.json', font set: [minecraft:font/nonlatin_european.png,minecraft:font/accented.png,minecraft:font/ascii.png]
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font 'minecraft:include/space' in pack: 'vanilla'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font bundle: 'minecraft:font/include/space.json', font set: [minecraft:include/space / minecraft:space]
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Ignore 'size=8.0' of providers[0] in font 'fragmentrender:inter_bold' in pack: 'mod/fragmentrender,modernui'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Ignore 'oversample=4.0' of providers[0] in font 'fragmentrender:inter_bold' in pack: 'mod/fragmentrender,modernui'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Ignore 'shift=Shift[x=0.0, y=0.0]' of providers[0] in font 'fragmentrender:inter_bold' in pack: 'mod/fragmentrender,modernui'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font 'fragmentrender:inter_bold' in pack: 'mod/fragmentrender,modernui'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font bundle: 'fragmentrender:font/inter_bold.json', font set: [Inter]
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font 'fragmentutils:inter_bold' in pack: 'mod/fragmentrender,modernui'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font bundle: 'fragmentutils:font/inter_bold.json', font set: [fragmentrender:inter_bold]
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Ignore 'size=8.0' of providers[0] in font 'fragmentrender:inter_medium' in pack: 'mod/fragmentrender,modernui'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Ignore 'oversample=4.0' of providers[0] in font 'fragmentrender:inter_medium' in pack: 'mod/fragmentrender,modernui'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Ignore 'shift=Shift[x=0.0, y=0.0]' of providers[0] in font 'fragmentrender:inter_medium' in pack: 'mod/fragmentrender,modernui'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font 'fragmentrender:inter_medium' in pack: 'mod/fragmentrender,modernui'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font bundle: 'fragmentrender:font/inter_medium.json', font set: [Inter Medium]
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font 'fragmentutils:rarity' in pack: 'mod/fragmentrender,modernui'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font bundle: 'fragmentutils:font/rarity.json', font set: [fragmentrender:rarity_badge]
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Ignore 'size=8.0' of providers[0] in font 'fragmentrender:rarity_badge' in pack: 'mod/fragmentrender,modernui'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Ignore 'oversample=4.0' of providers[0] in font 'fragmentrender:rarity_badge' in pack: 'mod/fragmentrender,modernui'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Ignore 'shift=Shift[x=0.0, y=0.0]' of providers[0] in font 'fragmentrender:rarity_badge' in pack: 'mod/fragmentrender,modernui'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font 'fragmentrender:rarity_badge' in pack: 'mod/fragmentrender,modernui'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font bundle: 'fragmentrender:font/rarity_badge.json', font set: [Mogra]
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Ignore 'size=8.0' of providers[0] in font 'fragmentrender:touchconcrete' in pack: 'mod/fragmentrender,modernui'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Ignore 'oversample=4.0' of providers[0] in font 'fragmentrender:touchconcrete' in pack: 'mod/fragmentrender,modernui'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Ignore 'shift=Shift[x=0.0, y=0.0]' of providers[0] in font 'fragmentrender:touchconcrete' in pack: 'mod/fragmentrender,modernui'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font 'fragmentrender:touchconcrete' in pack: 'mod/fragmentrender,modernui'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font bundle: 'fragmentrender:font/touchconcrete.json', font set: [TOUCHCONCRETE]
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font 'fragmentutils:touchconcrete_digits' in pack: 'mod/fragmentrender,modernui'
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded raw font bundle: 'fragmentutils:font/touchconcrete_digits.json', font set: [fragmentrender:touchconcrete]
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded font: 'fragmentrender:inter_medium', font set: [Inter Medium]
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded font: 'fragmentrender:rarity_badge', font set: [Mogra]
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded font: 'fragmentrender:touchconcrete', font set: [TOUCHCONCRETE]
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded font: 'minecraft:include/space', font set: [minecraft:include/space / minecraft:space]
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded font: 'minecraft:alt', font set: [minecraft:include/space / minecraft:space,minecraft:font/ascii_sga.png]
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded font: 'fragmentrender:inter_bold', font set: [Inter]
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded font: 'fragmentutils:touchconcrete_digits', font set: [TOUCHCONCRETE]
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded font: 'minecraft:include/default', font set: [minecraft:font/nonlatin_european.png,minecraft:font/accented.png,minecraft:font/ascii.png]
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded font: 'minecraft:default', font set: [minecraft:include/space / minecraft:space,minecraft:font/nonlatin_european.png,minecraft:font/accented.png,minecraft:font/ascii.png]
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded font: 'minecraft:illageralt', font set: [minecraft:include/space / minecraft:space,minecraft:font/asciillager.png]
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded font: 'fragmentutils:inter_bold', font set: [Inter]
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded font: 'fragmentrender:colus_regular', font set: [Colus Lowercase]
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded font: 'fragmentutils:rarity', font set: [Mogra]
+[07:19:19] [Worker-Main-1/INFO] [ModernUI-MC/TextLayout]: Loaded font: 'fragmentrender:colus_light', font set: [Colus Lowercase]
+[07:19:19] [Download-1/WARN] [mojang/YggdrasilMinecraftSessionService]: Couldn't look up profile properties for 00000000-0000-0000-0000-000000000001
+com.mojang.authlib.exceptions.MinecraftClientException: Failed to read from https://sessionserver.mojang.com/session/minecraft/profile/00000000000000000000000000000001?unsigned=false due to Connection refused
+	at MC-BOOTSTRAP/authlib@6.0.54/com.mojang.authlib.minecraft.client.MinecraftClient.readInputStream(MinecraftClient.java:108) ~[authlib-6.0.54.jar%23104!/:?] {}
+	at MC-BOOTSTRAP/authlib@6.0.54/com.mojang.authlib.minecraft.client.MinecraftClient.get(MinecraftClient.java:57) ~[authlib-6.0.54.jar%23104!/:?] {}
+	at MC-BOOTSTRAP/authlib@6.0.54/com.mojang.authlib.yggdrasil.YggdrasilMinecraftSessionService.fetchProfileUncached(YggdrasilMinecraftSessionService.java:201) ~[authlib-6.0.54.jar%23104!/:?] {}
+	at MC-BOOTSTRAP/authlib@6.0.54/com.mojang.authlib.yggdrasil.YggdrasilMinecraftSessionService.fetchProfile(YggdrasilMinecraftSessionService.java:171) ~[authlib-6.0.54.jar%23104!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.Minecraft.lambda$new$1(Minecraft.java:432) ~[neoforge-21.1.262.jar%23184!/:?] {re:mixin,pl:runtimedistcleaner:A,re:classloading,pl:mixin:A,pl:runtimedistcleaner:A}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768) ~[?:?] {}
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[?:?] {}
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[?:?] {}
+	at java.base/java.lang.Thread.run(Thread.java:1583) [?:?] {}
+Caused by: java.net.ConnectException: Connection refused
+	at java.base/sun.nio.ch.Net.pollConnect(Native Method) ~[?:?] {}
+	at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:694) ~[?:?] {}
+	at java.base/sun.nio.ch.NioSocketImpl.timedFinishConnect(NioSocketImpl.java:549) ~[?:?] {}
+	at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:592) ~[?:?] {}
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:327) ~[?:?] {}
+	at java.base/java.net.Socket.connect(Socket.java:751) ~[?:?] {}
+	at java.base/sun.security.ssl.SSLSocketImpl.connect(SSLSocketImpl.java:304) ~[?:?] {}
+	at java.base/sun.net.NetworkClient.doConnect(NetworkClient.java:178) ~[?:?] {}
+	at java.base/sun.net.www.http.HttpClient.openServer(HttpClient.java:539) ~[?:?] {}
+	at java.base/sun.net.www.http.HttpClient.openServer(HttpClient.java:644) ~[?:?] {}
+	at java.base/sun.net.www.protocol.https.HttpsClient.<init>(HttpsClient.java:265) ~[?:?] {}
+	at java.base/sun.net.www.protocol.https.HttpsClient.New(HttpsClient.java:378) ~[?:?] {}
+	at java.base/sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.getNewHttpClient(AbstractDelegateHttpsURLConnection.java:196) ~[?:?] {}
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.plainConnect0(HttpURLConnection.java:1305) ~[?:?] {}
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.plainConnect(HttpURLConnection.java:1146) ~[?:?] {}
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.connect(HttpURLConnection.java:1075) ~[?:?] {}
+	at java.base/sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.connect(AbstractDelegateHttpsURLConnection.java:181) ~[?:?] {}
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1707) ~[?:?] {}
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1632) ~[?:?] {}
+	at java.base/java.net.HttpURLConnection.getResponseCode(HttpURLConnection.java:531) ~[?:?] {}
+	at java.base/sun.net.www.protocol.https.HttpsURLConnectionImpl.getResponseCode(HttpsURLConnectionImpl.java:307) ~[?:?] {}
+	at MC-BOOTSTRAP/authlib@6.0.54/com.mojang.authlib.minecraft.client.MinecraftClient.readInputStream(MinecraftClient.java:84) ~[authlib-6.0.54.jar%23104!/:?] {}
+	... 8 more
+[07:19:19] [Yggdrasil Key Fetcher/ERROR] [mojang/YggdrasilServicesKeyInfo]: Failed to request yggdrasil public key
+com.mojang.authlib.exceptions.MinecraftClientException: Failed to read from https://api.minecraftservices.com/publickeys due to Connection refused
+	at MC-BOOTSTRAP/authlib@6.0.54/com.mojang.authlib.minecraft.client.MinecraftClient.readInputStream(MinecraftClient.java:108) ~[authlib-6.0.54.jar%23104!/:?] {}
+	at MC-BOOTSTRAP/authlib@6.0.54/com.mojang.authlib.minecraft.client.MinecraftClient.get(MinecraftClient.java:57) ~[authlib-6.0.54.jar%23104!/:?] {}
+	at MC-BOOTSTRAP/authlib@6.0.54/com.mojang.authlib.yggdrasil.YggdrasilServicesKeyInfo.fetch(YggdrasilServicesKeyInfo.java:114) ~[authlib-6.0.54.jar%23104!/:?] {}
+	at MC-BOOTSTRAP/authlib@6.0.54/com.mojang.authlib.yggdrasil.YggdrasilServicesKeyInfo$1.run(YggdrasilServicesKeyInfo.java:89) ~[authlib-6.0.54.jar%23104!/:?] {}
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572) ~[?:?] {}
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317) ~[?:?] {}
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304) ~[?:?] {}
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[?:?] {}
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[?:?] {}
+	at java.base/java.lang.Thread.run(Thread.java:1583) [?:?] {}
+Caused by: java.net.ConnectException: Connection refused
+	at java.base/sun.nio.ch.Net.pollConnect(Native Method) ~[?:?] {}
+	at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:694) ~[?:?] {}
+	at java.base/sun.nio.ch.NioSocketImpl.timedFinishConnect(NioSocketImpl.java:549) ~[?:?] {}
+	at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:592) ~[?:?] {}
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:327) ~[?:?] {}
+	at java.base/java.net.Socket.connect(Socket.java:751) ~[?:?] {}
+	at java.base/sun.security.ssl.SSLSocketImpl.connect(SSLSocketImpl.java:304) ~[?:?] {}
+	at java.base/sun.net.NetworkClient.doConnect(NetworkClient.java:178) ~[?:?] {}
+	at java.base/sun.net.www.http.HttpClient.openServer(HttpClient.java:539) ~[?:?] {}
+	at java.base/sun.net.www.http.HttpClient.openServer(HttpClient.java:644) ~[?:?] {}
+	at java.base/sun.net.www.protocol.https.HttpsClient.<init>(HttpsClient.java:265) ~[?:?] {}
+	at java.base/sun.net.www.protocol.https.HttpsClient.New(HttpsClient.java:378) ~[?:?] {}
+	at java.base/sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.getNewHttpClient(AbstractDelegateHttpsURLConnection.java:196) ~[?:?] {}
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.plainConnect0(HttpURLConnection.java:1305) ~[?:?] {}
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.plainConnect(HttpURLConnection.java:1146) ~[?:?] {}
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.connect(HttpURLConnection.java:1075) ~[?:?] {}
+	at java.base/sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.connect(AbstractDelegateHttpsURLConnection.java:181) ~[?:?] {}
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1707) ~[?:?] {}
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1632) ~[?:?] {}
+	at java.base/java.net.HttpURLConnection.getResponseCode(HttpURLConnection.java:531) ~[?:?] {}
+	at java.base/sun.net.www.protocol.https.HttpsURLConnectionImpl.getResponseCode(HttpsURLConnectionImpl.java:307) ~[?:?] {}
+	at MC-BOOTSTRAP/authlib@6.0.54/com.mojang.authlib.minecraft.client.MinecraftClient.readInputStream(MinecraftClient.java:84) ~[authlib-6.0.54.jar%23104!/:?] {}
+	... 9 more
+[07:19:19] [Worker-Main-2/ERROR] [minecraft/ModelManager]: Failed to load model minecraft:models/block/lantern_copper_exposed_floor_alt3.json
+com.google.gson.JsonSyntaxException: Missing axis, expected to find a string
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.getAsString(GsonHelper.java:119) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.getAxis(BlockElement.java:122) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.getRotation(BlockElement.java:103) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.deserialize(BlockElement.java:84) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.deserialize(BlockElement.java:76) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter.read(TreeTypeAdapter.java:76) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1227) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1329) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1300) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter$GsonContextImpl.deserialize(TreeTypeAdapter.java:179) ~[gson-2.10.1.jar%2396!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.getElements(BlockModel.java:409) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.deserialize(BlockModel.java:338) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:51) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:37) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter.read(TreeTypeAdapter.java:76) ~[gson-2.10.1.jar%2396!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromNullableJson(GsonHelper.java:507) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:514) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:566) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel.fromStream(BlockModel.java:83) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.resources.model.ModelManager.lambda$loadBlockModels$8(ModelManager.java:144) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768) [?:?] {}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.exec(CompletableFuture.java:1760) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:387) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1312) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1843) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1808) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:188) [?:?] {}
+[07:19:19] [Worker-Main-2/ERROR] [minecraft/ModelManager]: Failed to load model minecraft:models/block/lantern_copper_exposed_hanging_alt3.json
+com.google.gson.JsonSyntaxException: Missing axis, expected to find a string
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.getAsString(GsonHelper.java:119) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.getAxis(BlockElement.java:122) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.getRotation(BlockElement.java:103) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.deserialize(BlockElement.java:84) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.deserialize(BlockElement.java:76) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter.read(TreeTypeAdapter.java:76) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1227) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1329) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1300) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter$GsonContextImpl.deserialize(TreeTypeAdapter.java:179) ~[gson-2.10.1.jar%2396!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.getElements(BlockModel.java:409) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.deserialize(BlockModel.java:338) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:51) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:37) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter.read(TreeTypeAdapter.java:76) ~[gson-2.10.1.jar%2396!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromNullableJson(GsonHelper.java:507) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:514) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:566) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel.fromStream(BlockModel.java:83) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.resources.model.ModelManager.lambda$loadBlockModels$8(ModelManager.java:144) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768) [?:?] {}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.exec(CompletableFuture.java:1760) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:387) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1312) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1843) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1808) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:188) [?:?] {}
+[07:19:19] [Worker-Main-2/ERROR] [minecraft/ModelManager]: Failed to load model minecraft:models/block/lantern_copper_floor_alt3.json
+com.google.gson.JsonSyntaxException: Missing axis, expected to find a string
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.getAsString(GsonHelper.java:119) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.getAxis(BlockElement.java:122) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.getRotation(BlockElement.java:103) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.deserialize(BlockElement.java:84) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.deserialize(BlockElement.java:76) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter.read(TreeTypeAdapter.java:76) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1227) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1329) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1300) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter$GsonContextImpl.deserialize(TreeTypeAdapter.java:179) ~[gson-2.10.1.jar%2396!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.getElements(BlockModel.java:409) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.deserialize(BlockModel.java:338) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:51) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:37) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter.read(TreeTypeAdapter.java:76) ~[gson-2.10.1.jar%2396!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromNullableJson(GsonHelper.java:507) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:514) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:566) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel.fromStream(BlockModel.java:83) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.resources.model.ModelManager.lambda$loadBlockModels$8(ModelManager.java:144) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768) [?:?] {}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.exec(CompletableFuture.java:1760) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:387) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1312) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1843) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1808) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:188) [?:?] {}
+[07:19:19] [Worker-Main-2/ERROR] [minecraft/ModelManager]: Failed to load model minecraft:models/block/lantern_copper_hanging_alt3.json
+com.google.gson.JsonSyntaxException: Missing axis, expected to find a string
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.getAsString(GsonHelper.java:119) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.getAxis(BlockElement.java:122) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.getRotation(BlockElement.java:103) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.deserialize(BlockElement.java:84) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.deserialize(BlockElement.java:76) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter.read(TreeTypeAdapter.java:76) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1227) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1329) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1300) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter$GsonContextImpl.deserialize(TreeTypeAdapter.java:179) ~[gson-2.10.1.jar%2396!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.getElements(BlockModel.java:409) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.deserialize(BlockModel.java:338) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:51) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:37) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter.read(TreeTypeAdapter.java:76) ~[gson-2.10.1.jar%2396!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromNullableJson(GsonHelper.java:507) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:514) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:566) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel.fromStream(BlockModel.java:83) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.resources.model.ModelManager.lambda$loadBlockModels$8(ModelManager.java:144) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768) [?:?] {}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.exec(CompletableFuture.java:1760) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:387) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1312) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1843) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1808) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:188) [?:?] {}
+[07:19:19] [Worker-Main-2/ERROR] [minecraft/ModelManager]: Failed to load model minecraft:models/block/lantern_copper_oxidized_floor_alt3.json
+com.google.gson.JsonSyntaxException: Missing axis, expected to find a string
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.getAsString(GsonHelper.java:119) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.getAxis(BlockElement.java:122) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.getRotation(BlockElement.java:103) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.deserialize(BlockElement.java:84) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.deserialize(BlockElement.java:76) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter.read(TreeTypeAdapter.java:76) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1227) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1329) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1300) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter$GsonContextImpl.deserialize(TreeTypeAdapter.java:179) ~[gson-2.10.1.jar%2396!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.getElements(BlockModel.java:409) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.deserialize(BlockModel.java:338) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:51) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:37) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter.read(TreeTypeAdapter.java:76) ~[gson-2.10.1.jar%2396!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromNullableJson(GsonHelper.java:507) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:514) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:566) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel.fromStream(BlockModel.java:83) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.resources.model.ModelManager.lambda$loadBlockModels$8(ModelManager.java:144) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768) [?:?] {}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.exec(CompletableFuture.java:1760) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:387) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1312) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1843) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1808) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:188) [?:?] {}
+[07:19:19] [Worker-Main-2/ERROR] [minecraft/ModelManager]: Failed to load model minecraft:models/block/lantern_copper_oxidized_hanging_alt3.json
+com.google.gson.JsonSyntaxException: Missing axis, expected to find a string
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.getAsString(GsonHelper.java:119) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.getAxis(BlockElement.java:122) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.getRotation(BlockElement.java:103) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.deserialize(BlockElement.java:84) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.deserialize(BlockElement.java:76) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter.read(TreeTypeAdapter.java:76) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1227) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1329) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1300) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter$GsonContextImpl.deserialize(TreeTypeAdapter.java:179) ~[gson-2.10.1.jar%2396!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.getElements(BlockModel.java:409) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.deserialize(BlockModel.java:338) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:51) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:37) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter.read(TreeTypeAdapter.java:76) ~[gson-2.10.1.jar%2396!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromNullableJson(GsonHelper.java:507) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:514) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:566) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel.fromStream(BlockModel.java:83) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.resources.model.ModelManager.lambda$loadBlockModels$8(ModelManager.java:144) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768) [?:?] {}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.exec(CompletableFuture.java:1760) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:387) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1312) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1843) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1808) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:188) [?:?] {}
+[07:19:19] [Worker-Main-2/ERROR] [minecraft/ModelManager]: Failed to load model minecraft:models/block/lantern_copper_weathered_floor_alt3.json
+com.google.gson.JsonSyntaxException: Missing axis, expected to find a string
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.getAsString(GsonHelper.java:119) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.getAxis(BlockElement.java:122) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.getRotation(BlockElement.java:103) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.deserialize(BlockElement.java:84) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.deserialize(BlockElement.java:76) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter.read(TreeTypeAdapter.java:76) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1227) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1329) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1300) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter$GsonContextImpl.deserialize(TreeTypeAdapter.java:179) ~[gson-2.10.1.jar%2396!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.getElements(BlockModel.java:409) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.deserialize(BlockModel.java:338) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:51) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:37) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter.read(TreeTypeAdapter.java:76) ~[gson-2.10.1.jar%2396!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromNullableJson(GsonHelper.java:507) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:514) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:566) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel.fromStream(BlockModel.java:83) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.resources.model.ModelManager.lambda$loadBlockModels$8(ModelManager.java:144) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768) [?:?] {}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.exec(CompletableFuture.java:1760) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:387) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1312) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1843) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1808) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:188) [?:?] {}
+[07:19:19] [Worker-Main-2/ERROR] [minecraft/ModelManager]: Failed to load model minecraft:models/block/lantern_copper_weathered_hanging_alt3.json
+com.google.gson.JsonSyntaxException: Missing axis, expected to find a string
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.getAsString(GsonHelper.java:119) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.getAxis(BlockElement.java:122) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.getRotation(BlockElement.java:103) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.deserialize(BlockElement.java:84) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.deserialize(BlockElement.java:76) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter.read(TreeTypeAdapter.java:76) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1227) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1329) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1300) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter$GsonContextImpl.deserialize(TreeTypeAdapter.java:179) ~[gson-2.10.1.jar%2396!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.getElements(BlockModel.java:409) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.deserialize(BlockModel.java:338) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:51) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:37) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter.read(TreeTypeAdapter.java:76) ~[gson-2.10.1.jar%2396!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromNullableJson(GsonHelper.java:507) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:514) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:566) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel.fromStream(BlockModel.java:83) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.resources.model.ModelManager.lambda$loadBlockModels$8(ModelManager.java:144) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768) [?:?] {}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.exec(CompletableFuture.java:1760) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:387) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1312) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1843) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1808) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:188) [?:?] {}
+[07:19:19] [Worker-Main-2/ERROR] [minecraft/ModelManager]: Failed to load model minecraft:models/block/lantern_normal_floor_alt2.json
+com.google.gson.JsonSyntaxException: Missing axis, expected to find a string
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.getAsString(GsonHelper.java:119) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.getAxis(BlockElement.java:122) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.getRotation(BlockElement.java:103) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.deserialize(BlockElement.java:84) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.deserialize(BlockElement.java:76) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter.read(TreeTypeAdapter.java:76) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1227) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1329) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1300) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter$GsonContextImpl.deserialize(TreeTypeAdapter.java:179) ~[gson-2.10.1.jar%2396!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.getElements(BlockModel.java:409) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.deserialize(BlockModel.java:338) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:51) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:37) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter.read(TreeTypeAdapter.java:76) ~[gson-2.10.1.jar%2396!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromNullableJson(GsonHelper.java:507) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:514) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:566) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel.fromStream(BlockModel.java:83) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.resources.model.ModelManager.lambda$loadBlockModels$8(ModelManager.java:144) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768) [?:?] {}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.exec(CompletableFuture.java:1760) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:387) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1312) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1843) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1808) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:188) [?:?] {}
+[07:19:19] [Worker-Main-2/ERROR] [minecraft/ModelManager]: Failed to load model minecraft:models/block/lantern_normal_hanging_alt.json
+com.google.gson.JsonSyntaxException: Missing axis, expected to find a string
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.getAsString(GsonHelper.java:119) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.getAxis(BlockElement.java:122) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.getRotation(BlockElement.java:103) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.deserialize(BlockElement.java:84) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.deserialize(BlockElement.java:76) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter.read(TreeTypeAdapter.java:76) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1227) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1329) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1300) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter$GsonContextImpl.deserialize(TreeTypeAdapter.java:179) ~[gson-2.10.1.jar%2396!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.getElements(BlockModel.java:409) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.deserialize(BlockModel.java:338) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:51) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:37) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter.read(TreeTypeAdapter.java:76) ~[gson-2.10.1.jar%2396!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromNullableJson(GsonHelper.java:507) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:514) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:566) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel.fromStream(BlockModel.java:83) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.resources.model.ModelManager.lambda$loadBlockModels$8(ModelManager.java:144) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768) [?:?] {}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.exec(CompletableFuture.java:1760) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:387) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1312) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1843) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1808) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:188) [?:?] {}
+[07:19:19] [Worker-Main-2/ERROR] [minecraft/ModelManager]: Failed to load model minecraft:models/block/lantern_normal_hanging_alt2.json
+com.google.gson.JsonSyntaxException: Missing axis, expected to find a string
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.getAsString(GsonHelper.java:119) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.getAxis(BlockElement.java:122) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.getRotation(BlockElement.java:103) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.deserialize(BlockElement.java:84) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.deserialize(BlockElement.java:76) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter.read(TreeTypeAdapter.java:76) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1227) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1329) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1300) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter$GsonContextImpl.deserialize(TreeTypeAdapter.java:179) ~[gson-2.10.1.jar%2396!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.getElements(BlockModel.java:409) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.deserialize(BlockModel.java:338) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:51) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:37) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter.read(TreeTypeAdapter.java:76) ~[gson-2.10.1.jar%2396!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromNullableJson(GsonHelper.java:507) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:514) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:566) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel.fromStream(BlockModel.java:83) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.resources.model.ModelManager.lambda$loadBlockModels$8(ModelManager.java:144) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768) [?:?] {}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.exec(CompletableFuture.java:1760) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:387) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1312) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1843) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1808) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:188) [?:?] {}
+[07:19:19] [Worker-Main-2/ERROR] [minecraft/ModelManager]: Failed to load model minecraft:models/block/redstone_dust_tea.json
+com.google.gson.JsonSyntaxException: Missing axis, expected to find a string
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.getAsString(GsonHelper.java:119) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.getAxis(BlockElement.java:122) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.getRotation(BlockElement.java:103) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.deserialize(BlockElement.java:84) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.deserialize(BlockElement.java:76) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter.read(TreeTypeAdapter.java:76) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1227) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1329) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1300) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter$GsonContextImpl.deserialize(TreeTypeAdapter.java:179) ~[gson-2.10.1.jar%2396!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.getElements(BlockModel.java:409) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.deserialize(BlockModel.java:338) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:51) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:37) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter.read(TreeTypeAdapter.java:76) ~[gson-2.10.1.jar%2396!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromNullableJson(GsonHelper.java:507) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:514) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:566) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel.fromStream(BlockModel.java:83) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.resources.model.ModelManager.lambda$loadBlockModels$8(ModelManager.java:144) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768) [?:?] {}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.exec(CompletableFuture.java:1760) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:387) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1312) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1843) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1808) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:188) [?:?] {}
+[07:19:19] [Worker-Main-2/ERROR] [minecraft/ModelManager]: Failed to load model minecraft:models/block/redstone_dust_up.json
+com.google.gson.JsonSyntaxException: Missing axis, expected to find a string
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.getAsString(GsonHelper.java:119) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.getAxis(BlockElement.java:122) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.getRotation(BlockElement.java:103) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.deserialize(BlockElement.java:84) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockElement$Deserializer.deserialize(BlockElement.java:76) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter.read(TreeTypeAdapter.java:76) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1227) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1329) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.Gson.fromJson(Gson.java:1300) ~[gson-2.10.1.jar%2396!/:?] {}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter$GsonContextImpl.deserialize(TreeTypeAdapter.java:179) ~[gson-2.10.1.jar%2396!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.getElements(BlockModel.java:409) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.deserialize(BlockModel.java:338) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:51) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:37) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter.read(TreeTypeAdapter.java:76) ~[gson-2.10.1.jar%2396!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromNullableJson(GsonHelper.java:507) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:514) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:566) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel.fromStream(BlockModel.java:83) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.resources.model.ModelManager.lambda$loadBlockModels$8(ModelManager.java:144) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768) [?:?] {}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.exec(CompletableFuture.java:1760) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:387) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1312) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1843) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1808) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:188) [?:?] {}
+[07:19:19] [Worker-Main-2/ERROR] [minecraft/ModelManager]: Failed to load model minecraft:models/block/stairs/plank_outer_stairs_rotated.json
+java.lang.StringIndexOutOfBoundsException: Index 0 out of bounds for length 0
+	at java.base/jdk.internal.util.Preconditions$1.apply(Preconditions.java:55) ~[?:?] {}
+	at java.base/jdk.internal.util.Preconditions$1.apply(Preconditions.java:52) ~[?:?] {}
+	at java.base/jdk.internal.util.Preconditions$4.apply(Preconditions.java:213) ~[?:?] {}
+	at java.base/jdk.internal.util.Preconditions$4.apply(Preconditions.java:210) ~[?:?] {}
+	at java.base/jdk.internal.util.Preconditions.outOfBounds(Preconditions.java:98) ~[?:?] {}
+	at java.base/jdk.internal.util.Preconditions.outOfBoundsCheckIndex(Preconditions.java:106) ~[?:?] {}
+	at java.base/jdk.internal.util.Preconditions.checkIndex(Preconditions.java:302) ~[?:?] {}
+	at java.base/java.lang.String.checkIndex(String.java:4822) ~[?:?] {}
+	at java.base/java.lang.StringLatin1.charAt(StringLatin1.java:46) ~[?:?] {}
+	at java.base/java.lang.String.charAt(String.java:1544) ~[?:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel.isTextureReference(BlockModel.java:295) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.parseTextureLocationOrReference(BlockModel.java:384) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.getTextureMap(BlockModel.java:376) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel$Deserializer.deserialize(BlockModel.java:340) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:51) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at TRANSFORMER/neoforge@21.1.262/net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer.deserialize(ExtendedBlockModelDeserializer.java:37) ~[neoforge-21.1.262.jar%23185!/:?] {re:classloading}
+	at MC-BOOTSTRAP/com.google.gson@2.10.1/com.google.gson.internal.bind.TreeTypeAdapter.read(TreeTypeAdapter.java:76) ~[gson-2.10.1.jar%2396!/:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromNullableJson(GsonHelper.java:507) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:514) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:566) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.block.model.BlockModel.fromStream(BlockModel.java:83) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.resources.model.ModelManager.lambda$loadBlockModels$8(ModelManager.java:144) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768) [?:?] {}
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.exec(CompletableFuture.java:1760) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:387) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1312) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1843) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1808) [?:?] {}
+	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:188) [?:?] {}
+[07:19:20] [Worker-Main-1/WARN] [minecraft/SpriteContents]: Invalid frame index on sprite minecraft:block/torch/torch_flame/normal_flame2_s frame 15: 16
+[07:19:20] [Worker-Main-2/WARN] [minecraft/ModelBakery]: Unable to load model: 'minecraft:block/piston_head_short_down' referenced from: minecraft:block/piston_head_short_down: java.io.FileNotFoundException: minecraft:models/block/piston_head_short_down.json
+[07:19:20] [Worker-Main-1/WARN] [minecraft/SpriteContents]: Invalid frame index on sprite minecraft:block/torch/torch_flame/normal_flame5 frame 12: 16
+[07:19:20] [Worker-Main-1/WARN] [minecraft/SpriteContents]: Invalid frame index on sprite minecraft:block/torch/torch_flame/normal_flame9 frame 8: 16
+[07:19:20] [Worker-Main-1/WARN] [minecraft/SpriteContents]: Invalid frame index on sprite minecraft:block/torch/torch_flame/normal_flame2 frame 15: 16
+[07:19:20] [Worker-Main-1/WARN] [minecraft/SpriteLoader]: Texture grassiergrass:block/grass_bands with size 8x4 limits mip level from 4 to 2
+[07:19:20] [Worker-Main-1/WARN] [minecraft/SpriteLoader]: Texture grassiergrass:block/blade with size 2x2 limits mip level from 2 to 1
+[07:19:22] [Worker-Main-1/INFO] [ModernUI-MC/Init]: Loaded modern text engine
+[07:19:22] [Render thread/INFO] [ModernUI-MC/UIManager]: UI renderer initialized
+[07:19:22] [Worker-Main-2/WARN] [minecraft/ModelBakery]: Unable to load model: 'minecraft:block/template_chain' referenced from: minecraft:block/chain: java.io.FileNotFoundException: minecraft:models/block/template_chain.json
+[07:19:25] [Worker-Main-2/WARN] [minecraft/ModelManager]: Missing textures in model minecraft:jungle_trapdoor#inventory:
+    minecraft:textures/atlas/blocks.png:minecraft:block/jungle_door
+[07:19:25] [Worker-Main-2/WARN] [minecraft/ModelManager]: Missing textures in model minecraft:warped_trapdoor#inventory:
+    minecraft:textures/atlas/blocks.png:minecraft:block/warped_door
+[07:19:25] [Worker-Main-2/WARN] [minecraft/ModelManager]: Missing textures in model minecraft:acacia_trapdoor#inventory:
+    minecraft:textures/atlas/blocks.png:minecraft:block/acacia_door
+[07:19:25] [Worker-Main-2/WARN] [minecraft/ModelManager]: Missing textures in model minecraft:crimson_trapdoor#inventory:
+    minecraft:textures/atlas/blocks.png:minecraft:block/crimson_door
+[07:19:25] [Worker-Main-2/WARN] [minecraft/ModelManager]: Missing textures in model minecraft:birch_trapdoor#inventory:
+    minecraft:textures/atlas/blocks.png:minecraft:block/birch_door
+[07:19:25] [Worker-Main-2/WARN] [minecraft/ModelManager]: Missing textures in model minecraft:mangrove_trapdoor#inventory:
+    minecraft:textures/atlas/blocks.png:minecraft:block/mangrove_door
+[07:19:25] [Worker-Main-2/WARN] [minecraft/ModelManager]: Missing textures in model minecraft:dark_oak_trapdoor#inventory:
+    minecraft:textures/atlas/blocks.png:minecraft:block/dark_oak_door
+[07:19:25] [Worker-Main-2/WARN] [minecraft/ModelManager]: Missing textures in model minecraft:iron_trapdoor#inventory:
+    minecraft:textures/atlas/blocks.png:minecraft:block/iron_door
+[07:19:25] [Worker-Main-2/WARN] [minecraft/ModelManager]: Missing textures in model minecraft:oak_trapdoor#inventory:
+    minecraft:textures/atlas/blocks.png:minecraft:block/oak_door
+[07:19:25] [Worker-Main-2/WARN] [minecraft/ModelManager]: Missing textures in model minecraft:red_mushroom#:
+    minecraft:textures/atlas/blocks.png:minecraft:item/red_mushroom
+[07:19:25] [Worker-Main-2/INFO] [co.fr.fr.wo.mo.GrassSideTransitions/]: Fragment grass sides active: neighbour-aware dirt caps
+[07:19:25] [Render thread/WARN] [minecraft/Options]: Skipping bad option: 
+[07:19:25] [Render thread/WARN] [minecraft/SoundEngine]: Missing sound for event: minecraft:item.goat_horn.play
+[07:19:25] [Render thread/WARN] [minecraft/SoundEngine]: Missing sound for event: minecraft:entity.goat.screaming.horn_break
+[07:19:25] [Render thread/ERROR] [minecraft/SoundEngine]: Error starting SoundSystem. Turning off sounds & music
+java.lang.IllegalStateException: Failed to open OpenAL device
+	at TRANSFORMER/minecraft@1.21.1/com.mojang.blaze3d.audio.Library.openDeviceOrFallback(Library.java:229) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/com.mojang.blaze3d.audio.Library.init(Library.java:83) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.sounds.SoundEngine.loadLibrary(SoundEngine.java:146) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+ALSA lib confmisc.c:855:(parse_card) cannot find card '0'
+ALSA lib conf.c:5205:(_snd_config_evaluate) function snd_func_card_inum returned error: No such file or directory
+ALSA lib confmisc.c:422:(snd_func_concat) error evaluating strings
+ALSA lib conf.c:5205:(_snd_config_evaluate) function snd_func_concat returned error: No such file or directory
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.sounds.SoundEngine.reload(SoundEngine.java:138) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.sounds.SoundManager.apply(SoundManager.java:147) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+ALSA lib confmisc.c:1342:(snd_func_refer) error evaluating name
+ALSA lib conf.c:5205:(_snd_config_evaluate) function snd_func_refer returned error: No such file or directory
+ALSA lib conf.c:5728:(snd_config_expand) Evaluate error: No such file or directory
+ALSA lib pcm.c:2722:(snd_pcm_open_noupdate) Unknown PCM default
+ALSA lib confmisc.c:855:(parse_card) cannot find card '0'
+ALSA lib conf.c:5205:(_snd_config_evaluate) function snd_func_card_inum returned error: No such file or directory
+ALSA lib confmisc.c:422:(snd_func_concat) error evaluating strings
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.sounds.SoundManager.apply(SoundManager.java:48) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.packs.resources.SimplePreparableReloadListener.lambda$reload$1(SimplePreparableReloadListener.java:19) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at java.base/java.util.concurrent.CompletableFuture$UniAccept.tryFire(CompletableFuture.java:718) ~[?:?] {}
+ALSA lib conf.c:5205:(_snd_config_evaluate) function snd_func_concat returned error: No such file or directory
+ALSA lib confmisc.c:1342:(snd_func_refer) error evaluating name
+ALSA lib conf.c:5205:(_snd_config_evaluate) function snd_func_refer returned error: No such file or directory
+ALSA lib conf.c:5728:(snd_config_expand) Evaluate error: No such file or directory
+	at java.base/java.util.concurrent.CompletableFuture$Completion.run(CompletableFuture.java:482) ~[?:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.packs.resources.SimpleReloadInstance.lambda$new$3(SimpleReloadInstance.java:86) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.thread.BlockableEventLoop.doRunTask(BlockableEventLoop.java:151) ~[neoforge-21.1.262.jar%23184!/:?] {re:mixin,pl:accesstransformer:B,re:classloading,pl:accesstransformer:B,pl:mixin:APP:client.voxy.mixins.json:minecraft.MixinBlockableEventLoop from mod voxy,pl:mixin:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.thread.ReentrantBlockableEventLoop.doRunTask(ReentrantBlockableEventLoop.java:24) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,re:mixin}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.thread.BlockableEventLoop.pollTask(BlockableEventLoop.java:122) ~[neoforge-21.1.262.jar%23184!/:?] {re:mixin,pl:accesstransformer:B,re:classloading,pl:accesstransformer:B,pl:mixin:APP:client.voxy.mixins.json:minecraft.MixinBlockableEventLoop from mod voxy,pl:mixin:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.util.thread.BlockableEventLoop.runAllTasks(BlockableEventLoop.java:111) ~[neoforge-21.1.262.jar%23184!/:?] {re:mixin,pl:accesstransformer:B,re:classloading,pl:accesstransformer:B,pl:mixin:APP:client.voxy.mixins.json:minecraft.MixinBlockableEventLoop from mod voxy,pl:mixin:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.Minecraft.runTick(Minecraft.java:1161) ~[neoforge-21.1.262.jar%23184!/:?] {re:mixin,pl:runtimedistcleaner:A,re:classloading,pl:mixin:A,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.Minecraft.run(Minecraft.java:813) ~[neoforge-21.1.262.jar%23184!/:?] {re:mixin,pl:runtimedistcleaner:A,re:classloading,pl:mixin:A,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.main.Main.main(Main.java:230) ~[neoforge-21.1.262.jar%23184!/:?] {re:classloading,pl:runtimedistcleaner:A}
+ALSA lib pcm.c:2722:(snd_pcm_open_noupdate) Unknown PCM default
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[?:?] {}
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[?:?] {}
+	at MC-BOOTSTRAP/fml_loader@4.0.45/net.neoforged.fml.loading.targets.CommonLaunchHandler.runTarget(CommonLaunchHandler.java:136) ~[loader-4.0.45.jar%23134!/:4.0] {}
+	at MC-BOOTSTRAP/fml_loader@4.0.45/net.neoforged.fml.loading.targets.CommonLaunchHandler.clientService(CommonLaunchHandler.java:124) ~[loader-4.0.45.jar%23134!/:4.0] {}
+	at MC-BOOTSTRAP/fml_loader@4.0.45/net.neoforged.fml.loading.targets.NeoForgeClientDevLaunchHandler.runService(NeoForgeClientDevLaunchHandler.java:23) ~[loader-4.0.45.jar%23134!/:4.0] {}
+	at MC-BOOTSTRAP/fml_loader@4.0.45/net.neoforged.fml.loading.targets.CommonLaunchHandler.lambda$launchService$4(CommonLaunchHandler.java:118) ~[loader-4.0.45.jar%23134!/:4.0] {}
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@11.0.5/cpw.mods.modlauncher.LaunchServiceHandlerDecorator.launch(LaunchServiceHandlerDecorator.java:30) [modlauncher-11.0.5.jar%23114!/:?] {}
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@11.0.5/cpw.mods.modlauncher.LaunchServiceHandler.launch(LaunchServiceHandler.java:53) [modlauncher-11.0.5.jar%23114!/:?] {}
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@11.0.5/cpw.mods.modlauncher.LaunchServiceHandler.launch(LaunchServiceHandler.java:71) [modlauncher-11.0.5.jar%23114!/:?] {}
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@11.0.5/cpw.mods.modlauncher.Launcher.run(Launcher.java:103) [modlauncher-11.0.5.jar%23114!/:?] {}
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@11.0.5/cpw.mods.modlauncher.Launcher.main(Launcher.java:74) [modlauncher-11.0.5.jar%23114!/:?] {}
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@11.0.5/cpw.mods.modlauncher.BootstrapLaunchConsumer.accept(BootstrapLaunchConsumer.java:26) [modlauncher-11.0.5.jar%23114!/:?] {}
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@11.0.5/cpw.mods.modlauncher.BootstrapLaunchConsumer.accept(BootstrapLaunchConsumer.java:23) [modlauncher-11.0.5.jar%23114!/:?] {}
+	at cpw.mods.bootstraplauncher@2.0.2/cpw.mods.bootstraplauncher.BootstrapLauncher.run(BootstrapLauncher.java:210) [bootstraplauncher-2.0.2.jar:?] {}
+	at cpw.mods.bootstraplauncher@2.0.2/cpw.mods.bootstraplauncher.BootstrapLauncher.main(BootstrapLauncher.java:69) [bootstraplauncher-2.0.2.jar:?] {}
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[?:?] {}
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[?:?] {}
+	at net.neoforged.devlaunch.Main.main(Main.java:57) [DevLaunch-1.0.2.jar:?] {}
+[07:19:25] [Render thread/INFO] [ModernUI-MC/Init]: Font 'Segoe UI Variable' failed to load or invalid
+[07:19:25] [Render thread/INFO] [ModernUI-MC/Init]: Font 'Segoe UI' failed to load or invalid
+[07:19:25] [Render thread/INFO] [ModernUI-MC/Init]: Font 'San Francisco' failed to load or invalid
+[07:19:25] [Render thread/INFO] [ModernUI-MC/Init]: Font 'SimHei' failed to load or invalid
+[07:19:25] [Render thread/INFO] [ModernUI-MC/Init]: Font 'STHeiti' failed to load or invalid
+[07:19:25] [Render thread/INFO] [ModernUI-MC/Init]: Font 'Segoe UI Symbol' failed to load or invalid
+[07:19:25] [Render thread/INFO] [ModernUI-MC/Init]: Reloaded typeface: FontCollection{mFamilies=[Inter Frozen Medium, Source Han Sans CN Medium, Noto Sans, Open Sans, mui-i18n-compat], mExclusiveEastAsianBits=null}
+[07:19:25] [Render thread/INFO] [ModernUI-MC/Glyph]: Reloaded glyph manager
+[07:19:26] [Render thread/INFO] [ModernUI-MC/TextLayout]: Reloaded text layout engine, res level: 2 to 2, locale: en_US, layout RTL: false
+[07:19:26] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 4096x1024x4 minecraft:textures/atlas/blocks.png-atlas
+[07:19:26] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 256x256x4 minecraft:textures/atlas/signs.png-atlas
+[07:19:26] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 512x512x4 minecraft:textures/atlas/shield_patterns.png-atlas
+[07:19:26] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 512x512x4 minecraft:textures/atlas/banner_patterns.png-atlas
+[07:19:26] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 1024x1024x4 minecraft:textures/atlas/armor_trims.png-atlas
+[07:19:26] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 256x256x4 minecraft:textures/atlas/chest.png-atlas
+[07:19:26] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 128x64x4 minecraft:textures/atlas/decorated_pot.png-atlas
+[07:19:26] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 512x256x4 minecraft:textures/atlas/shulker_boxes.png-atlas
+[07:19:26] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 512x256x4 minecraft:textures/atlas/beds.png-atlas
+[07:19:26] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 512x256x0 minecraft:textures/atlas/particles.png-atlas
+[07:19:26] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 512x256x0 minecraft:textures/atlas/paintings.png-atlas
+[07:19:26] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 256x128x0 minecraft:textures/atlas/mob_effects.png-atlas
+[07:19:26] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 64x64x0 minecraft:textures/atlas/map_decorations.png-atlas
+[07:19:26] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 1024x512x0 minecraft:textures/atlas/gui.png-atlas
+[07:19:26] [Render thread/WARN] [minecraft/ShaderInstance]: Shader rendertype_entity_translucent_emissive could not find sampler named Sampler2 in the specified shader program.
+[07:19:26] [Render thread/INFO] [co.le.sh.cl.re.GrassSurfacePalette/]: Fragment grass ground albedo from active pack: [0.6008272, 0.6008272, 0.6008272]
+[07:19:27] [Render thread/WARN] [minecraft/ShaderInstance]: Shader grassiergrass:grass_blades could not find sampler named Sampler0 in the specified shader program.
+[07:19:27] [Render thread/WARN] [minecraft/ShaderInstance]: Shader grassiergrass:grass_blades could not find uniform named GroundAlbedo in the specified shader program.
+[07:19:27] [Render thread/WARN] [minecraft/ShaderInstance]: Shader grassiergrass:grass_plant could not find uniform named NoiseScale in the specified shader program.
+[07:19:27] [Render thread/INFO] [ne.ne.ne.cl.en.an.js.AnimationLoader/]: Loaded 0 entity animations
+[07:19:28] [Render thread/INFO] [minecraft/RecipeManager]: Loaded 1290 recipes
+[07:19:29] [Render thread/INFO] [minecraft/AdvancementTree]: Loaded 1399 advancements
+[07:19:30] [Server thread/INFO] [minecraft/IntegratedServer]: Starting integrated minecraft server version 1.21.1
+[07:19:30] [Server thread/INFO] [minecraft/MinecraftServer]: Generating keypair
+[07:19:40] [Server thread/INFO] [minecraft/MinecraftServer]: Preparing start region for dimension minecraft:overworld
+[07:19:40] [progressListener/INFO] [minecraft/LoggerChunkProgressListener]: Preparing spawn area: 0%
+[07:19:40] [progressListener/INFO] [minecraft/LoggerChunkProgressListener]: Preparing spawn area: 0%
+[07:19:40] [Server thread/INFO] [ne.ne.ne.se.pe.PermissionAPI/]: Successfully initialized permission handler neoforge:default_handler
+[07:19:41] [progressListener/INFO] [minecraft/LoggerChunkProgressListener]: Time elapsed: 815 ms
+[07:19:41] [Server thread/INFO] [minecraft/IntegratedServer]: Changing view distance to 8, from 10
+[07:19:41] [Server thread/INFO] [minecraft/IntegratedServer]: Changing simulation distance to 5, from 0
+[07:19:42] [Server thread/INFO] [minecraft/PlayerList]: WaterStudy[local:E:ffaecebc] logged in with entity id 2 at (612.5, 113.0, 564.5)
+[07:19:42] [Server thread/INFO] [minecraft/MinecraftServer]: WaterStudy joined the game
+[07:19:42] [Render thread/INFO] [Voxy/]: [me.cx.vy.cl.VoxyInstance]: Initializing voxy instance
+[07:19:42] [Render thread/INFO] [Voxy/]: [me.cx.vy.cl.VoxyInstance]: Dedicated voxy thread pool size: 2
+[07:19:43] [Render thread/INFO] [Voxy/]: [me.cx.vy.cl.VoxyInstance]: Creating new world engine: -3004277920449385920@537273501
+[07:19:43] [Render thread/INFO] [Voxy/]: [me.cx.vy.ct.ce.VoxyRenderSystem]: Creating Voxy render system
+[07:19:45] [Model factory processor/INFO] [Voxy/]: [me.cx.vy.ct.ct.FragmentAtmosphereCompat]: Fragment Render atmosphere protocol v1 linked to Vision LOD composite
+[07:19:45] [Render thread/INFO] [Voxy/]: [me.cx.vy.ct.ce.RenderResourceReuse]: Allocated new geometry buffer: 536870912, isSparse: false, driver stated 31Mb of free memory
+[07:19:45] [Render thread/INFO] [Voxy/]: [me.cx.vy.ct.ce.VoxyRenderSystem]: Voxy render system created with 536870912 geometry capacity, using pipeline 'NormalRenderPipeline' with renderer 'MDICSectionRenderer'
+[07:19:46] [Render thread/INFO] [ChunkBuilder/]: Started 1 worker threads
+[07:19:46] [Render thread/WARN] [Voxy/]: [me.cx.vy.cl.is.DHImporter]: Unable to load sqlite JDBC or lzma decompressor, DHImporting wont be available
+[07:19:46] [Render thread/WARN] [minecraft/ClientPacketListener]: Ignoring chat session from WaterStudy due to missing Services public key
+[07:19:46] [Render thread/INFO] [minecraft/AdvancementTree]: Loaded 2 advancements
+[07:19:52] [Render thread/INFO] [co.fr.fr.wo.sk.SkyRenderer/]: Fragment sky active: 60 baked forms in 10 families, 8K panorama, 2 cumulus light banks, 512x256 reflection, 256px cloud shadows; baked stars, Milky Way and aurora; no volume raymarch
+[07:19:52] [Render thread/INFO] [co.fr.fr.wo.li.WorldLighting/]: Fragment solar lighting active: 2048px, 160.0 block radius, hard shadows, no small plants or mobs
+[07:19:54] [Render thread/INFO] [co.fr.fr.wo.WorldPipeline/]: Fragment OpenGL world pipeline active: Sodium 0.8, no Iris, 1280x720, 32 water mask frames
+[07:19:54] [Render thread/INFO] [co.fr.fr.wo.gl.SpatialAntialiasing/]: Fragment SMAA 1x active: 1280x720, spatial only, before Photon late FX
+[07:19:59] [Async Node Manager/INFO] [Voxy/]: [me.cx.vy.ct.ce.rg.hl.AsyncNodeManager$ComputeMemoryCopy]: Resizing scratch data buffer to: 2097152
+[07:19:59] [Async Node Manager/INFO] [Voxy/]: [me.cx.vy.ct.ce.rg.hl.AsyncNodeManager$ComputeMemoryCopy]: Resizing scratch data buffer to: 4194304
+[07:20:06] [Server thread/INFO] [minecraft/MinecraftServer]: [WaterStudy: Teleported WaterStudy to 512.500000, 150.000000, 700.500000]
+[07:20:10] [Async Node Manager/INFO] [Voxy/]: [me.cx.vy.ct.ce.rg.hl.AsyncNodeManager$ComputeMemoryCopy]: Resizing scratch data buffer to: 2097152
+[07:20:10] [Async Node Manager/INFO] [Voxy/]: [me.cx.vy.ct.ce.rg.hl.AsyncNodeManager$ComputeMemoryCopy]: Resizing scratch data buffer to: 4194304
+[07:20:17] [Render thread/INFO] [minecraft/ChatComponent]: [System] [CHAT] Hybrid WIP ON: not built (WIP is off), GPU=0MiB, last draw=0 triangles, level tiles=[0, 0, 0], early raster cull=true
+[07:20:29] [Render thread/INFO] [minecraft/ChatComponent]: [System] [CHAT] building 64-block tiles, ready payload budget 16MiB
+[07:21:24] [Render thread/INFO] [Voxy/]: [me.cx.vy.ct.ce.rg.hd.HybridTerrain]: Hybrid tiled terrain ready: Hybrid WIP ON: 213 tiles, indices fine/coarse/far=4346506/2478762/1990786, 54988ms elapsed (including queue wait), max tile input=1800KiB, max tile mesh=4804KiB, observed heap=2000MiB, skipped=0, GPU fallback=0, reused=0, GPU=390MiB, last draw=35706 triangles, level tiles=[1, 0, 0], early raster cull=true
+[07:21:53] [Server thread/INFO] [minecraft/MinecraftServer]: [WaterStudy: Teleported WaterStudy to 512.500000, 150.000000, 700.500000]
+[07:22:07] [Render thread/INFO] [minecraft/ChatComponent]: [System] [CHAT] Hybrid WIP ON: 213 tiles, indices fine/coarse/far=4346506/2478762/1990786, 54988ms elapsed (including queue wait), max tile input=1800KiB, max tile mesh=4804KiB, observed heap=2000MiB, skipped=0, GPU fallback=0, reused=0, GPU=390MiB, last draw=2248689 triangles, level tiles=[60, 53, 0], early raster cull=false
+[07:22:27] [Render thread/INFO] [minecraft/ChatComponent]: [System] [CHAT] Saved screenshot as 2026-10-25_07.22.24.png
+[07:22:33] [Render thread/INFO] [minecraft/ChatComponent]: [System] [CHAT] Hybrid WIP ON: 213 tiles, indices fine/coarse/far=4346506/2478762/1990786, 54988ms elapsed (including queue wait), max tile input=1800KiB, max tile mesh=4804KiB, observed heap=2000MiB, skipped=0, GPU fallback=0, reused=0, GPU=390MiB, last draw=2248689 triangles, level tiles=[60, 53, 0], early raster cull=true
+[07:22:56] [Render thread/INFO] [minecraft/ChatComponent]: [System] [CHAT] Saved screenshot as 2026-10-25_07.22.53.png
+[07:23:51] [Render thread/INFO] [minecraft/ChatComponent]: [System] [CHAT] Saved screenshot as 2026-10-25_07.23.48.png
+[07:24:00] [Render thread/INFO] [minecraft/ChatComponent]: [System] [CHAT] Hybrid WIP ON: 213 tiles, indices fine/coarse/far=4346506/2478762/1990786, 54988ms elapsed (including queue wait), max tile input=1800KiB, max tile mesh=4804KiB, observed heap=2000MiB, skipped=0, GPU fallback=0, reused=0, GPU=390MiB, last draw=2248689 triangles, level tiles=[60, 53, 0], early raster cull=false
+[07:24:07] [Render thread/INFO] [minecraft/ChatComponent]: [System] [CHAT] Saved screenshot as 2026-10-25_07.24.03.png
+[07:24:19] [Yggdrasil Key Fetcher/ERROR] [mojang/YggdrasilServicesKeyInfo]: Failed to request yggdrasil public key
+com.mojang.authlib.exceptions.MinecraftClientException: Failed to read from https://api.minecraftservices.com/publickeys due to Connection refused
+	at MC-BOOTSTRAP/authlib@6.0.54/com.mojang.authlib.minecraft.client.MinecraftClient.readInputStream(MinecraftClient.java:108) ~[authlib-6.0.54.jar%23104!/:?] {}
+	at MC-BOOTSTRAP/authlib@6.0.54/com.mojang.authlib.minecraft.client.MinecraftClient.get(MinecraftClient.java:57) ~[authlib-6.0.54.jar%23104!/:?] {}
+	at MC-BOOTSTRAP/authlib@6.0.54/com.mojang.authlib.yggdrasil.YggdrasilServicesKeyInfo.fetch(YggdrasilServicesKeyInfo.java:114) ~[authlib-6.0.54.jar%23104!/:?] {}
+	at MC-BOOTSTRAP/authlib@6.0.54/com.mojang.authlib.yggdrasil.YggdrasilServicesKeyInfo$1.run(YggdrasilServicesKeyInfo.java:89) ~[authlib-6.0.54.jar%23104!/:?] {}
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572) ~[?:?] {}
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317) ~[?:?] {}
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304) ~[?:?] {}
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[?:?] {}
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[?:?] {}
+	at java.base/java.lang.Thread.run(Thread.java:1583) [?:?] {}
+Caused by: java.net.ConnectException: Connection refused
+	at java.base/sun.nio.ch.Net.pollConnect(Native Method) ~[?:?] {}
+	at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:694) ~[?:?] {}
+	at java.base/sun.nio.ch.NioSocketImpl.timedFinishConnect(NioSocketImpl.java:549) ~[?:?] {}
+	at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:592) ~[?:?] {}
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:327) ~[?:?] {}
+	at java.base/java.net.Socket.connect(Socket.java:751) ~[?:?] {}
+	at java.base/sun.security.ssl.SSLSocketImpl.connect(SSLSocketImpl.java:304) ~[?:?] {}
+	at java.base/sun.net.NetworkClient.doConnect(NetworkClient.java:178) ~[?:?] {}
+	at java.base/sun.net.www.http.HttpClient.openServer(HttpClient.java:539) ~[?:?] {}
+	at java.base/sun.net.www.http.HttpClient.openServer(HttpClient.java:644) ~[?:?] {}
+	at java.base/sun.net.www.protocol.https.HttpsClient.<init>(HttpsClient.java:265) ~[?:?] {}
+	at java.base/sun.net.www.protocol.https.HttpsClient.New(HttpsClient.java:378) ~[?:?] {}
+	at java.base/sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.getNewHttpClient(AbstractDelegateHttpsURLConnection.java:196) ~[?:?] {}
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.plainConnect0(HttpURLConnection.java:1305) ~[?:?] {}
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.plainConnect(HttpURLConnection.java:1146) ~[?:?] {}
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.connect(HttpURLConnection.java:1075) ~[?:?] {}
+	at java.base/sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.connect(AbstractDelegateHttpsURLConnection.java:181) ~[?:?] {}
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1707) ~[?:?] {}
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1632) ~[?:?] {}
+	at java.base/java.net.HttpURLConnection.getResponseCode(HttpURLConnection.java:531) ~[?:?] {}
+	at java.base/sun.net.www.protocol.https.HttpsURLConnectionImpl.getResponseCode(HttpsURLConnectionImpl.java:307) ~[?:?] {}
+	at MC-BOOTSTRAP/authlib@6.0.54/com.mojang.authlib.minecraft.client.MinecraftClient.readInputStream(MinecraftClient.java:84) ~[authlib-6.0.54.jar%23104!/:?] {}
+	... 9 more
+[07:24:42] [Server thread/INFO] [minecraft/IntegratedServer]: Saving and pausing game...
+[07:24:42] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[Sky Art Study]'/minecraft:overworld
+[07:24:42] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[Sky Art Study]'/minecraft:the_end
+[07:24:42] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[Sky Art Study]'/minecraft:the_nether
+[07:24:45] [Server thread/INFO] [minecraft/ServerGamePacketListenerImpl]: WaterStudy lost connection: Disconnected
+[07:24:45] [Server thread/INFO] [minecraft/MinecraftServer]: WaterStudy left the game
+[07:24:45] [Server thread/INFO] [minecraft/ServerCommonPacketListenerImpl]: Stopping singleplayer server as player logged out
+[07:24:45] [Server thread/INFO] [minecraft/MinecraftServer]: Stopping server
+[07:24:45] [Server thread/INFO] [minecraft/MinecraftServer]: Saving players
+[07:24:45] [Server thread/INFO] [minecraft/MinecraftServer]: Saving worlds
+[07:24:46] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[Sky Art Study]'/minecraft:overworld
+[07:24:46] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[Sky Art Study]'/minecraft:the_end
+[07:24:46] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[Sky Art Study]'/minecraft:the_nether
+[07:24:46] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (Sky_Art_Study): All chunks are saved
+[07:24:46] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[07:24:46] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[07:24:46] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved
+[07:24:46] [Render thread/INFO] [Voxy/]: [me.cx.vy.ct.ce.VoxyRenderSystem]: Flushing download stream
+[07:24:46] [Render thread/INFO] [Voxy/]: [me.cx.vy.ct.ce.VoxyRenderSystem]: Shutting down rendering
+[07:24:46] [Render thread/INFO] [Voxy/]: [me.cx.vy.ct.ce.VoxyRenderSystem]: Shutting down render pipeline
+[07:24:46] [Render thread/INFO] [Voxy/]: [me.cx.vy.ct.ce.VoxyRenderSystem]: Flushing download stream
+[07:24:46] [Render thread/INFO] [Voxy/]: [me.cx.vy.ct.ce.VoxyRenderSystem]: Render shutdown completed
+[07:24:46] [Render thread/INFO] [ChunkBuilder/]: Stopping worker threads
+[07:24:46] [Render thread/INFO] [Voxy/]: [me.cx.vy.cl.VoxyInstance]: Shutting down voxy instance
+[07:24:47] [Render thread/INFO] [Voxy/]: [me.cx.vy.cl.VoxyInstance]: Instance shutdown

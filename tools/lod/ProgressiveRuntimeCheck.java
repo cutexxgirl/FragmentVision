@@ -10,6 +10,13 @@ public final class ProgressiveRuntimeCheck {
         var source=ConformingSurface.extract(s,7,7,32,GreedyQuadMesher.build(s,7,7,32).selected());
         var p=QuadricSimplifier.progressive(source,.1,8);
         require(p.steps().size()>100,"nontrivial history");
+        byte[] encoded=ProgressiveMeshFile.encode(p);
+        var replay=ProgressiveMeshFile.decode(encoded,encoded.length);
+        require(replay.steps().equals(p.steps()),"dependent history survives disk format");
+        for(int prefix:p.threePrefixes()) {
+            var a=p.level(prefix);var b=replay.level(prefix);
+            require(Arrays.equals(a.positions(),b.positions())&&Arrays.equals(a.normals(),b.normals())&&Arrays.equals(a.indices(),b.indices())&&Arrays.equals(a.faceData(),b.faceData())&&Arrays.equals(a.locked(),b.locked()),"linked levels replay bit-exactly");
+        }
         int last=source.triangles();
         for(int prefix:p.threePrefixes()) {
             var mesh=p.level(prefix);require(mesh.triangles()<last,"three distinct decreasing levels");last=mesh.triangles();
