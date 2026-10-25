@@ -1,0 +1,36 @@
+plane: 2048 -> 308 triangles, 1089 -> 219 vertices, 16778 -> 2550 packed bytes
+LOD bake invariants passed: 10088; fixtures in /workspace/fragmentvision-atmosphere/build/lod-proof/check
+plane: Voxy=8 tri/32 B; packed=2 tri/8 B; far=2 tri/8 B (exact_is_cheaper_than_candidates)
+hills: Voxy=1676 tri/6704 B; packed=1590 tri/6360 B; far=358 tri/3328 B (direct_simplification_within_geometry_and_distance_budgets)
+rugged: Voxy=4542 tri/18168 B; packed=4244 tri/16976 B; far=4244 tri/16976 B (geometric_error_unmet_exact_fallback)
+arch: Voxy=64 tri/256 B; packed=28 tri/112 B; far=28 tri/112 B (exact_is_cheaper_than_candidates)
+protected: Voxy=8 tri/32 B; packed=2 tri/8 B; far=2 tri/8 B (exact_is_cheaper_than_candidates)
+material_light: Voxy=180 tri/720 B; packed=180 tri/720 B; far=180 tri/720 B (exact_is_cheaper_than_candidates)
+flat_step_neighbour: Voxy=8 tri/32 B; packed=2 tri/8 B; far=2 tri/8 B (exact_is_cheaper_than_candidates)
+Voxy comparison assertions passed: 245980
+Direct geometry assertions passed: 3921906
+Progressive/runtime checks passed: 11682; levels=[1524, 942, 358]
+ProgressiveFileCheck passed: exact levels/morph replay, deterministic bytes, checksum/version/count/budget rejection, atomic replacement; 225 bytes
+Linked neighbouring histories: positions/normals match at 9 level pairs and intermediate phases; contour vertices=43
+HybridLodPolicyCheck passed: 21 checks
+CoveragePrefixCheck passed: 722040 checks
+HybridGpuLayoutCheck passed: 131075 checks; 80 -> 64 bytes per shared position, bit-exact
+Visual surface domains and explicit triangle/memory trade: passed
+Three-level distance policy: passed
+MeshGpuLayoutCheck passed: 6000 exact 8-byte vertices and invalid coordinate refusals
+600 packed quad GPU fixtures exported
+Quad direction buckets: 1000 camera positions, indirect ABI, opaque cube and two-sided coverage passed
+............
+----------------------------------------------------------------------
+Ran 12 tests in 0.175s
+
+OK
+tile-0-0: Voxy baseline=66 tri/264 B, selected far=44 tri/176 B (quads); 237.6ms
+Published /tmp/lod-anvil-check-zxhn7p98/first in 0.25s. This is an offline geometry proof; no game backend was enabled.
+tile-0-0: Voxy baseline=66 tri/264 B, selected far=44 tri/176 B (quads); 258.2ms
+Published /tmp/lod-anvil-check-zxhn7p98/replay in 0.27s. This is an offline geometry proof; no game backend was enabled.
+tile-0-0: Voxy baseline=1676 tri/6704 B, selected far=358 tri/3328 B (mesh); 1204.1ms
+Published /tmp/lod-anvil-check-zxhn7p98/smooth in 1.22s. This is an offline geometry proof; no game backend was enabled.
+tile-0-0: Voxy baseline=1676 tri/6704 B, selected far=358 tri/3328 B (mesh); 2522.1ms
+Published /tmp/lod-anvil-check-zxhn7p98/direct-replay in 2.54s. This is an offline geometry proof; no game backend was enabled.
+Anvil -> snapshot -> Java baker -> checksummed pages/replay/refusal: passed

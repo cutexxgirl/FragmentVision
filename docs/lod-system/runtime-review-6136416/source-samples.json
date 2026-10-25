@@ -1,0 +1,178 @@
+[
+  {
+    "pixel": [
+      800,
+      400
+    ],
+    "block": [
+      445,
+      62,
+      495
+    ],
+    "state": "minecraft:grass_block[snowy=false]",
+    "biome": "minecraft:plains",
+    "distance": 249.0,
+    "closed_save_state": "minecraft:grass_block[snowy=false]",
+    "same_state": true
+  },
+  {
+    "pixel": [
+      850,
+      410
+    ],
+    "block": [
+      474,
+      69,
+      498
+    ],
+    "state": "minecraft:grass_block[snowy=false]",
+    "biome": "minecraft:plains",
+    "distance": 237.0,
+    "closed_save_state": "minecraft:grass_block[snowy=false]",
+    "same_state": true
+  },
+  {
+    "pixel": [
+      900,
+      410
+    ],
+    "block": [
+      493,
+      67,
+      472
+    ],
+    "state": "minecraft:stone",
+    "biome": "minecraft:stony_shore",
+    "distance": 258.4,
+    "closed_save_state": "minecraft:stone",
+    "same_state": true
+  },
+  {
+    "pixel": [
+      950,
+      425
+    ],
+    "block": [
+      516,
+      68,
+      474
+    ],
+    "state": "minecraft:stone",
+    "biome": "minecraft:stony_shore",
+    "distance": 255.6,
+    "closed_save_state": "minecraft:stone",
+    "same_state": true
+  },
+  {
+    "pixel": [
+      1000,
+      440
+    ],
+    "block": [
+      536,
+      68,
+      472
+    ],
+    "state": "minecraft:stone",
+    "biome": "minecraft:plains",
+    "distance": 258.2,
+    "closed_save_state": "minecraft:stone",
+    "same_state": true
+  },
+  {
+    "pixel": [
+      1050,
+      450
+    ],
+    "block": [
+      553,
+      70,
+      469
+    ],
+    "state": "minecraft:grass_block[snowy=false]",
+    "biome": "minecraft:plains",
+    "distance": 262.2,
+    "closed_save_state": "minecraft:grass_block[snowy=false]",
+    "same_state": true
+  },
+  {
+    "pixel": [
+      1100,
+      450
+    ],
+    "block": [
+      573,
+      62,
+      435
+    ],
+    "state": "minecraft:water[level=0]",
+    "biome": "minecraft:ocean",
+    "distance": 299.8,
+    "closed_save_state": "minecraft:water[level=0]",
+    "same_state": true
+  },
+  {
+    "pixel": [
+      1050,
+      500
+    ],
+    "block": [
+      552,
+      70,
+      514
+    ],
+    "state": "minecraft:short_grass",
+    "biome": "minecraft:plains",
+    "distance": 223.2,
+    "closed_save_state": "minecraft:short_grass",
+    "same_state": true
+  },
+  {
+    "pixel": [
+      1120,
+      520
+    ],
+    "block": [
+      560,
+      89,
+      543
+    ],
+    "state": "minecraft:oak_leaves[distance=2,persistent=false,waterlogged=false]",
+    "biome": "minecraft:forest",
+    "distance": 191.4,
+    "closed_save_state": "minecraft:oak_leaves[distance=2,persistent=false,waterlogged=false]",
+    "same_state": true
+  },
+  {
+    "pixel": [
+      1000,
+      480
+    ],
+    "block": [
+      537,
+      68,
+      510
+    ],
+    "state": "minecraft:grass_block[snowy=false]",
+    "biome": "minecraft:plains",
+    "distance": 225.6,
+    "closed_save_state": "minecraft:grass_block[snowy=false]",
+    "same_state": true
+  },
+  {
+    "pixel": [
+      760,
+      370
+    ],
+    "block": [
+      407,
+      62,
+      474
+    ],
+    "state": "minecraft:water[level=0]",
+    "biome": "minecraft:ocean",
+    "distance": 278.8,
+    "closed_save_state": "minecraft:water[level=0]",
+    "same_state": true
+  }
+]
