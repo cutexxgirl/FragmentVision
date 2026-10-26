@@ -38,6 +38,7 @@ public final class BakedMeshBackend implements AutoCloseable {
     }
     private final Map<TileKey,Tile> tiles=new LinkedHashMap<>();
     private final Map<Page,Tile> pageTiles=new IdentityHashMap<>();
+    private final Map<TileKey,Tile> terrainOwners=new HashMap<>();
     private record CapBuffer(int handle,int macroWidth){}
     private final Map<Page,CapBuffer> pageCaps=new IdentityHashMap<>();
     private final Map<String,CapBuffer> capBuffers=new HashMap<>();
@@ -76,7 +77,7 @@ public final class BakedMeshBackend implements AutoCloseable {
             if((coverage.getOrDefault(tile,0)&mask)!=0)throw new IllegalArgumentException("Duplicate tile level");coverage.merge(tile,mask,(a,b)->a|b);
             double error=pageError(p);JsonArray levelErrors=new JsonArray();for(int i=0;i<3;i++)levelErrors.add(i==l?error:0.);p.add("level_errors",levelErrors);
             String key=tile+"/"+p.get("file").getAsString();var old=unique.get(key);
-            if(old==null){p.addProperty("level_mask",mask);unique.put(key,p);}else{if(!old.get("sha256").equals(p.get("sha256")))throw new IllegalArgumentException("Conflicting page hashes");if(!Objects.equals(old.get("surface_map_sha256"),p.get("surface_map_sha256")))throw new IllegalArgumentException("Conflicting surface map");
+            if(old==null){p.addProperty("level_mask",mask);unique.put(key,p);}else{if(!old.get("sha256").equals(p.get("sha256")))throw new IllegalArgumentException("Conflicting page hashes");if(!Objects.equals(old.get("lod_group"),p.get("lod_group")))throw new IllegalArgumentException("Conflicting LOD groups");if(!Objects.equals(old.get("surface_map_sha256"),p.get("surface_map_sha256")))throw new IllegalArgumentException("Conflicting surface map");
                 old.getAsJsonArray("level_errors").set(l,new JsonPrimitive(error));old.addProperty("level_mask",old.get("level_mask").getAsInt()|mask);}
         }
         if(level<0&&coverage.values().stream().anyMatch(m->m!=7))throw new IllegalArgumentException("All three levels required per tile");
@@ -87,7 +88,7 @@ public final class BakedMeshBackend implements AutoCloseable {
         }}
         if(selected.isEmpty()||selected.size()>8192||total>128L<<20)throw new IllegalArgumentException("Package budget exceeded (8192 pages/128MiB encoded)");
         // Validate every page before disturbing the currently visible package.
-        record Cpu(SurfaceMesh mesh,PackedQuads quads,int x,int y,int z,int mask,int width,double[] errors,String layer,boolean compact,SurfaceMaterialMap.Data cap,String capFile){}
+        record Cpu(SurfaceMesh mesh,PackedQuads quads,int x,int y,int z,int mask,int width,double[] errors,String layer,boolean compact,SurfaceMaterialMap.Data cap,String capFile,TileKey group){}
         JsonArray entries=JsonParser.parseString(new String(palette,java.nio.charset.StandardCharsets.UTF_8)).getAsJsonArray();
         if(entries.size()>8192)throw new IllegalArgumentException("Material budget");
         var decoded=new ArrayList<Cpu>();var decodedCaps=new HashMap<String,SurfaceMaterialMap.Data>();long vertices=0;
@@ -110,7 +111,20 @@ public final class BakedMeshBackend implements AutoCloseable {
                     cap=SurfaceMaterialMap.read(capPath);cap.validate(entries.size());decodedCaps.put(capFile,cap);}
                 if(cap.originX()!=x||cap.originZ()!=z||cap.width()!=pageWidth)throw new IllegalArgumentException("Surface map origin mismatch");
             }
-            decoded.add(new Cpu(mesh,quads,x,y,z,p.get("level_mask").getAsInt(),pageWidth,errors,p.has("layer")?p.get("layer").getAsString():"solid",mesh!=null&&p.has("mesh_layout")&&p.get("mesh_layout").getAsString().equals("compact-terrain-strip-v1"),cap,capFile));}
+            String layer=p.has("layer")?p.get("layer").getAsString():"solid";
+            TileKey group=new TileKey(x,y,z,pageWidth,layer);
+            if(p.has("lod_group")){
+                var g=p.getAsJsonArray("lod_group");if(g.size()!=3||pageWidth!=32||!layer.equals("terrain"))throw new IllegalArgumentException("Invalid joined terrain group");
+                int gx=g.get(0).getAsInt(),gz=g.get(1).getAsInt(),gw=g.get(2).getAsInt();
+                long dx=(long)x-gx,dz=(long)z-gz;
+                if(gw!=64||dx<0||dz<0||dx>=64||dz>=64||dx%32!=0||dz%32!=0)throw new IllegalArgumentException("Page outside joined terrain group");
+                group=new TileKey(gx,y,gz,gw,layer);
+            }
+            decoded.add(new Cpu(mesh,quads,x,y,z,p.get("level_mask").getAsInt(),pageWidth,errors,p.has("layer")?p.get("layer").getAsString():"solid",mesh!=null&&p.has("mesh_layout")&&p.get("mesh_layout").getAsString().equals("compact-terrain-strip-v1"),cap,capFile,group));}
+        var ownership=new HashMap<TileKey,TileKey>();
+        for(var cpu:decoded){var physical=new TileKey(cpu.x,cpu.y,cpu.z,cpu.width,cpu.layer);var prior=ownership.putIfAbsent(physical,cpu.group);if(prior!=null&&!prior.equals(cpu.group))throw new IllegalArgumentException("Inconsistent joined ownership");}
+        // A partially declared group must never hide a missing member/level.
+        for(var cpu:decoded)if(cpu.width==32&&cpu.group.width==64){for(int dz=0;dz<64;dz+=32)for(int dx=0;dx<64;dx+=32){var member=new TileKey(cpu.group.x+dx,cpu.y,cpu.group.z+dz,32,"terrain");if(!cpu.group.equals(ownership.get(member)))throw new IllegalArgumentException("Incomplete joined terrain group");}}
         int width=manifest.get("tile_width").getAsInt();if(width<4||width>64)throw new IllegalArgumentException("Invalid tile width");
         close();automaticLevels=level<0;
         try {
@@ -142,12 +156,12 @@ public final class BakedMeshBackend implements AutoCloseable {
                     if(buffer==null){int handle=glCreateBuffers();buffer=new CapBuffer(handle,cpu.cap.macroWidth());capBuffers.put(cpu.capFile,buffer);glNamedBufferData(handle,cpu.cap.words(),GL_STATIC_DRAW);gpuBytes+=cpu.cap.gpuBytes();}
                     pageCaps.put(page,buffer);if(gpuBytes>192L*1024*1024)throw new IllegalArgumentException("Resident GPU budget exceeded");
                 }
-                Tile tile=tiles.computeIfAbsent(new TileKey(cpu.x,cpu.y,cpu.z,cpu.width,cpu.layer),key->new Tile());
-                if((tile.availableMask&cpu.mask)!=0)throw new IllegalArgumentException("Conflicting physical tile levels");
+                Tile tile=tiles.computeIfAbsent(cpu.group,key->new Tile());
+                if(cpu.layer.equals("terrain"))terrainOwners.put(new TileKey(cpu.x,cpu.y,cpu.z,cpu.width,"terrain"),tile);
                 tile.availableMask|=cpu.mask;
                 pageTiles.put(page,tile);
-                if(page.count>0){extend(tile.bounds,page.bounds[0],page.bounds[1],page.bounds[2]);extend(tile.bounds,page.bounds[3],page.bounds[4],page.bounds[5]);}
-                for(int l=0;l<3;l++)if((cpu.mask&(1<<l))!=0)tile.errors[l]=cpu.errors[l];
+                if(page.count>0){extend(tile.bounds,page.bounds[0]+cpu.x-cpu.group.x,page.bounds[1],page.bounds[2]+cpu.z-cpu.group.z);extend(tile.bounds,page.bounds[3]+cpu.x-cpu.group.x,page.bounds[4],page.bounds[5]+cpu.z-cpu.group.z);}
+                for(int l=0;l<3;l++)if((cpu.mask&(1<<l))!=0)tile.errors[l]=Math.max(tile.errors[l],cpu.errors[l]);
             }
             if(!quadSubmissions.isEmpty()) {
                 commandStaging=MemoryUtil.memAllocInt(quadSubmissions.size()*QuadFaceBuckets.BUCKETS*QuadFaceBuckets.COMMAND_INTS);
@@ -240,7 +254,7 @@ public final class BakedMeshBackend implements AutoCloseable {
         // Retained near snow covers must sit on exact ground. Once their screen-space
         // thickness is subpixel, the original-column cap material replaces that shell.
         for(var entry:tiles.entrySet())if(entry.getKey().layer.equals("snow")&&entry.getValue().selected==0){
-            TileKey key=entry.getKey();Tile ground=tiles.get(new TileKey(key.x,key.y,key.z,key.width,"terrain"));if(ground!=null)ground.selected=0;
+            TileKey key=entry.getKey();Tile ground=terrainOwners.get(new TileKey(key.x,key.y,key.z,key.width,"terrain"));if(ground!=null)ground.selected=0;
         }
         for(var entry:tiles.entrySet())if(entry.getKey().layer.equals("terrain"))terrainLevels[entry.getValue().selected]++;
     }
@@ -292,5 +306,5 @@ public final class BakedMeshBackend implements AutoCloseable {
     @Override public void close(){active=false;for(Page p:pages){glDeleteVertexArrays(p.vao);glDeleteBuffers(p.vertex);glDeleteBuffers(p.index);glDeleteBuffers(p.attributes);}pages.clear();quadSubmissions.clear();singleSided=null;
         if(commandStaging!=null){MemoryUtil.memFree(commandStaging);commandStaging=null;}
         if(commandBuffer!=0){glDeleteBuffers(commandBuffer);commandBuffer=0;}
-        pageTiles.clear();pageCaps.clear();for(CapBuffer cap:capBuffers.values())glDeleteBuffers(cap.handle);capBuffers.clear();tiles.clear();uniforms.clear();if(table!=0)glDeleteBuffers(table);table=0;if(shader!=null)shader.free();shader=null;if(quadShader!=null)quadShader.free();quadShader=null;if(compactShader!=null)compactShader.free();compactShader=null;gpuBytes=triangles=drawn=culled=0;drawnMeshPages=drawnQuadPages=0;Arrays.fill(terrainLevels,0);}
+        pageTiles.clear();terrainOwners.clear();pageCaps.clear();for(CapBuffer cap:capBuffers.values())glDeleteBuffers(cap.handle);capBuffers.clear();tiles.clear();uniforms.clear();if(table!=0)glDeleteBuffers(table);table=0;if(shader!=null)shader.free();shader=null;if(quadShader!=null)quadShader.free();quadShader=null;if(compactShader!=null)compactShader.free();compactShader=null;gpuBytes=triangles=drawn=culled=0;drawnMeshPages=drawnQuadPages=0;Arrays.fill(terrainLevels,0);}
 }

@@ -43,6 +43,7 @@ subprocess.run([java, "-cp", str(classes), "CompactTerrainLayoutCheck"], check=T
 subprocess.run([java, "-Xmx512m", "-cp", str(classes), "LodInputPolicyCheck"], check=True)
 subprocess.run([java, "-cp", str(classes), "SurfaceMaterialMapCheck"], check=True)
 subprocess.run([java, "-Xmx512m", "-cp", str(classes), "LayeredSeamCheck"], check=True)
+subprocess.run([java, "-Xmx1g", "-cp", str(classes), "JoinedContoursCheck", str(root / "docs/lod-system/surfaces-water-2026-10-26/mountain-source.fvvol.gz")], check=True)
 subprocess.run([java, "-cp", str(classes), "SurfaceDomainsCheck"], check=True)
 subprocess.run([java, "-cp", str(classes), "MeshLevelPolicyCheck"], check=True)
 subprocess.run([java, "-cp", str(classes), "MeshGpuLayoutCheck"], check=True)

@@ -1,0 +1,6 @@
+{
+  "result": "all source-column state+biome pairs identical after global remap",
+  "maps": 16,
+  "columns_including_halo": 20736,
+  "source_snapshot_sha256": "99c11f3db77fdb7874076a23cd1810cf90ef271d90d8e5de7d5d3405ba71d857"
+}

@@ -7,8 +7,9 @@ public final class BakeLayersMain {
     public static void main(String[] args)throws Exception{
         if(args.length<2||args.length>4)throw new IllegalArgumentException("input snapshot, output directory, [tile=32], [exact]");
         int width=args.length>=3?Integer.parseInt(args[2]):32,h=SurfaceExtractor.REQUIRED_HALO;
+        boolean joined=args.length==4&&args[3].equals("joined");
         boolean smooth=args.length<4||!args[3].equals("exact");
-        if(args.length==4&&smooth)throw new IllegalArgumentException("Unknown mode");
+        if(args.length==4&&smooth&&!joined)throw new IllegalArgumentException("Unknown mode");
         if(width<4||width>32)throw new IllegalArgumentException("Tile width");
         Path input=Path.of(args[0]),target=Path.of(args[1]);
         VoxelSnapshot raw=VoxelSnapshot.read(input),s=LodInputPolicy.clean(raw);
@@ -20,10 +21,15 @@ public final class BakeLayersMain {
             var palette=new ArrayList<String>();for(int i=0;i<s.states().length;i++)palette.add("{\"state\":"+BakeProofMain.json(s.states()[i])+",\"biome\":"+BakeProofMain.json(s.biomes()[i])+"}");
             Files.writeString(staging.resolve("palette.json"),"["+String.join(",",palette)+"]\n");
             var terrainSource=LayeredTileBake.prepare(s);
+            if(joined&&(width!=32||(s.sizeX()-2*h)%64!=0||(s.sizeZ()-2*h)%64!=0))throw new IllegalArgumentException("Joined mode requires full 64-block groups");
+            var joinedTiles=new HashMap<String,List<LayeredTileBake.Layer>>();var joinedGroups=new HashSet<String>();
+            if(joined)for(int gz=h;gz<s.sizeZ()-h;gz+=64)for(int gx=h;gx<s.sizeX()-h;gx+=64){var group=JoinedTerrainBake.build(s,terrainSource,gx,gz);if(group.stream().allMatch(tile->tile.layers().stream().anyMatch(layer->layer.name().equals("terrain"))))joinedGroups.add((s.originX()+gx)+","+(s.originZ()+gz));for(var tile:group)joinedTiles.put(tile.x()+","+tile.z(),tile.layers());System.out.println("Joined patch "+gx+","+gz+" ready");}
             var pages=new ArrayList<String>();long bytes=0,exactTriangles=0,farTriangles=0,exactGpu=0,farGpu=0;
             for(int z=h;z<s.sizeZ()-h;z+=width)for(int x=h;x<s.sizeX()-h;x+=width){
-                for(var layer:LayeredTileBake.build(s,terrainSource,x,z,width,smooth)){
+                for(var layer:(joined?joinedTiles.get(x+","+z):LayeredTileBake.build(s,terrainSource,x,z,width,smooth))){
                     String name="tile-"+((x-h)/width)+"-"+((z-h)/width)+"-"+layer.name();var unique=new HashMap<String,Path>();
+                    int gx=s.originX()+h+((x-h)/64)*64,gz=s.originZ()+h+((z-h)/64)*64;
+                    String groupJson=joined&&joinedGroups.contains(gx+","+gz)&&layer.name().equals("terrain")?",\"lod_group\":["+gx+","+gz+",64]":"";
                     String mapJson="";
                     if(layer.surfaceMap()!=null){
                         Path mapPath=staging.resolve(name+".fvcap");SurfaceMaterialMap.write(mapPath,layer.surfaceMap());bytes+=Files.size(mapPath);
@@ -34,13 +40,13 @@ public final class BakeLayersMain {
                         if(choice.isMesh())MeshPage.write(path,choice.mesh(),s.originX()+x,s.originY(),s.originZ()+z,x,z);else choice.quads().write(path,s.originX()+x,s.originY(),s.originZ()+z);
                         String hash=BakeProofMain.hash(path);Path prior=unique.putIfAbsent(hash,path);if(prior!=null){Files.delete(path);path=prior;}else bytes+=Files.size(path);
                         long gpu=choice.isMesh()?CompactTerrainLayout.build(choice.mesh(),x,z).gpuBytes():choice.quads().gpuBytes();
-                        pages.add("{\"file\":"+BakeProofMain.json(path.getFileName().toString())+",\"sha256\":"+BakeProofMain.json(hash)+",\"tile\":["+(s.originX()+x)+","+(s.originZ()+z)+"],\"tile_width\":"+width+",\"layer\":"+BakeProofMain.json(layer.name())+",\"level\":"+level+",\"mesh_layout\":\"compact-terrain-strip-v1\",\"representation\":"+BakeProofMain.json(choice.isMesh()?"mesh":"quads")+",\"triangles\":"+choice.triangles()+",\"vertices\":"+(choice.isMesh()?choice.mesh().vertices():0)+",\"payload_bytes\":"+choice.payloadBytes()+",\"gpu_geometry_bytes\":"+gpu+mapJson+",\"source_shape_error\":"+layer.sourceErrors()[level]+",\"bytes\":"+Files.size(path)+",\"packed_triangles\":"+layer.exact().triangles()+",\"packed_payload_bytes\":"+layer.exact().payloadBytes()+",\"packed_gpu_bytes\":"+layer.exact().gpuBytes()+",\"candidate_error\":"+BakeProofMain.errorJson(layer.errors()[level])+",\"error_limit_blocks\":"+TileBake.errorLimit(level)+",\"reason\":"+BakeProofMain.json(choice.reason())+"}");
+                        pages.add("{\"file\":"+BakeProofMain.json(path.getFileName().toString())+",\"sha256\":"+BakeProofMain.json(hash)+",\"tile\":["+(s.originX()+x)+","+(s.originZ()+z)+"],\"tile_width\":"+width+",\"layer\":"+BakeProofMain.json(layer.name())+",\"level\":"+level+",\"mesh_layout\":\"compact-terrain-strip-v1\",\"representation\":"+BakeProofMain.json(choice.isMesh()?"mesh":"quads")+",\"triangles\":"+choice.triangles()+",\"vertices\":"+(choice.isMesh()?choice.mesh().vertices():0)+",\"payload_bytes\":"+choice.payloadBytes()+",\"gpu_geometry_bytes\":"+gpu+groupJson+mapJson+",\"source_shape_error\":"+layer.sourceErrors()[level]+",\"bytes\":"+Files.size(path)+",\"packed_triangles\":"+layer.exact().triangles()+",\"packed_payload_bytes\":"+layer.exact().payloadBytes()+",\"packed_gpu_bytes\":"+layer.exact().gpuBytes()+",\"candidate_error\":"+BakeProofMain.errorJson(layer.errors()[level])+",\"error_limit_blocks\":"+TileBake.errorLimit(level)+",\"reason\":"+BakeProofMain.json(choice.reason())+"}");
                         if(level==2){exactTriangles+=layer.exact().triangles();farTriangles+=choice.triangles();exactGpu+=layer.exact().gpuBytes();farGpu+=gpu+(layer.surfaceMap()==null?0:layer.surfaceMap().gpuBytes());}
                     }
                 }
                 System.out.println("Tile "+(s.originX()+x)+","+(s.originZ()+z)+" ready");
             }
-            Files.writeString(staging.resolve("manifest.json"),"{\"format\":\"fragment-lod-proof-3\",\"algorithm\":\"layered-terrain-column-material-qem-v2\",\"input_policy\":\"small-vegetation-removed-leaves-retained-v2\",\"snapshot_sha256\":"+BakeProofMain.json(BakeProofMain.hash(input))+",\"palette_sha256\":"+BakeProofMain.json(BakeProofMain.hash(staging.resolve("palette.json")))+",\"unknown_voxels\":0,\"tile_width\":"+width+",\"halo\":"+h+",\"prepared_unique_pages_bytes\":"+bytes+",\"pages\":["+String.join(",\n",pages)+"]}\n");
+            Files.writeString(staging.resolve("manifest.json"),"{\"format\":\"fragment-lod-proof-3\",\"algorithm\":"+BakeProofMain.json(joined?"joined-64-terrain-column-material-v1":"layered-terrain-column-material-qem-v2")+",\"input_policy\":\"small-vegetation-removed-leaves-retained-v2\",\"snapshot_sha256\":"+BakeProofMain.json(BakeProofMain.hash(input))+",\"palette_sha256\":"+BakeProofMain.json(BakeProofMain.hash(staging.resolve("palette.json")))+",\"unknown_voxels\":0,\"tile_width\":"+width+",\"halo\":"+h+",\"prepared_unique_pages_bytes\":"+bytes+",\"pages\":["+String.join(",\n",pages)+"]}\n");
             Files.move(staging,target,StandardCopyOption.ATOMIC_MOVE);published=true;
             System.out.println("Far total triangles "+exactTriangles+" -> "+farTriangles+", GPU geometry "+exactGpu+" -> "+farGpu+", unique bytes="+bytes);
         }finally{if(!published)try(var walk=Files.walk(staging)){for(Path p:walk.sorted(Comparator.reverseOrder()).toList())Files.deleteIfExists(p);}}

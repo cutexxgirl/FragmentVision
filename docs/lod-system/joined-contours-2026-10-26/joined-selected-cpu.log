@@ -1,0 +1,47 @@
+/workspace/fragmentvision-atmosphere/src/main/java/me/cortex/voxy/client/core/rendering/lod/bake/SurfaceRelaxer.java:35: warning: [lossy-conversions] implicit cast from double to float in compound assignment is possibly lossy
+        for(int t=0;t<source.indices().length;t+=3){int a=source.indices()[t],b=source.indices()[t+1],c=source.indices()[t+2];double[] n=normal(p,a,b,c);for(int v:new int[]{a,b,c})for(int d=0;d<3;d++)normals[v*3+d]+=n[d];}
+                                                                                                                                                                                                                         ^
+1 warning
+plane: 2048 -> 308 triangles, 1089 -> 219 vertices, 16778 -> 2550 packed bytes
+LOD bake invariants passed: 10088; fixtures in /workspace/fragmentvision-atmosphere/build/lod-proof/check
+plane: Voxy=8 tri/32 B; packed=2 tri/8 B; far=2 tri/8 B (exact_is_cheaper_than_candidates)
+hills: Voxy=1676 tri/6704 B; packed=1590 tri/6360 B; far=358 tri/3328 B (direct_simplification_within_geometry_and_distance_budgets)
+rugged: Voxy=4542 tri/18168 B; packed=4244 tri/16976 B; far=4244 tri/16976 B (geometric_error_unmet_exact_fallback)
+arch: Voxy=64 tri/256 B; packed=28 tri/112 B; far=28 tri/112 B (exact_is_cheaper_than_candidates)
+protected: Voxy=8 tri/32 B; packed=2 tri/8 B; far=2 tri/8 B (exact_is_cheaper_than_candidates)
+material_light: Voxy=180 tri/720 B; packed=180 tri/720 B; far=180 tri/720 B (exact_is_cheaper_than_candidates)
+flat_step_neighbour: Voxy=8 tri/32 B; packed=2 tri/8 B; far=2 tri/8 B (exact_is_cheaper_than_candidates)
+Voxy comparison assertions passed: 245980
+Direct geometry assertions passed: 3921906
+Progressive/runtime checks passed: 11682; levels=[1524, 942, 358]
+ProgressiveFileCheck passed: exact levels/morph replay, deterministic bytes, checksum/version/count/budget rejection, atomic replacement; 225 bytes
+Linked neighbouring histories: positions/normals match at 9 level pairs and intermediate phases; contour vertices=43
+HybridLodPolicyCheck passed: 21 checks
+CoveragePrefixCheck passed: 722040 checks
+HybridGpuLayoutCheck passed: 131075 checks; 80 -> 64 bytes per shared position, bit-exact
+Compact cost cuts equal independent runs; closed tetrahedral topology retained
+Compact terrain: exact oriented triangle/attribute coverage, restart strips, 6-byte vertices; tri=2106, restart=452, GPU=26416
+LOD input filtering, revealed ground, retained leaves/water, fixed contours and strict smooth terrain cost: passed
+Source cap IDs/halos, lossless map ABI, retained foliage, native snow shapes and cover error: passed (GPU 428 B)
+Adjacent terrain tiles and retained cave interfaces: exact open contours at every accepted level; shared material halo agrees; accepted=4
+Real snow patch L2: shared cut contours closed, external/cave contours exact; triangles 5010 -> 1512, GPU+maps 28736 -> 19358
+Joined page cuts: unique cliff ownership and audited lattice: passed
+Visual surface domains and explicit triangle/memory trade: passed
+Three-level distance policy: passed
+MeshGpuLayoutCheck passed: 6000 exact 8-byte vertices and invalid coordinate refusals
+600 packed quad GPU fixtures exported
+Quad direction buckets: 1000 camera positions, indirect ABI, opaque cube and two-sided coverage passed
+............
+----------------------------------------------------------------------
+Ran 12 tests in 0.202s
+
+OK
+tile-0-0: Voxy baseline=66 tri/264 B, selected far=44 tri/176 B (quads); 513.0ms
+Published /tmp/lod-anvil-check-iyr6tcqe/first in 0.53s. This is an offline geometry proof; no game backend was enabled.
+tile-0-0: Voxy baseline=66 tri/264 B, selected far=44 tri/176 B (quads); 334.3ms
+Published /tmp/lod-anvil-check-iyr6tcqe/replay in 0.39s. This is an offline geometry proof; no game backend was enabled.
+tile-0-0: Voxy baseline=1676 tri/6704 B, selected far=358 tri/3328 B (mesh); 2114.0ms
+Published /tmp/lod-anvil-check-iyr6tcqe/smooth in 2.13s. This is an offline geometry proof; no game backend was enabled.
+tile-0-0: Voxy baseline=1676 tri/6704 B, selected far=358 tri/3328 B (mesh); 2331.3ms
+Published /tmp/lod-anvil-check-iyr6tcqe/direct-replay in 2.39s. This is an offline geometry proof; no game backend was enabled.
+Anvil -> snapshot -> Java baker -> checksummed pages/replay/refusal: passed

@@ -12,13 +12,15 @@ parser.add_argument('--work',type=Path,required=True)
 parser.add_argument('--snapshots',type=Path,help='Reuse immutable b0..b63.fvvol.gz inputs; do not re-export the open save')
 parser.add_argument('--exact',action='store_true',help='Clean layers without smooth candidates')
 parser.add_argument('--java',default=str(Path(os.environ['JAVA_HOME'])/'bin/java') if 'JAVA_HOME' in os.environ else 'java')
+parser.add_argument('--joined',action='store_true',help='Experimental shared 64-block terrain groups, still encoded as 32-block pages')
 args=parser.parse_args()
+if args.exact and args.joined:parser.error('--exact and --joined are exclusive')
 root=Path(__file__).resolve().parents[2];work=args.work;work.mkdir(parents=True,exist_ok=True)
 region=args.region;out=args.output;out.mkdir(parents=True,exist_ok=True)
 if (out/'manifest.json').exists():raise SystemExit('Refusing to overwrite completed full-frame package')
 sources=sorted((root/'src/main/java/me/cortex/voxy/client/core/rendering/lod/bake').glob('*.java'))+[root/'tools/lod/BakeLayersMain.java',root/'tools/lod/BakeProofMain.java',root/'src/main/java/me/cortex/voxy/client/core/util/ScanMesher2D.java']
 fingerprint=hashlib.sha256(b''.join(str(p.relative_to(root)).encode()+b'\0'+p.read_bytes() for p in sources)).hexdigest()
-config={'baker_source_sha256':fingerprint,'tile':32,'mode':'exact' if args.exact else 'smooth','snapshot_root':str((args.snapshots if args.snapshots else work).resolve())}
+config={'baker_source_sha256':fingerprint,'tile':32,'mode':'exact' if args.exact else 'joined' if args.joined else 'smooth','snapshot_root':str((args.snapshots if args.snapshots else work).resolve())}
 config_path=work/'bake-config.json'
 if config_path.exists() and json.loads(config_path.read_text())!=config:raise SystemExit('Bake source/settings changed: use a fresh work directory')
 if not config_path.exists() and any(work.glob('b*/manifest.json')):raise SystemExit('Existing batches lack a source fingerprint: use a fresh work directory')
@@ -35,7 +37,7 @@ def prepare(index):
   if args.snapshots and not snapshot.exists():raise FileNotFoundError(snapshot)
   if not snapshot.exists():export_world.export(region,snapshot,(x-7,-64,z-7),(142,384,142),[(x-7,-64,z-7,x+135,320,z+135)])
   if not package.exists():
-   with (work/f'b{index}.log').open('w') as log:subprocess.run([java,'-XX:ActiveProcessorCount=1','-Xmx512m','-cp',str(root/'build/lod-proof/classes'),'BakeLayersMain',str(snapshot),str(package),'32',*(['exact'] if args.exact else [])],stdout=log,stderr=subprocess.STDOUT,check=True)
+   with (work/f'b{index}.log').open('w') as log:subprocess.run([java,'-XX:ActiveProcessorCount=1','-Xmx512m','-cp',str(root/'build/lod-proof/classes'),'BakeLayersMain',str(snapshot),str(package),'32',*(['exact'] if args.exact else ['joined'] if args.joined else [])],stdout=log,stderr=subprocess.STDOUT,check=True)
  return index
 
 with ThreadPoolExecutor(max_workers=2) as pool:

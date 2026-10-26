@@ -57,9 +57,21 @@ def audit(root,work=None):
     cap_cache[name]=len(data)-32
   if page['representation']=='mesh':
    error=page['candidate_error'];assert level>0 and error['within_limit'] and error['upper_bound_blocks']<=page['error_limit_blocks']
-   assert page['triangles']<page['packed_triangles']
-   assert page['gpu_geometry_bytes']+page.get('surface_map_gpu_bytes',0)<page['packed_gpu_bytes']
+   if 'lod_group' not in page:
+    assert page['triangles']<page['packed_triangles']
+    assert page['gpu_geometry_bytes']+page.get('surface_map_gpu_bytes',0)<page['packed_gpu_bytes']
   stat=stats[(page['layer'],level,page['representation'])];stat.update(pages=1,triangles=page['triangles'],gpu=page['gpu_geometry_bytes'],cap_gpu=page.get('surface_map_gpu_bytes',0),exact_triangles=page['packed_triangles'],exact_gpu=page['packed_gpu_bytes'])
+ groups=collections.defaultdict(list)
+ for page in pages:
+  if 'lod_group' in page:groups[(tuple(page['lod_group']),page['level'])].append(page)
+ for (group,level),members in groups.items():
+  gx,gz,w=group;assert w==64 and len(members)==4
+  assert {tuple(p['tile']) for p in members}=={(gx+dx,gz+dz) for dz in (0,32) for dx in (0,32)}
+  if any(p['representation']=='mesh' for p in members):
+   assert all(p['representation']=='mesh' for p in members)
+   coords={tuple(p['tile']) for p in members};near_snow=[p for p in pages if p['layer']=='snow' and p['level']==0 and tuple(p['tile']) in coords];far_snow=[p for p in pages if p['layer']=='snow' and p['level']==level and tuple(p['tile']) in coords]
+   assert sum(p['triangles'] for p in members)+sum(p['triangles'] for p in far_snow)<sum(p['packed_triangles'] for p in members)+sum(p['triangles'] for p in near_snow)
+   assert sum(p['gpu_geometry_bytes']+p.get('surface_map_gpu_bytes',0) for p in members)+sum(p['gpu_geometry_bytes'] for p in far_snow)<sum(p['packed_gpu_bytes'] for p in members)+sum(p['gpu_geometry_bytes'] for p in near_snow)
  assert all(value=={0,1,2} for value in levels.values())
  assert sum((root/name).stat().st_size for name in assets)==manifest['prepared_unique_pages_bytes']
  unique_gpu=sum(p['gpu'] for p in geometry.values())+sum(cap_cache.values())+len(palette)*6*32
