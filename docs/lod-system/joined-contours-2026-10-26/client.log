@@ -1,5 +1,5 @@
 To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
-Daemon will be stopped at the end of the build 
+Daemon will be stopped at the end of the build
 > Task :createMinecraftArtifacts UP-TO-DATE
 > Task :compileJava UP-TO-DATE
 > Task :processResources UP-TO-DATE
@@ -21,7 +21,7 @@ WARN StatusConsoleListener Advanced terminal features are not available in this 
 [11:48:43] [main/INFO] [ne.ne.fm.lo.ImmediateWindowHandler/]: ImmediateWindowProvider not loading because splash screen is disabled
 [11:48:43] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=union:/home/agent/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.16.4+mixin.0.8.7/26d01f0567ab46e9ca0d2ed89d0ecc11aadbd433/sponge-mixin-0.16.4+mixin.0.8.7.jar%23126!/ Service=ModLauncher Env=CLIENT
 [11:48:44] [main/INFO] [ne.ne.fm.lo.mo.lo.JarInJarDependencyLocator/]: Found 21 dependencies adding them to mods collection
-[11:48:44] [main/INFO] [ne.ne.fm.lo.mo.ModDiscoverer/]: 
+[11:48:44] [main/INFO] [ne.ne.fm.lo.mo.ModDiscoverer/]:
      Mod List:
 		Name Version (Mod Id)
 
@@ -52,7 +52,7 @@ WARN StatusConsoleListener Advanced terminal features are not available in this 
 [11:48:59] [Render thread/WARN] [minecraft/VanillaPackResourcesBuilder]: Assets URL 'union:/workspace/fragmentrender-sky/build/moddev/artifacts/neoforge-21.1.262.jar%23184!/data/.mcassetsroot' uses unexpected schema
 [11:48:59] [Render thread/INFO] [mojang/YggdrasilAuthenticationService]: Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, name=PROD]
 [11:48:59] [Render thread/INFO] [minecraft/Minecraft]: Setting user: WaterStudy
-[11:48:59] [Render thread/WARN] [minecraft/Options]: Skipping bad option: 
+[11:48:59] [Render thread/WARN] [minecraft/Options]: Skipping bad option:
 [11:48:59] [Render thread/INFO] [minecraft/Minecraft]: Backend library: LWJGL version 3.3.3+5
 [11:49:00] [Render thread/INFO] [ModernUI-MC/Init]: Created MuiForgeAPI
 [11:49:00] [Render thread/INFO] [ModernUI-MC/Init]: Promoted to OpenGL 4.6 Core Profile
@@ -64,7 +64,7 @@ WARN StatusConsoleListener Advanced terminal features are not available in this 
 [11:49:00] [Render thread/INFO] [ModernUI/Core]: OpenGL vendor: Mesa
 [11:49:00] [Render thread/INFO] [ModernUI/Core]: OpenGL renderer: llvmpipe (LLVM 19.1.7, 256 bits)
 [11:49:00] [Render thread/INFO] [ModernUI/Core]: OpenGL version: 4.6 (Core Profile) Mesa 25.0.7-2+deb13u1
-[11:49:00] [Render thread/INFO] [ModernUI/Core]: OpenGL caps: 
+[11:49:00] [Render thread/INFO] [ModernUI/Core]: OpenGL caps:
 AnisotropySupport: true
 GpuTracingSupport: false
 ConservativeRasterSupport: false
@@ -821,7 +821,7 @@ java.lang.StringIndexOutOfBoundsException: Index 0 out of bounds for length 0
 [11:49:12] [Worker-Main-2/WARN] [minecraft/ModelManager]: Missing textures in model minecraft:red_mushroom#:
     minecraft:textures/atlas/blocks.png:minecraft:item/red_mushroom
 [11:49:12] [Worker-Main-2/INFO] [co.fr.fr.wo.mo.GrassSideTransitions/]: Fragment grass sides active: neighbour-aware dirt caps
-[11:49:12] [Render thread/WARN] [minecraft/Options]: Skipping bad option: 
+[11:49:12] [Render thread/WARN] [minecraft/Options]: Skipping bad option:
 [11:49:12] [Render thread/WARN] [minecraft/SoundEngine]: Missing sound for event: minecraft:item.goat_horn.play
 [11:49:12] [Render thread/WARN] [minecraft/SoundEngine]: Missing sound for event: minecraft:entity.goat.screaming.horn_break
 ALSA lib confmisc.c:855:(parse_card) cannot find card '0'
