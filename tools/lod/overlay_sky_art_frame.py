@@ -7,15 +7,18 @@ parser.add_argument('--original',type=Path,required=True)
 parser.add_argument('--batches',type=Path,required=True,help='Contains reduced-b0 and reduced-b27 from the same immutable source snapshots')
 parser.add_argument('--output',type=Path,required=True)
 args=parser.parse_args();old=args.original;out=args.output
+m=json.loads((old/'manifest.json').read_text())
+reduced_manifests={batch:json.loads((args.batches/f'reduced-b{batch}'/'manifest.json').read_text()) for batch in (0,27)}
+if any('surface_map' in p or 'layer' in p for manifest in [m,*reduced_manifests.values()] for p in manifest['pages']):raise SystemExit('Legacy overlay only accepts single-layer pages. Use build_sky_art_frame.py for layered/material-map packages.')
 out.mkdir(parents=True,exist_ok=False)
-m=json.loads((old/'manifest.json').read_text());palette=json.loads((old/'palette.json').read_text());lookup={(p['state'],p['biome']):i for i,p in enumerate(palette)}
+palette=json.loads((old/'palette.json').read_text());lookup={(p['state'],p['biome']):i for i,p in enumerate(palette)}
 pages=[dict(p,tile_width=64) for p in m['pages'] if not p['file'].startswith(('b0-','b27-'))]
 for p in pages:
  dest=out/p['file']
  if not dest.exists():shutil.copyfile(old/p['file'],dest)
 for batch in (0,27):
  source=args.batches/f'reduced-b{batch}';local=json.loads((source/'palette.json').read_text());mapping=[lookup[(p['state'],p['biome'])] for p in local]
- for p in json.loads((source/'manifest.json').read_text())['pages']:
+ for p in reduced_manifests[batch]['pages']:
   name=f'reduced{batch}-'+p['file'];dest=out/name
   if not dest.exists():
    data=bytearray((source/p['file']).read_bytes())

@@ -23,6 +23,7 @@ fb = ctx.simple_framebuffer((256,256))
 fb.use()
 ctx.enable(moderngl.DEPTH_TEST)
 ctx.disable(moderngl.CULL_FACE)
+materials=ctx.buffer(reserve=65536*6*32);materials.clear();materials.bind_to_storage_buffer(14)
 source = ctx.buffer((data/'bucket-source.bin').read_bytes())
 ordered = ctx.buffer((data/'bucket-sorted.bin').read_bytes())
 cameras = [(20,15,20),(-15,15,20),(20,-15,20),(20,15,-20),(4,20,0),(4,-20,0)]

@@ -100,11 +100,11 @@ public final class BakeProofMain {
             }
         }
     }
-    private static String hash(Path path) throws Exception {
+    static String hash(Path path) throws Exception {
         var digest=MessageDigest.getInstance("SHA-256");try(var in=Files.newInputStream(path)){byte[] b=new byte[65536];for(int n;(n=in.read(b))>=0;)digest.update(b,0,n);}
         return HexFormat.of().formatHex(digest.digest());
     }
-    private static String json(String value) {
+    static String json(String value) {
         var out=new StringBuilder("\"");
         for(char c:value.toCharArray()) {if(c=='"'||c=='\\')out.append('\\').append(c);else if(c<32)out.append(String.format("\\u%04x",(int)c));else out.append(c);}
         return out.append('"').toString();

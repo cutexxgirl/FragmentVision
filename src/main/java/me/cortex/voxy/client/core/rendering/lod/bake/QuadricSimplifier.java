@@ -43,6 +43,20 @@ public final class QuadricSimplifier {
             throw new IllegalArgumentException("Invalid simplification settings");
         return new QuadricSimplifier(source,true,true).run(ratio,maxCostDistance);
     }
+    public static Result simplifyCompactTerrain(SurfaceMesh source,double ratio,double maxCostDistance){
+        if(!Double.isFinite(ratio)||ratio<=0||ratio>1||!Double.isFinite(maxCostDistance)||maxCostDistance<0)throw new IllegalArgumentException("Invalid terrain settings");
+        return new QuadricSimplifier(source,true,true,16).run(ratio,maxCostDistance);
+    }
+    /** Reuse one collapse search for all ascending cost cuts. Capturing a compact
+     * snapshot does not mutate the search, so every cut matches an independent run. */
+    public static List<SurfaceMesh> sampleCompactTerrain(SurfaceMesh source,double ratio,double[] costs){
+        if(costs.length==0||!Double.isFinite(ratio)||ratio<=0||ratio>1)throw new IllegalArgumentException("Sampling settings");
+        for(int i=0;i<costs.length;i++)if(!Double.isFinite(costs[i])||costs[i]<0||(i>0&&costs[i]<=costs[i-1]))throw new IllegalArgumentException("Ascending costs required");
+        var reducer=new QuadricSimplifier(source,true,true,16);reducer.sampleCosts=costs.clone();reducer.sampled=new ArrayList<>();
+        var result=reducer.run(ratio,costs[costs.length-1]);
+        while(reducer.nextSample<costs.length){reducer.sampled.add(result.mesh);reducer.nextSample++;}
+        return List.copyOf(reducer.sampled);
+    }
     public static ProgressiveMesh progressive(SurfaceMesh source,double ratio,double maxCostDistance) {
         if(!Double.isFinite(ratio)||ratio<=0||ratio>1||!Double.isFinite(maxCostDistance)||maxCostDistance<0)
             throw new IllegalArgumentException("Invalid simplification settings");
@@ -52,7 +66,11 @@ public final class QuadricSimplifier {
         return new ProgressiveMesh(source,simplifier.history);
     }
     private List<ProgressiveMesh.Step> history;
+    private List<SurfaceMesh> sampled;private double[] sampleCosts;private int nextSample;
+    private record TriangleKey(int a,int b,int c){}
     private final boolean guardContacts;
+    private final int precision;
+    private double minX=Double.POSITIVE_INFINITY,maxX=Double.NEGATIVE_INFINITY,minZ=Double.POSITIVE_INFINITY,maxZ=Double.NEGATIVE_INFINITY;
     private static final long CONTACT_WORK_LIMIT=100_000_000L;
     private long contactWork;
     private SpatialBins pointBins,faceBins;
@@ -91,12 +109,15 @@ public final class QuadricSimplifier {
     private final Face[] faces;
     private int triangleCount;
     private QuadricSimplifier(SurfaceMesh source,boolean guardContacts){this(source,guardContacts,false);}
-    private QuadricSimplifier(SurfaceMesh source,boolean guardContacts,boolean domainsPrelocked) {
+    private QuadricSimplifier(SurfaceMesh source,boolean guardContacts,boolean domainsPrelocked){this(source,guardContacts,domainsPrelocked,256);}
+    private QuadricSimplifier(SurfaceMesh source,boolean guardContacts,boolean domainsPrelocked,int precision) {
+        this.precision=precision;
         this.guardContacts=guardContacts;
         vertices=new Vertex[source.vertices()];faces=new Face[source.triangles()];triangleCount=faces.length;
         for(int i=0;i<vertices.length;i++) {
             Vertex v=new Vertex();v.x=source.positions()[i*3];v.y=source.positions()[i*3+1];v.z=source.positions()[i*3+2];
             v.nx=source.normals()[i*3];v.ny=source.normals()[i*3+1];v.nz=source.normals()[i*3+2];v.locked=source.locked()[i];vertices[i]=v;
+            minX=Math.min(minX,v.x);maxX=Math.max(maxX,v.x);minZ=Math.min(minZ,v.z);maxZ=Math.max(maxZ,v.z);
         }
         for(int i=0;i<faces.length;i++) {
             Face f=new Face(source.indices()[i*3],source.indices()[i*3+1],source.indices()[i*3+2],source.faceData()[i]);faces[i]=f;
@@ -129,6 +150,7 @@ public final class QuadricSimplifier {
             if(Thread.currentThread().isInterrupted())throw new java.util.concurrent.CancellationException();
             Edge edge=queue.poll();Vertex a=vertices[edge.a],b=vertices[edge.b];
             if(!a.alive||!b.alive||a.version!=edge.av||b.version!=edge.bv)continue;
+            if(sampled!=null)while(nextSample<sampleCosts.length&&edge.cost>sampleCosts[nextSample]*sampleCosts[nextSample]){sampled.add(compact());nextSample++;}
             if(edge.cost>error*error)break;
             if(!valid(edge)) { rejected++;if(guardContacts&&contactWork>CONTACT_WORK_LIMIT)break;continue; }
             collapse(edge);collapses++;maxCost=Math.max(maxCost,edge.cost);
@@ -168,6 +190,7 @@ public final class QuadricSimplifier {
         for(double[] p:choices)if(p!=null) {
             // Evaluate the *published* quantized point, so quantization cannot silently introduce a foldover.
             double x=quant(p[0]),y=quant(p[1]),z=quant(p[2]);
+            if(precision==16&&(x<minX||x>maxX||z<minZ||z>maxZ))continue;
             double cost=Math.max(0,cost(q,x,y,z));
             if(!Double.isFinite(cost))continue;
             if(best==null||cost<best.cost)best=new Edge(ia,ib,a.version,b.version,x,y,z,cost);
@@ -192,6 +215,13 @@ public final class QuadricSimplifier {
             double[] before=normal(f,-1,0,0,0),after=normal(f,hasA?e.a:e.b,e.x,e.y,e.z);
             double bl=length(before),al=length(after);
             if(al<1e-8||bl<1e-8||(before[0]*after[0]+before[1]*after[1]+before[2]*after[2])<.25*bl*al)return false;
+        }
+        // The vertex-only link test is insufficient for tetrahedral components:
+        // reject collapses that create duplicate triangles and erase a closed component.
+        var remaining=new HashSet<TriangleKey>();
+        for(int id:affected){Face f=faces[id];int x=f.v[0]==e.b?e.a:f.v[0],y=f.v[1]==e.b?e.a:f.v[1],z=f.v[2]==e.b?e.a:f.v[2];
+            if(x==y||y==z||z==x)continue;int min=Math.min(x,Math.min(y,z)),max=Math.max(x,Math.max(y,z));
+            if(!remaining.add(new TriangleKey(min,x+y+z-min-max,max)))return false;
         }
         if(history!=null)for(int id:affected) {
             Face f=faces[id];
@@ -317,7 +347,7 @@ public final class QuadricSimplifier {
         return new double[]{ay*bz-az*by,az*bx-ax*bz,ax*by-ay*bx};
     }
     private static double length(double[] p) {return Math.sqrt(p[0]*p[0]+p[1]*p[1]+p[2]*p[2]);}
-    private static double quant(double v) {return Math.round(v*256)/256.;}
+    private double quant(double v) {return Math.round(v*precision)/(double)precision;}
     private static double cost(double[] q,double x,double y,double z) {
         return q[0]*x*x+2*q[1]*x*y+2*q[2]*x*z+2*q[3]*x+q[4]*y*y+2*q[5]*y*z+2*q[6]*y+q[7]*z*z+2*q[8]*z+q[9];
     }

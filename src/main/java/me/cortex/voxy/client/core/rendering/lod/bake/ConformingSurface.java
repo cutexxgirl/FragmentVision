@@ -17,7 +17,9 @@ public final class ConformingSurface {
         Vertex(Point p){this.p=p;}
     }
     private record Line(int axis,int a,int b){}
-    public static SurfaceMesh extract(VoxelSnapshot s,int minX,int minZ,int width,PackedQuads quads) {
+    public static SurfaceMesh extract(VoxelSnapshot s,int minX,int minZ,int width,PackedQuads quads) {return extract(s,minX,minZ,width,quads,false);}
+    public static SurfaceMesh extractTerrain(VoxelSnapshot s,int minX,int minZ,int width,PackedQuads quads){return extract(s,minX,minZ,width,quads,true);}
+    private static SurfaceMesh extract(VoxelSnapshot s,int minX,int minZ,int width,PackedQuads quads,boolean terrainDomains) {
         if(quads.data().length>32768)throw new IllegalStateException("Direct surface quad budget exceeded");
         SurfaceMesh rectangles=quads.mesh(0,0);
         var ids=new HashMap<Point,Integer>();var vertices=new ArrayList<Vertex>();
@@ -26,7 +28,10 @@ public final class ConformingSurface {
             String state=s.states()[i];
             // Leaf distance/persistence affect simulation, not silhouette or texture.
             if(state.substring(0,state.indexOf('[')<0?state.length():state.indexOf('[')).endsWith("_leaves"))state=state.split("\\[",2)[0];
-            String key=state+"/"+s.biomes()[i];domains[i]=domainIds.computeIfAbsent(key,k->domainIds.size());
+            // Terrain geometry ignores colour boundaries only in the column-material path.
+            // The separate lossless source map preserves cap species/biomes and snow coverage.
+            if(terrainDomains&&LodInputPolicy.terrain(state))state="terrain:surface";
+            String key=state+(terrainDomains&&state.equals("terrain:surface")?"":"/"+s.biomes()[i]);domains[i]=domainIds.computeIfAbsent(key,k->domainIds.size());
         }
         int[][] corners=new int[quads.data().length][4];
         for(int q=0;q<corners.length;q++)for(int k=0;k<4;k++) {
@@ -90,6 +95,12 @@ public final class ConformingSurface {
             locked[to]=fixed;
         }
         int[] indices=triangles.stream().mapToInt(id->remap[id]).toArray();
+        // Terrain partitions meet retained cave/model surfaces at interior open edges.
+        // Lock those contours too; merely pinning the outer tile grid leaves cracks.
+        if(terrainDomains){var incidence=new HashMap<Long,Integer>();
+            for(int t=0;t<indices.length;t+=3)for(int k=0;k<3;k++){int a=indices[t+k],b=indices[t+(k+1)%3];long edge=((long)Math.min(a,b)<<32)|Math.max(a,b);incidence.merge(edge,1,Integer::sum);}
+            for(var edge:incidence.entrySet())if(edge.getValue()!=2){locked[(int)(edge.getKey()>>>32)]=true;locked[(int)(long)edge.getKey()]=true;}
+        }
         return new SurfaceMesh(p,n,indices,attributes.stream().mapToInt(Integer::intValue).toArray(),locked);
     }
     private static int vertex(Point point,Map<Point,Integer> ids,List<Vertex> vertices) {

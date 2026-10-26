@@ -8,6 +8,7 @@ import java.util.*;
  * accepted per scan domain only if it emits no more rectangles than that baseline.
  */
 public final class GreedyQuadMesher {
+    @FunctionalInterface public interface FaceSelector {boolean accepts(int x,int y,int z,int face);}
     public record Result(PackedQuads selected,PackedQuads baseline,long visibleUnitFaces) {}
     private static final int[][] N={{-1,0,0},{1,0,0},{0,-1,0},{0,1,0},{0,0,-1},{0,0,1}};
     private static final int MAX_QUADS=262_144;
@@ -18,10 +19,15 @@ public final class GreedyQuadMesher {
         @Override protected void emitQuad(int endU,int endV,int width,int height,long key) {
             int u=uBase+endU-width+1,v=vBase+endV-height+1;
             int x=face<2?depth:u,y=face<2?v:face<4?depth:v,z=face<2?u:face<4?v:depth;
-            out.add(PackedQuads.encode(x,y,z,width,height,face,(int)(key>>>8),(int)(key&255)));
+            long quad=PackedQuads.encode(x,y,z,width,height,face,(int)((key>>>8)&65535),(int)(key&255));
+            out.add((key&(1L<<37))!=0?PackedQuads.shape(quad,(int)((key>>>24)&7)):quad);
         }
     }
-    public static Result build(VoxelSnapshot s,int minX,int minZ,int width) {
+    public static Result build(VoxelSnapshot s,int minX,int minZ,int width) {return build(s,minX,minZ,width,id->true);}
+    public static Result build(VoxelSnapshot s,int minX,int minZ,int width,java.util.function.IntPredicate owned) {return build(s,minX,minZ,width,owned,(x,y,z,face)->true);}
+    public static Result build(VoxelSnapshot s,int minX,int minZ,int width,java.util.function.IntPredicate owned,FaceSelector selector) {return build(s,minX,minZ,width,owned,selector,false);}
+    public static Result build(VoxelSnapshot s,int minX,int minZ,int width,java.util.function.IntPredicate owned,FaceSelector selector,boolean shapes) {
+        int[] heights=new int[s.states().length];boolean[] snow=new boolean[heights.length];for(int i=1;i<heights.length;i++){heights[i]=shapes?TerrainShapes.height(s.states()[i]):8;snow[i]=shapes&&TerrainShapes.snow(s.states()[i]);}
         if(width<1||width>64||minX<0||minZ<0||minX+width>s.sizeX()||minZ+width>s.sizeZ())throw new IllegalArgumentException("Invalid quad tile");
         var chosen=new ArrayList<Long>();var baseline=new ArrayList<Long>();long faces=0;
         for(int f=0;f<6;f++) {
@@ -36,8 +42,15 @@ public final class GreedyQuadMesher {
                     if(uu>=0&&uu<width&&vv>=0&&vv<vLength) {
                         int x=minX+(f<2?d:uu),y=f<2?vv:f<4?d:vv,z=minZ+(f<2?uu:f<4?vv:d);
                         int material=s.block(x,y,z);
-                        if(material>0&&s.block(x+N[f][0],y+N[f][1],z+N[f][2])==0) {
-                            key=((long)material<<8)|(s.light()[s.index(x+N[f][0],y+N[f][1],z+N[f][2])]&255);faces++;
+                        if(material>0&&owned.test(material)&&selector.accepts(x,y,z,f)) {
+                            int nx=x+N[f][0],ny=y+N[f][1],nz=z+N[f][2],neighbour=s.block(nx,ny,nz),low=0;
+                            boolean visible=neighbour==0;
+                            if(shapes&&neighbour>=0){if(f==3)visible=heights[material]<8||neighbour==0;else if(f==2)visible=heights[neighbour]<8;else{visible=heights[material]>heights[neighbour];low=heights[neighbour];}}
+                            if(visible){int light=ny>=0&&ny<s.sizeY()?s.light()[s.index(nx,ny,nz)]&255:0;
+                                key=((long)material<<8)|light;
+                                if(shapes&&(snow[material]||low>0)){key|=((long)low<<24)|(1L<<37);if(f<2||f>3)key|=((long)(y+1)<<27);}
+                                faces++;
+                            }
                         }
                     }
                     a.putNext(key);plane[v*32+u]=key;

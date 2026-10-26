@@ -1,0 +1,40 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.4.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :createMinecraftArtifacts UP-TO-DATE
+> Task :extractSodiumModJar UP-TO-DATE
+
+> Task :compileJava
+/workspace/fragmentvision-atmosphere/src/main/java/me/cortex/voxy/client/core/rendering/lod/runtime/BakedMeshBackend.java:182: warning: [deprecation] getQuads(BlockState,Direction,RandomSource) in BakedModel has been deprecated
+            for(int face=0;face<6;face++){Direction direction=new Direction[]{Direction.WEST,Direction.EAST,Direction.DOWN,Direction.UP,Direction.NORTH,Direction.SOUTH}[face];var quads=model.getQuads(state,direction,RandomSource.create(0));var sprite=quads.isEmpty()?model.getParticleIcon():quads.getFirst().getSprite();boolean tinted=!quads.isEmpty()&&quads.getFirst().isTinted();int tint=tinted?ModelFactory.captureSurfaceTint(state,biome):0xffffff;int o=(i*6+face)*8;
+                                                                                                                                                                                              ^
+/workspace/fragmentvision-atmosphere/src/main/java/me/cortex/voxy/client/core/rendering/lod/runtime/BakedMeshBackend.java:182: warning: [deprecation] getParticleIcon() in BakedModel has been deprecated
+            for(int face=0;face<6;face++){Direction direction=new Direction[]{Direction.WEST,Direction.EAST,Direction.DOWN,Direction.UP,Direction.NORTH,Direction.SOUTH}[face];var quads=model.getQuads(state,direction,RandomSource.create(0));var sprite=quads.isEmpty()?model.getParticleIcon():quads.getFirst().getSprite();boolean tinted=!quads.isEmpty()&&quads.getFirst().isTinted();int tint=tinted?ModelFactory.captureSurfaceTint(state,biome):0xffffff;int o=(i*6+face)*8;
+                                                                                                                                                                                                                                                                                ^
+/workspace/fragmentvision-atmosphere/src/main/java/me/cortex/voxy/client/core/rendering/lod/runtime/BakedMeshBackend.java:261: warning: [deprecation] LOCATION_BLOCKS in TextureAtlas has been deprecated
+        glBindTextureUnit(0,Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).getId());glBindSampler(0,0);glBindBufferBase(GL_SHADER_STORAGE_BUFFER,14,table);
+                                                                                               ^
+3 warnings
+
+> Task :processResources
+> Task :classes
+> Task :jarJar UP-TO-DATE
+> Task :stripRocksDbJni UP-TO-DATE
+> Task :jar
+> Task :assemble
+> Task :compileTestJava NO-SOURCE
+> Task :processTestResources NO-SOURCE
+> Task :testClasses UP-TO-DATE
+> Task :test NO-SOURCE
+> Task :check UP-TO-DATE
+> Task :build
+
+[Incubating] Problems report is available at: file:///workspace/fragmentvision-atmosphere/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.4.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 44s
+7 actionable tasks: 3 executed, 4 up-to-date

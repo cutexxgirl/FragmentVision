@@ -1,0 +1,167 @@
+{
+  "scope": "prepared geometry; not frame-time or total renderer GPU memory",
+  "format": "fragment-lod-proof-3",
+  "algorithm": "layered-terrain-column-material-qem-v2",
+  "input_policy": "small-vegetation-removed-leaves-retained-v2",
+  "tiles_and_layers": 58,
+  "unique_geometry_pages": 88,
+  "material_maps": 16,
+  "resident_geometry_material_command_bytes": 1463056,
+  "encoded_unique_bytes": 1390434,
+  "statistics": [
+    {
+      "layer": "caves",
+      "level": 0,
+      "representation": "quads",
+      "pages": 16,
+      "triangles": 146936,
+      "gpu": 590176,
+      "cap_gpu": 0,
+      "exact_triangles": 146936,
+      "exact_gpu": 590176
+    },
+    {
+      "layer": "caves",
+      "level": 1,
+      "representation": "quads",
+      "pages": 16,
+      "triangles": 146936,
+      "gpu": 590176,
+      "cap_gpu": 0,
+      "exact_triangles": 146936,
+      "exact_gpu": 590176
+    },
+    {
+      "layer": "caves",
+      "level": 2,
+      "representation": "quads",
+      "pages": 16,
+      "triangles": 146936,
+      "gpu": 590176,
+      "cap_gpu": 0,
+      "exact_triangles": 146936,
+      "exact_gpu": 590176
+    },
+    {
+      "layer": "detail",
+      "level": 0,
+      "representation": "quads",
+      "pages": 16,
+      "triangles": 129270,
+      "gpu": 519512,
+      "cap_gpu": 0,
+      "exact_triangles": 129270,
+      "exact_gpu": 519512
+    },
+    {
+      "layer": "detail",
+      "level": 1,
+      "representation": "quads",
+      "pages": 16,
+      "triangles": 129270,
+      "gpu": 519512,
+      "cap_gpu": 0,
+      "exact_triangles": 129270,
+      "exact_gpu": 519512
+    },
+    {
+      "layer": "detail",
+      "level": 2,
+      "representation": "quads",
+      "pages": 16,
+      "triangles": 129270,
+      "gpu": 519512,
+      "cap_gpu": 0,
+      "exact_triangles": 129270,
+      "exact_gpu": 519512
+    },
+    {
+      "layer": "snow",
+      "level": 0,
+      "representation": "quads",
+      "pages": 10,
+      "triangles": 6508,
+      "gpu": 27552,
+      "cap_gpu": 0,
+      "exact_triangles": 6508,
+      "exact_gpu": 27552
+    },
+    {
+      "layer": "snow",
+      "level": 1,
+      "representation": "quads",
+      "pages": 10,
+      "triangles": 0,
+      "gpu": 1520,
+      "cap_gpu": 0,
+      "exact_triangles": 6508,
+      "exact_gpu": 27552
+    },
+    {
+      "layer": "snow",
+      "level": 2,
+      "representation": "quads",
+      "pages": 10,
+      "triangles": 0,
+      "gpu": 1520,
+      "cap_gpu": 0,
+      "exact_triangles": 6508,
+      "exact_gpu": 27552
+    },
+    {
+      "layer": "terrain",
+      "level": 0,
+      "representation": "quads",
+      "pages": 16,
+      "triangles": 29632,
+      "gpu": 120960,
+      "cap_gpu": 11592,
+      "exact_triangles": 29632,
+      "exact_gpu": 120960
+    },
+    {
+      "layer": "terrain",
+      "level": 1,
+      "representation": "mesh",
+      "pages": 7,
+      "triangles": 5569,
+      "gpu": 49268,
+      "cap_gpu": 4436,
+      "exact_triangles": 15958,
+      "exact_gpu": 64896
+    },
+    {
+      "layer": "terrain",
+      "level": 1,
+      "representation": "quads",
+      "pages": 9,
+      "triangles": 13674,
+      "gpu": 56064,
+      "cap_gpu": 7156,
+      "exact_triangles": 13674,
+      "exact_gpu": 56064
+    },
+    {
+      "layer": "terrain",
+      "level": 2,
+      "representation": "mesh",
+      "pages": 13,
+      "triangles": 6354,
+      "gpu": 62028,
+      "cap_gpu": 8884,
+      "exact_triangles": 26064,
+      "exact_gpu": 106232
+    },
+    {
+      "layer": "terrain",
+      "level": 2,
+      "representation": "quads",
+      "pages": 3,
+      "triangles": 3568,
+      "gpu": 14728,
+      "cap_gpu": 2708,
+      "exact_triangles": 3568,
+      "exact_gpu": 14728
+    }
+  ]
+}

@@ -28,22 +28,25 @@ public record PackedQuads(long[] data) {
     public static int face(long q){return (int)((q>>>33)&7);}
     public static int light(long q){return (int)((q>>>36)&255);}
     public static int material(long q){return (int)((q>>>44)&65535);}
+    public static int lowerCut(long q){return (int)((q>>>60)&7);}
+    public static boolean shaped(long q){return (q>>>63)!=0;}
+    public static long shape(long q,int cut){if(cut<0||cut>7)throw new IllegalArgumentException("Shape cut");return q|((long)cut<<60)|Long.MIN_VALUE;}
     private static void validate(long q) {
-        if((q>>>60)!=0||face(q)>5||material(q)==0)throw new IllegalArgumentException("Invalid packed quad");
+        if(((q>>>60)!=0&&(q>>>63)==0)||face(q)>5||material(q)==0)throw new IllegalArgumentException("Invalid packed quad");
     }
     public void write(Path path,int ox,int oy,int oz) throws IOException {
         try(var out=new DataOutputStream(new BufferedOutputStream(Files.newOutputStream(path,StandardOpenOption.CREATE_NEW)))) {
-            out.writeBytes("FVQUAD01");out.writeInt(ox);out.writeInt(oy);out.writeInt(oz);out.writeInt(data.length);
+            out.writeBytes(Arrays.stream(data).anyMatch(PackedQuads::shaped)?"FVQUAD02":"FVQUAD01");out.writeInt(ox);out.writeInt(oy);out.writeInt(oz);out.writeInt(data.length);
             for(long q:data)out.writeLong(q);
         }
     }
     public record Decoded(int originX,int originY,int originZ,PackedQuads quads) {}
     public static Decoded read(Path path) throws IOException {
         try(var in=new DataInputStream(new BufferedInputStream(Files.newInputStream(path)))) {
-            if(!new String(in.readNBytes(8),StandardCharsets.US_ASCII).equals("FVQUAD01"))throw new IOException("Unsupported quad page");
+            String format=new String(in.readNBytes(8),StandardCharsets.US_ASCII);if(!format.equals("FVQUAD01")&&!format.equals("FVQUAD02"))throw new IOException("Unsupported quad page");
             int x=in.readInt(),y=in.readInt(),z=in.readInt(),count=in.readInt();
             if(count<0||count>1_000_000||Files.size(path)!=24+count*8L)throw new IOException("Invalid quad page length");
-            long[] quads=new long[count];for(int i=0;i<count;i++)quads[i]=in.readLong();
+            long[] quads=new long[count];for(int i=0;i<count;i++){quads[i]=in.readLong();if(format.equals("FVQUAD01")&&(quads[i]>>>60)!=0)throw new IOException("Shape marker requires quad ABI v2");}
             try{return new Decoded(x,y,z,new PackedQuads(quads));}
             catch(IllegalArgumentException bad){throw new IOException(bad.getMessage(),bad);}
         }

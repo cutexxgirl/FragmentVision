@@ -2,6 +2,10 @@
 #ifdef FV_PACKED_QUADS
 layout(std430,binding=13) readonly buffer Quads {uvec2 quads[];};
 flat out uint v_Attribute;
+struct Material {vec4 uv;vec4 tint;};
+layout(std430,binding=14) readonly buffer Materials {Material materials[];};
+#elif defined(FV_COMPACT_TERRAIN)
+layout(location=0) in uvec3 packedPosition;
 #else
 layout(location=0) in uvec2 packedPosition;
 #endif
@@ -22,6 +26,25 @@ void main(){
  else if(face==3u){p=vec3(x+c.x*u,y+1.,z+c.y*v);n=vec3(0,1,0);}
  else if(face==4u){p=vec3(x+(1.-c.y)*u,y+c.x*v,z);n=vec3(0,0,-1);}
  else {p=vec3(x+c.y*u,y+c.x*v,z+1.);n=vec3(0,0,1);}
+ float kind=materials[material*6u+face].tint.w;
+ // ABI v2 marks intrinsic snow heights and the exposed side above a lower neighbour.
+ // Legacy v1 full-cube pages remain available for a faithful geometry A/B.
+ if((hi&0x80000000u)!=0u){
+  float height=kind>=6.?kind-6.:1.;float lower=float((hi>>28u)&7u)/8.;
+  if(face==3u)p.y=y+height;
+  else if(face<2u||face>3u)p.y=mix(y+lower,y+height,c.x);
+ }
+ // Source water surface is 8/9 of a full block at an exposed top.
+ if(kind==5.){
+  if(face==3u)p.y-=1./9.;
+  else if((face<2u||face>3u)&&c.x>.5)p.y-=1./9.;
+ }
+#elif defined(FV_COMPACT_TERRAIN)
+ uint lo=packedPosition.x|(packedPosition.y<<16u),hi=packedPosition.z;
+ vec3 p=vec3(float(lo&1023u),float((lo>>10u)&8191u),float(((lo>>23u)|(hi<<9u))&1023u))/16.-1.;
+ vec2 oct=vec2(float((hi>>1u)&127u),float((hi>>8u)&127u))/127.*2.-1.;
+ vec3 n=vec3(oct,1.-abs(oct.x)-abs(oct.y));
+ if(n.z<0.)n.xy=(1.-abs(n.yx))*mix(vec2(-1),vec2(1),greaterThanEqual(n.xy,vec2(0)));
 #else
  uint lo=packedPosition.x,hi=packedPosition.y;
  vec3 p=vec3(float(lo&32767u),float(lo>>15u),float(hi&32767u))/256.-1.;
