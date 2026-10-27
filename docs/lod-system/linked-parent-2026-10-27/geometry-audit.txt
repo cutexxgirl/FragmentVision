@@ -1,0 +1,1 @@
+Linked endpoint audit passed: tiles=1024, faces=2627671, eight independent morph corners, fixed contours, exact parent face multiset

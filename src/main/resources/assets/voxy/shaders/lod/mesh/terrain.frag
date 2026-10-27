@@ -13,6 +13,9 @@ uniform int u_AttributeBits,u_AttributeOffset;
 #ifdef FV_NATIVE_COLLAR
 in float v_NativeWeight;
 #endif
+#ifdef FV_NATIVE_SNOW
+in float v_NativeOpacity;
+#endif
 uniform vec3 u_CameraPhase,u_Origin;
 uniform int u_SurfaceMacroWidth;
 uniform vec2 u_LodEdge;
@@ -46,6 +49,10 @@ uint fv_attribute(){
 // NormalRenderPipeline.finish composites this colour and applies shared air once.
 // FR_LOD_MATERIAL leaves the lighting result un-fogged for that pass.
 void main(){
+ float opacity=1.;
+#ifdef FV_NATIVE_SNOW
+ opacity=v_NativeOpacity;if(opacity<=.00001)discard;
+#endif
  if(max(length(v_Position.xz),abs(v_Position.y))>u_LodEdge.y)discard;
  uint attributeData=fv_attribute();
  uint face=(attributeData>>8u)&7u;
@@ -71,5 +78,5 @@ void main(){
  vec4 tex=textureGrad(u_Atlas,uv,dFdx(rawUV)*scale,dFdy(rawUV)*scale);
  if(tex.a<.1)discard;
  vec3 n=normalize(fv_SurfaceNormal);float shade=dot(n*n,vec3(.6,1,.8));
- outColour=vec4(fr_lighting(tex.rgb*m.tint.rgb*shade,m.tint.w>=6.?0.:m.tint.w),1);
+ outColour=vec4(fr_lighting(tex.rgb*m.tint.rgb*shade,m.tint.w>=6.?0.:m.tint.w),opacity);
 }

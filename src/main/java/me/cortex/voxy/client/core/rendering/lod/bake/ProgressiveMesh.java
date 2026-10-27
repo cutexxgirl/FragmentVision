@@ -3,7 +3,9 @@ package me.cortex.voxy.client.core.rendering.lod.bake;
 import java.util.*;
 
 /** Ordered, dependent edge collapses with stable source IDs. Immutable owned input.
- * Only single-operation local orientation is certified; swept self-intersection and
+ * Ordinary histories certify single-operation local orientation. Collar histories
+ * additionally guard every original source face through the final parent morph.
+ * Swept self-intersection and
  * surface-distance certification are separate gates before runtime publication.
  */
 public final class ProgressiveMesh {
@@ -53,6 +55,15 @@ public final class ProgressiveMesh {
             for(int c=0;c<3;c++){state.p[v+c]=(float)(state.p[v+c]+(target[c]-state.p[v+c])*t);state.n[v+c]=(float)(state.n[v+c]+(normal[c]-state.n[v+c])*t);}
         }
         return new SurfaceMesh(state.p,state.n,state.indices,state.attributes,state.locked);
+    }
+    /** Parent positions/normals on the original fine indices, including the faces
+     * that collapse to zero area. At the endpoint its surviving faces equal level(prefix). */
+    public SurfaceMesh parentOnFineTopology(int prefix){
+        if(prefix<0||prefix>steps.size())throw new IllegalArgumentException("Invalid prefix");
+        float[] p=source.positions().clone(),n=source.normals().clone();int[] roots=new int[source.vertices()];for(int i=0;i<roots.length;i++)roots[i]=i;
+        for(int i=0;i<prefix;i++){var s=steps.get(i);roots[s.removed()]=s.kept();p[s.kept()*3]=s.x();p[s.kept()*3+1]=s.y();p[s.kept()*3+2]=s.z();n[s.kept()*3]=s.nx();n[s.kept()*3+1]=s.ny();n[s.kept()*3+2]=s.nz();}
+        float[] mapped=new float[p.length],normals=new float[n.length];for(int i=0;i<roots.length;i++){int id=root(roots,i);System.arraycopy(p,id*3,mapped,i*3,3);System.arraycopy(n,id*3,normals,i*3,3);}
+        return new SurfaceMesh(mapped,normals,source.indices().clone(),source.faceData().clone(),source.locked().clone());
     }
     /** Three linked prefixes; their errors/cost must still be accepted independently. */
     public int[] threePrefixes(){return new int[]{steps.size()/3,steps.size()*2/3,steps.size()};}

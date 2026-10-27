@@ -9,12 +9,25 @@ layout(location=0) in uvec3 packedPosition;
 #else
 layout(location=0) in uvec2 packedPosition;
 #endif
-#ifdef FV_NATIVE_COLLAR
+#if defined(FV_NATIVE_COLLAR) || defined(FV_NATIVE_SNOW)
 layout(binding=11) uniform sampler2D u_NativeField;
 layout(binding=12) uniform sampler2D u_NativeOldField;
 uniform vec4 u_NativeCurrent,u_NativePrevious;
 uniform float u_NativeBlend;
+float nativeWeight(vec2 relative){
+ float current=textureLod(u_NativeField,(relative+u_NativeCurrent.xy)*u_NativeCurrent.zw,0.).r;
+ float previous=textureLod(u_NativeOldField,(relative+u_NativePrevious.xy)*u_NativePrevious.zw,0.).r;
+ return min(current,mix(previous,current,u_NativeBlend));
+}
+#endif
+#ifdef FV_NATIVE_COLLAR
+layout(location=1) in uvec2 packedFinePosition;
+uniform int u_NativeExplicitFine;
 out float v_NativeWeight;
+#endif
+#ifdef FV_NATIVE_SNOW
+uniform int u_NativeSnowPage;
+out float v_NativeOpacity;
 #endif
 uniform mat4 u_MVP;
 uniform vec3 u_Origin;
@@ -60,11 +73,13 @@ void main(){
  if(n.z<0.) n.xy=(1.-abs(n.yx))*mix(vec2(-1),vec2(1),greaterThanEqual(n.xy,vec2(0)));
 #endif
 #ifdef FV_NATIVE_COLLAR
- vec3 fine=round(p);vec2 relative=fine.xz+u_Origin.xz;
- float current=textureLod(u_NativeField,(relative+u_NativeCurrent.xy)*u_NativeCurrent.zw,0.).r;
- float previous=textureLod(u_NativeOldField,(relative+u_NativePrevious.xy)*u_NativePrevious.zw,0.).r;
- v_NativeWeight=min(current,mix(previous,current,u_NativeBlend));
+ vec3 fine=round(p);
+ if(u_NativeExplicitFine!=0){uint flo=packedFinePosition.x,fhi=packedFinePosition.y;fine=vec3(float(flo&32767u),float(flo>>15u),float(fhi&32767u))/256.-1.;}
+ v_NativeWeight=nativeWeight(fine.xz+u_Origin.xz);
  p=mix(fine,p,v_NativeWeight);
+#endif
+#ifdef FV_NATIVE_SNOW
+ v_NativeOpacity=1.;if(u_NativeSnowPage!=0&&kind>=6.)v_NativeOpacity=1.-nativeWeight(p.xz+u_Origin.xz);
 #endif
  v_Normal=normalize(n);v_Position=p+u_Origin;gl_Position=u_MVP*vec4(v_Position,1);
 }

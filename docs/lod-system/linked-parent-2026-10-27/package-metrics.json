@@ -1,0 +1,14 @@
+{
+  "old_terrain_triangles": {
+    "0": 2209386,
+    "1": 1614566,
+    "2": 717117
+  },
+  "new_terrain_triangles": {
+    "0": 1675872,
+    "1": 1246940,
+    "2": 671517
+  },
+  "source_tiles": 1024,
+  "source_fine_triangles": 2627671
+}

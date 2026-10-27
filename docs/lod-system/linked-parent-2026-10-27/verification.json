@@ -1,0 +1,30 @@
+{
+  "package": "sky-linked-parent",
+  "manifest_sha256": "380953a4bbb4950dfb312eba8c3f59028230fe3ace9c80cf1668aba465bad861",
+  "installed_jar_sha256": "dc431057b8493cf48a8ae0d1dd854681b35d7f450aaf55c6d59f18126c157ec0",
+  "world": "Sky_Art_Study",
+  "camera": [
+    448,
+    180,
+    800,
+    90,
+    10
+  ],
+  "fov": 50,
+  "native_chunks": 8,
+  "lod_blocks": 512,
+  "renderer": "llvmpipe LLVM 19.1.7",
+  "hardware_fps_measured": false,
+  "full_endpoint_audit": {
+    "tiles": 1024,
+    "source_triangles": 2627671
+  },
+  "stationary_frame": {
+    "gpu_bytes": 114697820,
+    "submitted_triangles": 2395360,
+    "drawn_transition_pages": 21,
+    "resident_transition_pages": 32,
+    "cpu_endpoint_pages": 821,
+    "ready_columns": 43
+  }
+}

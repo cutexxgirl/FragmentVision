@@ -65,6 +65,11 @@ public final class QuadricSimplifier {
         simplifier.run(ratio,maxCostDistance);
         return new ProgressiveMesh(source,simplifier.history);
     }
+    /** Original exact topology is retained for a genuine native-to-parent morph. */
+    public static ProgressiveMesh progressiveCollar(SurfaceMesh fine,SurfaceMesh seed,double ratio,double maxCostDistance){
+        var reducer=new QuadricSimplifier(seed,true,true,256);reducer.history=new ArrayList<>();reducer.morphGuard=new RootMorphGuard(fine,seed);reducer.run(ratio,maxCostDistance);return new ProgressiveMesh(seed,reducer.history);
+    }
+    private RootMorphGuard morphGuard;
     private List<ProgressiveMesh.Step> history;
     private List<SurfaceMesh> sampled;private double[] sampleCosts;private int nextSample;
     private record TriangleKey(int a,int b,int c){}
@@ -193,6 +198,7 @@ public final class QuadricSimplifier {
             if(precision==16&&(x<minX||x>maxX||z<minZ||z>maxZ))continue;
             double cost=Math.max(0,cost(q,x,y,z));
             if(!Double.isFinite(cost))continue;
+            if(morphGuard!=null&&!morphGuard.allows(ia,ib,x,y,z))continue;
             if(best==null||cost<best.cost)best=new Edge(ia,ib,a.version,b.version,x,y,z,cost);
         }
         if(best!=null)queue.add(best);
@@ -234,6 +240,7 @@ public final class QuadricSimplifier {
             double quadratic=2*(d1+d0-2*dm);
             if(d0-quadratic<=1e-12)return false;
         }
+        if(morphGuard!=null&&!morphGuard.allows(e.a,e.b,e.x,e.y,e.z))return false;
         if(guardContacts&&!contactsValid(e))return false;
         return true;
     }
@@ -299,6 +306,7 @@ public final class QuadricSimplifier {
     }
 
     private void collapse(Edge e) {
+        if(morphGuard!=null)morphGuard.collapse(e.a,e.b,e.x,e.y,e.z);
         Vertex a=vertices[e.a],b=vertices[e.b];
         var affected=new HashSet<Integer>(a.faces);affected.addAll(b.faces);
         for(int id:affected) {

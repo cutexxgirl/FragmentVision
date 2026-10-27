@@ -18,3 +18,20 @@ for now,old in [(0,1),(1,0),(.5,1),(.25,0)]:
   w=min(now,old+(now-old)*t);expected=fine+(target-fine)*w+np.array([100,0,-50]);assert np.allclose(got[:,:3],expected,atol=1e-5),(now,old,t,got,expected);assert np.allclose(got[:,3],w)
  current.release();previous.release()
 print('Collar GPU: exact native, target geometry, world field coordinates, growth clamp and temporal release passed;',c.info['GL_RENDERER'])
+# A collapsed parent can move past rounding's Voronoi cell. The exact source
+# endpoint must come from its own integer attribute, not round(parent).
+far=target.copy();far[1]=[3,2.5,3];far[2]=[3,2.5,3]
+q=[]
+for x,y,z in far:
+ lo=round(float((x+1)*256))|(round(float((y+1)*256))<<15);hi=round(float((z+1)*256))|(128<<15)|(255<<23);q.append(lo|(hi<<32))
+b.write(np.array(q,dtype='u8').tobytes());source=[]
+for x,y,z in fine:
+ lo=round(float((x+1)*256))|(round(float((y+1)*256))<<15);hi=round(float((z+1)*256));source.append(lo|(hi<<32))
+fine_buffer=c.buffer(np.array(source,dtype='u8').tobytes());vao=c.vertex_array(p,[(b,'2u','packedPosition'),(fine_buffer,'2u','packedFinePosition')]);p['u_NativeExplicitFine'].value=1
+for w in [0,.25,.5,1]:
+ current=c.texture((4,4),1,np.full((4,4),w,dtype='f4').tobytes(),dtype='f4');current.use(11);current.use(12);p['u_NativeBlend'].value=1
+ vao.transform(out,mode=moderngl.POINTS,vertices=4);got=np.frombuffer(out.read(),dtype='f4').reshape(4,4);expected=fine+(far-fine)*w+np.array([100,0,-50]);assert np.allclose(got[:,:3],expected,atol=1e-5),(got,expected);current.release()
+# Compile the real quad vertex variant with snow fade outputs.
+snow=(r/'src/main/resources/assets/voxy/shaders/lod/mesh/terrain.vert').read_text().replace('#version 460 core','#version 460 core\n#define FV_PACKED_QUADS\n#define FV_NATIVE_SNOW')
+c.program(vertex_shader=snow,varyings=['v_Position','v_NativeOpacity'])
+print('Linked parent GPU: explicit fine endpoint >1 block displacement and snow vertex variant passed')
