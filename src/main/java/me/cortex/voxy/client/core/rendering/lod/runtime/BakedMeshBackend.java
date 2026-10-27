@@ -51,17 +51,71 @@ public final class BakedMeshBackend implements AutoCloseable {
     private int commandBuffer;
     private IntBuffer commandStaging;
     private final RenderProperties properties;
+    private Path loadedRoot;
+    private final NativeTerrainJoin nativeJoin=new NativeTerrainJoin();
+    private final Map<TileKey,Page> collars=new HashMap<>();
+    private int drawnCollars;
+    private boolean nativeJoinEnabled=true;
+    public String nativeJoin(boolean enabled){nativeJoinEnabled=enabled;return "Native geometry join="+enabled;}
+    private record SourceColour(int y,String state,String biome){}
+    private SourceColour sourceColour(int x,int z,int expectedY,boolean leaves,JsonArray palette,JsonArray rows,Map<String,PackedQuads.Decoded> cache)throws Exception{
+        SourceColour best=null;
+        for(var row:rows){var p=row.getAsJsonObject();if(p.get("level").getAsInt()!=0||!p.has("layer")||!p.get("layer").getAsString().equals(leaves?"detail":"terrain"))continue;
+            var tile=p.getAsJsonArray("tile");int tx=tile.get(0).getAsInt(),tz=tile.get(1).getAsInt(),width=p.get("tile_width").getAsInt();if(x<tx||z<tz||x>=tx+width||z>=tz+width)continue;
+            String file=p.get("file").getAsString();var data=cache.get(file);if(data==null){data=PackedQuads.read(checked(loadedRoot.resolve(file),8<<20));cache.put(file,data);}
+            for(long q:data.quads().data())if(PackedQuads.face(q)==3){
+                int qx=data.originX()+PackedQuads.x(q),qz=data.originZ()+PackedQuads.z(q),qy=data.originY()+PackedQuads.y(q);
+                if(x<qx||x>=qx+PackedQuads.u(q)||z<qz||z>=qz+PackedQuads.v(q))continue;
+                var material=palette.get(PackedQuads.material(q)).getAsJsonObject();String state=material.get("state").getAsString();
+                if(leaves&&!LodInputPolicy.name(state).endsWith("_leaves"))continue;
+                if(best==null||(leaves?Math.abs(qy-expectedY)<Math.abs(best.y-expectedY):qy>best.y))best=new SourceColour(qy,state,material.get("biome").getAsString());
+            }
+        }return best;
+    }
+    public String auditColours()throws Exception{
+        if(loadedRoot==null)throw new IllegalStateException("Load a package first: audit must use its saved biomes");
+        var mc=Minecraft.getInstance();var camera=mc.gameRenderer.getMainCamera().getPosition();
+        var palette=JsonParser.parseString(readSmall(loadedRoot.resolve("palette.json"),4<<20)).getAsJsonArray();
+        var rows=JsonParser.parseString(readSmall(loadedRoot.resolve("manifest.json"),16<<20)).getAsJsonObject().getAsJsonArray("pages");
+        var cache=new HashMap<String,PackedQuads.Decoded>();
+        var output=new StringBuilder("x\ty\tz\tnative_biome\tsaved_biome\tsaved_y\tstate\tnative_rgb\tlod_rgb\tmax_channel_delta\n");int exact=0,total=0,max=0,heightDelta=0,missing=0,biomeMismatch=0;
+        for(int dz=-64;dz<=64;dz+=16)for(int dx=-64;dx<=64;dx+=16){
+            int x=(int)Math.floor(camera.x)+dx,z=(int)Math.floor(camera.z)+dz;if(!mc.level.hasChunk(x>>4,z>>4))continue;
+            int y=mc.level.getMaxBuildHeight()-1,leafY=Integer.MIN_VALUE;BlockState leaf=null;
+            while(y>=mc.level.getMinBuildHeight()){
+                var sample=mc.level.getBlockState(new net.minecraft.core.BlockPos(x,y,z));
+                if(leaf==null&&sample.is(net.minecraft.tags.BlockTags.LEAVES)){leaf=sample;leafY=y;}
+                if(LodInputPolicy.terrain(BuiltInRegistries.BLOCK.getKey(sample.getBlock()).toString()))break;y--;
+            }
+            if(y<mc.level.getMinBuildHeight())continue;
+            var ground=sourceColour(x,z,y,false,palette,rows,cache);
+            var states=new ArrayList<>(List.of(net.minecraft.world.level.block.Blocks.GRASS_BLOCK.defaultBlockState(),net.minecraft.world.level.block.Blocks.BIRCH_LEAVES.defaultBlockState(),net.minecraft.world.level.block.Blocks.OAK_LEAVES.defaultBlockState(),net.minecraft.world.level.block.Blocks.SPRUCE_LEAVES.defaultBlockState()));
+            if(leaf!=null)states.add(leaf);
+            for(int sample=0;sample<states.size();sample++){
+                var state=states.get(sample);boolean actualLeaf=sample==4;int atY=actualLeaf?leafY:y;var source=actualLeaf?sourceColour(x,z,atY,true,palette,rows,cache):ground;
+                if(source==null){missing++;continue;}heightDelta=Math.max(heightDelta,Math.abs(source.y-atY));
+                var pos=new net.minecraft.core.BlockPos(x,atY,z);var nativeBiome=mc.level.getBiome(pos).value();var nativeBiomeKey=mc.level.registryAccess().registryOrThrow(Registries.BIOME).getKey(nativeBiome).toString();
+                var savedBiome=mc.level.registryAccess().registryOrThrow(Registries.BIOME).get(ResourceLocation.parse(source.biome));if(savedBiome==null)throw new IllegalStateException("Saved biome missing");
+                if(!nativeBiomeKey.equals(source.biome))biomeMismatch++;
+                int nativeTint=mc.getBlockColors().getColor(state,mc.level,pos,1)&0xffffff,lodTint=ModelFactory.captureSurfaceTint(state,savedBiome)&0xffffff;
+                int delta=0;for(int shift:new int[]{0,8,16})delta=Math.max(delta,Math.abs(((nativeTint>>shift)&255)-((lodTint>>shift)&255)));total++;if(delta==0)exact++;max=Math.max(max,delta);
+                output.append(x).append('\t').append(atY).append('\t').append(z).append('\t').append(nativeBiomeKey).append('\t').append(source.biome).append('\t').append(source.y).append('\t').append(BuiltInRegistries.BLOCK.getKey(state.getBlock())).append('\t').append(String.format("%06x\t%06x\t%d\n",nativeTint,lodTint,delta));
+            }
+        }
+        Files.writeString(mc.gameDirectory.toPath().resolve("lod-colour-audit.tsv"),output);
+        return "Native/saved LOD tint audit: exact="+exact+"/"+total+", max RGB delta="+max+", biome mismatches="+biomeMismatch+", max source height delta="+heightDelta+", missing="+missing+"; lod-colour-audit.tsv";
+    }
     private boolean automaticLevels;
     private int submissionMode=3;
     public String submissionMode(int mode){if(mode<0||mode>3)throw new IllegalArgumentException("Submission mode");submissionMode=mode;return "Mesh submission="+mode+" (0 split, 1 direct buckets, 2 mixed MDI, 3 compact MDI)";}
     private record Uniforms(int mvp,int phase,int origin,int attributeBits,int attributeOffset,int surfaceMacroWidth,int lodEdge) {}
     private final Map<Integer,Uniforms> uniforms=new HashMap<>();
     private int drawnMeshPages,drawnQuadPages;private final int[] terrainLevels=new int[3];
-    private Shader shader,quadShader,compactShader;private int table;private boolean active;private long gpuBytes,triangles,drawn,culled;
+    private Shader shader,quadShader,compactShader,collarShader;private int table;private boolean active;private long gpuBytes,triangles,drawn,culled;
     public BakedMeshBackend(RenderProperties properties){this.properties=properties;}
     public boolean active(){return active;}
     public String enabled(boolean enabled){if(enabled&&pages.isEmpty())return "No baked pages loaded";active=enabled;return status();}
-    public String status(){return "Baked mesh proof "+(active?"ON":"OFF")+": pages="+pages.size()+", GPU="+gpuBytes+" bytes, triangles="+triangles+", submitted="+drawn+", direction-culled="+culled+"; old Voxy geometry draws/traversal="+(active?"BYPASSED":"normal")+"; levels="+(automaticLevels?"projected error 2px + hysteresis":"fixed")+"; terrain levels="+Arrays.toString(terrainLevels)+", drawn mesh/quad pages="+drawnMeshPages+"/"+drawnQuadPages+"; loaded package coverage only; submission="+submissionMode;}
+    public String status(){return "Baked mesh proof "+(active?"ON":"OFF")+": pages="+pages.size()+", GPU="+gpuBytes+" bytes, triangles="+triangles+", submitted="+drawn+", direction-culled="+culled+"; old Voxy geometry draws/traversal="+(active?"BYPASSED":"normal")+"; levels="+(automaticLevels?"projected error 2px + hysteresis":"fixed")+"; terrain levels="+Arrays.toString(terrainLevels)+", drawn mesh/quad pages="+drawnMeshPages+"/"+drawnQuadPages+"; loaded package coverage only; native collars="+drawnCollars+"/"+collars.size()+", ready columns="+nativeJoin.readyColumns()+"; submission="+submissionMode;}
     public String load(String name,int level)throws Exception {
         if(!name.matches("[a-zA-Z0-9_-]+")||level< -1||level>2)throw new IllegalArgumentException("Invalid package/level");
         if(!FragmentAtmosphereCompat.hasMaterial())throw new IllegalStateException("Fragment Render material required");
@@ -139,7 +193,10 @@ public final class BakedMeshBackend implements AutoCloseable {
             compactShader=Shader.make().apply(properties::apply).define("FR_HYBRID_SURFACE").define("FV_COMPACT_TERRAIN")
                 .add(ShaderType.VERTEX,"voxy:lod/mesh/terrain.vert").add(ShaderType.FRAGMENT,"voxy:lod/mesh/terrain.frag")
                 .replace("// FRAGMENT_MATERIAL_SOURCE",primitiveMaterialSource()).compile();
-            for(Shader program:new Shader[]{shader,quadShader,compactShader})uniforms.put(program.id(),new Uniforms(
+            collarShader=Shader.make().apply(properties::apply).define("FR_HYBRID_SURFACE").define("FV_NATIVE_COLLAR")
+                .add(ShaderType.VERTEX,"voxy:lod/mesh/terrain.vert").add(ShaderType.FRAGMENT,"voxy:lod/mesh/terrain.frag")
+                .replace("// FRAGMENT_MATERIAL_SOURCE",primitiveMaterialSource()).compile();
+            for(Shader program:new Shader[]{shader,quadShader,compactShader,collarShader})uniforms.put(program.id(),new Uniforms(
                 glGetUniformLocation(program.id(),"u_MVP"),glGetUniformLocation(program.id(),"u_CameraPhase"),glGetUniformLocation(program.id(),"u_Origin"),glGetUniformLocation(program.id(),"u_AttributeBits"),glGetUniformLocation(program.id(),"u_AttributeOffset"),glGetUniformLocation(program.id(),"u_SurfaceMacroWidth"),glGetUniformLocation(program.id(),"u_LodEdge")));
             singleSided=new boolean[entries.size()];
             var mc=Minecraft.getInstance();
@@ -153,6 +210,7 @@ public final class BakedMeshBackend implements AutoCloseable {
             float[] materials=materials(entries);table=glCreateBuffers();glNamedBufferData(table,materials,GL_STATIC_DRAW);gpuBytes=materials.length*4L;
             for(var cpu:decoded){if(cpu.mesh!=null)upload(cpu.mesh,cpu.x,cpu.y,cpu.z,entries.size(),cpu.mask,cpu.width,cpu.compact);else uploadQuads(cpu.quads,cpu.x,cpu.y,cpu.z,entries.size(),cpu.mask,cpu.width);if(gpuBytes>192L*1024*1024)throw new IllegalArgumentException("Resident GPU budget exceeded");
                 Page page=pages.getLast();
+                if(cpu.layer.equals("terrain")&&cpu.quads!=null&&(cpu.mask&1)!=0)nativeJoin.register(cpu.quads,cpu.x,cpu.y,cpu.z);
                 if(cpu.cap!=null){
                     CapBuffer buffer=capBuffers.get(cpu.capFile);
                     if(buffer==null){int handle=glCreateBuffers();buffer=new CapBuffer(handle,cpu.cap.macroWidth());capBuffers.put(cpu.capFile,buffer);glNamedBufferData(handle,cpu.cap.words(),GL_STATIC_DRAW);gpuBytes+=cpu.cap.gpuBytes();}
@@ -165,6 +223,24 @@ public final class BakedMeshBackend implements AutoCloseable {
                 if(page.count>0){extend(tile.bounds,page.bounds[0]+cpu.x-cpu.group.x,page.bounds[1],page.bounds[2]+cpu.z-cpu.group.z);extend(tile.bounds,page.bounds[3]+cpu.x-cpu.group.x,page.bounds[4],page.bounds[5]+cpu.z-cpu.group.z);}
                 for(int l=0;l<3;l++)if((cpu.mask&(1<<l))!=0)tile.errors[l]=Math.max(tile.errors[l],cpu.errors[l]);
             }
+            Path collarIndex=root.resolve("native-collars.json");
+            if(automaticLevels&&Files.isRegularFile(collarIndex)){
+                var sourceHashes=new HashMap<String,String>();
+                for(var row:manifest.getAsJsonArray("pages")){var value=row.getAsJsonObject();if(value.get("level").getAsInt()==0&&value.has("layer")&&value.get("layer").getAsString().equals("terrain"))sourceHashes.put(value.getAsJsonArray("tile").toString(),value.get("sha256").getAsString());}
+                var assets=JsonParser.parseString(readSmall(collarIndex,1<<20)).getAsJsonArray();
+                if(assets.size()>2048)throw new IllegalArgumentException("Native collar count budget");long totalCollars=0;
+                for(var element:assets){var asset=element.getAsJsonObject();String file=asset.get("file").getAsString();
+                    if(!file.matches("collar_[0-9_-]+[.]mesh"))throw new IllegalArgumentException("Native collar filename");
+                    Path path=checked(root.resolve(file),4<<20);byte[] bytes=Files.readAllBytes(path);totalCollars+=bytes.length;
+                    if(totalCollars>32L<<20)throw new IllegalArgumentException("Native collar disk budget");verify(bytes,asset.get("sha256").getAsString());
+                    var data=MeshPage.read(path);var key=new TileKey(data.originX(),data.originY(),data.originZ(),32,"terrain");
+                    if(!asset.has("source_sha256")||!asset.get("source_sha256").getAsString().equals(sourceHashes.get("["+key.x+","+key.z+"]")))throw new IllegalArgumentException("Native collar source hash");
+                    if(!terrainOwners.containsKey(key)||collars.containsKey(key))throw new IllegalArgumentException("Native collar ownership");
+                    for(float v:data.mesh().positions())if(Math.abs(v-Math.round(v))>.45f)throw new IllegalArgumentException("Native collar fine endpoint");
+                    upload(data.mesh(),key.x,key.y,key.z,entries.size(),1,32,false);Page page=pages.removeLast();collars.put(key,page);
+                    if(gpuBytes>192L<<20)throw new IllegalArgumentException("Native collar GPU budget");
+                }
+            }
             if(!quadSubmissions.isEmpty()) {
                 commandStaging=MemoryUtil.memAllocInt(quadSubmissions.size()*QuadFaceBuckets.BUCKETS*QuadFaceBuckets.COMMAND_INTS);
                 commandBuffer=glCreateBuffers();glNamedBufferData(commandBuffer,commandStaging.capacity()*4L,GL_DYNAMIC_DRAW);
@@ -173,7 +249,7 @@ public final class BakedMeshBackend implements AutoCloseable {
             }
             singleSided=null;
             if(automaticLevels&&tiles.values().stream().anyMatch(t->t.availableMask!=7))throw new IllegalArgumentException("Physical tile needs all levels");
-            active=true;return status();
+            loadedRoot=root;active=true;return status();
         }catch(Exception error){close();throw error;}
     }
     private static double pageError(JsonObject page){
@@ -262,10 +338,13 @@ public final class BakedMeshBackend implements AutoCloseable {
         for(var entry:tiles.entrySet())if(entry.getKey().layer.equals("snow")&&entry.getValue().selected==0){
             TileKey key=entry.getKey();Tile ground=terrainOwners.get(new TileKey(key.x,key.y,key.z,key.width,"terrain"));if(ground!=null)ground.selected=0;
         }
+        for(var entry:tiles.entrySet()){
+            TileKey key=entry.getKey();if(nativeJoinEnabled&&!collars.isEmpty()&&(key.layer.equals("terrain")||key.layer.equals("snow"))&&nativeJoin.affects(key.x,key.z,key.width))entry.getValue().selected=0;
+        }
         for(var entry:tiles.entrySet())if(entry.getKey().layer.equals("terrain"))terrainLevels[entry.getValue().selected]++;
     }
     public void render(Viewport<?> view){if(!active)return;drawn=culled=0;drawnMeshPages=drawnQuadPages=0;
-        if(automaticLevels)selectLevels(view);
+        drawnCollars=0;if(automaticLevels){nativeJoin.update();selectLevels(view);}
         if(commandStaging!=null){
             commandStaging.clear();
             for(var entry:quadSubmissions.entrySet()) {
@@ -289,25 +368,32 @@ public final class BakedMeshBackend implements AutoCloseable {
         glBindTextureUnit(0,Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).getId());glBindSampler(0,0);glBindBufferBase(GL_SHADER_STORAGE_BUFFER,14,table);
         glEnable(GL_DEPTH_TEST);glDepthFunc(properties.closerEqualDepthCompare());glDepthMask(true);glDisable(GL_BLEND);glDisable(GL_CULL_FACE);
         float renderEnd=Math.max(32,view.fogParameters.renderEnd());
-        Shader bound=null;
-        try{for(Page page:pages){
-            if(automaticLevels&&(page.levelMask&(1<<pageTiles.get(page).selected))==0)continue;
-            float x=(float)(page.x-view.cameraX),y=(float)(page.y-view.cameraY),z=(float)(page.z-view.cameraZ);float[] b=page.bounds;
-            if(page.count==0||!view.frustum.testAab(x+b[0]-.01f,y+b[1]-.01f,z+b[2]-.01f,x+b[3]+.01f,y+b[4]+.01f,z+b[5]+.01f))continue;
+        nativeJoin.saveBindings();Shader bound=null;
+        try{for(Page original:pages){
+            if(automaticLevels&&(original.levelMask&(1<<pageTiles.get(original).selected))==0)continue;
+            Page page=original;boolean collar=false;
+            if(nativeJoinEnabled&&automaticLevels&&(original.levelMask&1)!=0){
+                var key=new TileKey(original.x,original.y,original.z,original.width,"terrain");
+                Page candidate=collars.get(key);
+                // Only the physical terrain owner can substitute this sidecar, never detail/cave pages.
+                if(candidate!=null&&terrainOwners.get(key)==pageTiles.get(original)&&nativeJoin.affects(key.x,key.z,key.width)){page=candidate;collar=true;}
+            }
+            float x=(float)(page.x-view.cameraX),y=(float)(page.y-view.cameraY),z=(float)(page.z-view.cameraZ);float[] b=page.bounds;float pad=collar?.5f:.01f;
+            if(page.count==0||!view.frustum.testAab(x+b[0]-pad,y+b[1]-pad,z+b[2]-pad,x+b[3]+pad,y+b[4]+pad,z+b[5]+pad))continue;
             double dx=Math.max(0,Math.max(x+b[0],-x-b[3])),dz=Math.max(0,Math.max(z+b[2],-z-b[5]));
             if(dx*dx+dz*dz>(double)renderEnd*renderEnd)continue;
             if(page.quads&&quadSubmissions.get(page).submitted==0){culled+=page.count*2L;continue;}
-            Shader program=page.quads?quadShader:page.compact?compactShader:shader;
+            Shader program=collar?collarShader:page.quads?quadShader:page.compact?compactShader:shader;
             if(program!=bound){
                 if(bound!=null){FragmentAtmosphereCompat.releaseMaterial();bound=null;}
                 program.bind();
                 try(var stack=org.lwjgl.system.MemoryStack.stackPush()){glUniformMatrix4fv(uniforms.get(program.id()).mvp(),false,view.MVP.get(stack.mallocFloat(16)));}
                 glUniform3f(uniforms.get(program.id()).phase(),(float)(view.cameraX%1),(float)(view.cameraY%1),(float)(view.cameraZ%1));
                 glUniform2f(uniforms.get(program.id()).lodEdge(),renderEnd*.80f,renderEnd);
-                FragmentAtmosphereCompat.bindMaterial(program.id());bound=program;
+                FragmentAtmosphereCompat.bindMaterial(program.id());bound=program;if(collar)nativeJoin.bind(program.id(),view.cameraX,view.cameraZ);
             }
             glUniform3f(uniforms.get(program.id()).origin(),x,y,z);
-            CapBuffer cap=pageCaps.get(page);glUniform1i(uniforms.get(program.id()).surfaceMacroWidth(),cap==null?0:cap.macroWidth);glBindBufferBase(GL_SHADER_STORAGE_BUFFER,15,cap==null?table:cap.handle);
+            CapBuffer cap=collar?null:pageCaps.get(page);glUniform1i(uniforms.get(program.id()).surfaceMacroWidth(),cap==null?0:cap.macroWidth);glBindBufferBase(GL_SHADER_STORAGE_BUFFER,15,cap==null?table:cap.handle);
             if(page.compact){glUniform1i(uniforms.get(program.id()).attributeBits(),page.attributeBits);glUniform1i(uniforms.get(program.id()).attributeOffset(),page.dictionarySize);}
             glBindVertexArray(page.vao);glBindBufferBase(GL_SHADER_STORAGE_BUFFER,13,page.quads?page.vertex:page.attributes);
             if(page.quads){
@@ -327,16 +413,16 @@ public final class BakedMeshBackend implements AutoCloseable {
                 }
                 drawn+=submission.submitted;culled+=page.count*2L-submission.submitted;
             }else{
-                drawnMeshPages++;glDrawElements(page.compact?GL_TRIANGLE_STRIP:GL_TRIANGLES,page.count,page.indexType,0L);drawn+=page.primitiveCount;
+                if(collar)drawnCollars++;drawnMeshPages++;glDrawElements(page.compact?GL_TRIANGLE_STRIP:GL_TRIANGLES,page.count,page.indexType,0L);drawn+=page.primitiveCount;
             }
         }}finally{
-            glBindBuffer(GL_DRAW_INDIRECT_BUFFER,previousIndirect);glBindBufferBase(GL_SHADER_STORAGE_BUFFER,15,previousCap);if(!previousRestart)glDisable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
+            nativeJoin.restoreBindings();glBindBuffer(GL_DRAW_INDIRECT_BUFFER,previousIndirect);glBindBufferBase(GL_SHADER_STORAGE_BUFFER,15,previousCap);if(!previousRestart)glDisable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
             if(bound!=null)FragmentAtmosphereCompat.releaseMaterial();
             glBindBufferBase(GL_SHADER_STORAGE_BUFFER,14,0);glBindBufferBase(GL_SHADER_STORAGE_BUFFER,13,0);glBindVertexArray(0);glBindTextureUnit(0,0);glEnable(GL_CULL_FACE);
         }
     }
-    @Override public void close(){active=false;for(Page p:pages){glDeleteVertexArrays(p.vao);glDeleteBuffers(p.vertex);glDeleteBuffers(p.index);glDeleteBuffers(p.attributes);}pages.clear();quadSubmissions.clear();singleSided=null;
+    @Override public void close(){loadedRoot=null;active=false;nativeJoin.close();for(Page p:collars.values()){glDeleteVertexArrays(p.vao);glDeleteBuffers(p.vertex);glDeleteBuffers(p.index);glDeleteBuffers(p.attributes);}collars.clear();for(Page p:pages){glDeleteVertexArrays(p.vao);glDeleteBuffers(p.vertex);glDeleteBuffers(p.index);glDeleteBuffers(p.attributes);}pages.clear();quadSubmissions.clear();singleSided=null;
         if(commandStaging!=null){MemoryUtil.memFree(commandStaging);commandStaging=null;}
         if(commandBuffer!=0){glDeleteBuffers(commandBuffer);commandBuffer=0;}
-        pageTiles.clear();terrainOwners.clear();pageCaps.clear();for(CapBuffer cap:capBuffers.values())glDeleteBuffers(cap.handle);capBuffers.clear();tiles.clear();uniforms.clear();if(table!=0)glDeleteBuffers(table);table=0;if(shader!=null)shader.free();shader=null;if(quadShader!=null)quadShader.free();quadShader=null;if(compactShader!=null)compactShader.free();compactShader=null;gpuBytes=triangles=drawn=culled=0;drawnMeshPages=drawnQuadPages=0;Arrays.fill(terrainLevels,0);}
+        pageTiles.clear();terrainOwners.clear();pageCaps.clear();for(CapBuffer cap:capBuffers.values())glDeleteBuffers(cap.handle);capBuffers.clear();tiles.clear();uniforms.clear();if(table!=0)glDeleteBuffers(table);table=0;if(shader!=null)shader.free();shader=null;if(quadShader!=null)quadShader.free();quadShader=null;if(compactShader!=null)compactShader.free();compactShader=null;if(collarShader!=null)collarShader.free();collarShader=null;gpuBytes=triangles=drawn=culled=0;drawnMeshPages=drawnQuadPages=0;Arrays.fill(terrainLevels,0);}
 }

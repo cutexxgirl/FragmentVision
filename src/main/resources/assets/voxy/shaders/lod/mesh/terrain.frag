@@ -10,6 +10,9 @@ layout(std430,binding=13) readonly buffer Attributes {uint attributes[];};
 #ifdef FV_COMPACT_TERRAIN
 uniform int u_AttributeBits,u_AttributeOffset;
 #endif
+#ifdef FV_NATIVE_COLLAR
+in float v_NativeWeight;
+#endif
 uniform vec3 u_CameraPhase,u_Origin;
 uniform int u_SurfaceMacroWidth;
 uniform vec2 u_LodEdge;
@@ -40,11 +43,8 @@ uint fv_attribute(){
 #endif
 }
 // FRAGMENT_MATERIAL_SOURCE
-vec3 fv_finishAtmosphere(vec3 colour){
- // FR_LOD_MATERIAL defers air to Voxy's final composite. This backend bypasses
- // that composite, so apply the SAME air/edge functions once, here.
- return fr_aerialLodEdge(fr_aerialFog(colour,v_Position),v_Position,u_LodEdge.x,u_LodEdge.y);
-}
+// NormalRenderPipeline.finish composites this colour and applies shared air once.
+// FR_LOD_MATERIAL leaves the lighting result un-fogged for that pass.
 void main(){
  if(max(length(v_Position.xz),abs(v_Position.y))>u_LodEdge.y)discard;
  uint attributeData=fv_attribute();
@@ -56,16 +56,20 @@ void main(){
  }
  Material m=materials[materialID*6u+face];
  fr_RelativePosition=v_Position;fv_SurfaceNormal=normalize(v_Normal);
+#ifdef FV_NATIVE_COLLAR
+ vec3 axis=face==0u?vec3(-1,0,0):face==1u?vec3(1,0,0):face==2u?vec3(0,-1,0):face==3u?vec3(0,1,0):face==4u?vec3(0,0,-1):vec3(0,0,1);
+ fv_SurfaceNormal=normalize(mix(axis,fv_SurfaceNormal,v_NativeWeight));
+#endif
  fr_BaseLight=vec3(1);fr_CanopyNormal=m.tint.w==2.0?fv_SurfaceNormal:vec3(0);
  fr_SkyLight=float((attributeData>>4u)&15u)/15.;fr_BlockLight=float(attributeData&15u)/15.;
  // Far water reuses Fragment Render's deep scattering and reflected sky. It is
  // opaque at LOD distances; native water retains refraction and shoreline foam.
- if(m.tint.w==5.){outColour=vec4(fv_finishAtmosphere(fr_lodWaterColor()),1);return;}
+ if(m.tint.w==5.){outColour=vec4(fr_lodWaterColor(),1);return;}
  vec3 worldUV=v_Position+u_CameraPhase;vec2 rawUV=face<2u?worldUV.zy:face<4u?worldUV.xz:worldUV.xy;
  vec2 scale=m.uv.zw-m.uv.xy;vec2 inset=.5/vec2(textureSize(u_Atlas,0));
  vec2 uv=m.uv.xy+clamp(fract(rawUV)*scale,inset,scale-inset);
  vec4 tex=textureGrad(u_Atlas,uv,dFdx(rawUV)*scale,dFdy(rawUV)*scale);
  if(tex.a<.1)discard;
- vec3 n=normalize(v_Normal);float shade=dot(n*n,vec3(.6,1,.8));
- outColour=vec4(fv_finishAtmosphere(fr_lighting(tex.rgb*m.tint.rgb*shade,m.tint.w>=6.?0.:m.tint.w)),1);
+ vec3 n=normalize(fv_SurfaceNormal);float shade=dot(n*n,vec3(.6,1,.8));
+ outColour=vec4(fr_lighting(tex.rgb*m.tint.rgb*shade,m.tint.w>=6.?0.:m.tint.w),1);
 }

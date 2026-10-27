@@ -1,0 +1,1 @@
+Native collars: 1024 pages, 2627671 triangles, all independent morph weights preserve orientation; exact shared contours; max component displacement=0.3515625

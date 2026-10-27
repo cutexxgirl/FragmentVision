@@ -18,8 +18,17 @@ public final class NativeTransitionFieldCheck {
         var negative=new NativeTransitionField(translated,2,12);close(l.weight(8,8),negative.weight(-152,-152));
         var single=new NativeTransitionField(Set.of(new Cell(0,0)),2,12);
         close(single.weight(-5,-5),single.weight(21,21));close(single.weight(-1,-1),0);close(single.weight(-20,-20),1);
+        // Independent four-segment reference checks spatial bin borders/corners.
+        for(double x=-20;x<=36;x+=.5)for(double z=-20;z<=36;z+=.5){
+            double expected=1;if(x>=0&&x<16&&z>=0&&z<16)expected=0;
+            else for(int edge=0;edge<4;edge++){
+                double across=edge<2?x-(edge==0?0:16):z-(edge==2?0:16),along=edge<2?z:x;
+                double d=Math.hypot(across,Math.max(0,Math.max(-along,along-16)));
+                double t=Math.clamp((d-2)/12,0,1);expected*=t*t*t*(t*(t*6-15)+10);
+            }close(single.weight(x,z),expected);
+        }
         var empty=new NativeTransitionField(Set.of(),2,12);close(empty.weight(0,0),1);
         for(double x=-20;x<36;x+=.3)for(double z=-20;z<36;z+=.3){double w=single.weight(x,z);if(w<0||w>1||!Double.isFinite(w))throw new AssertionError("Invalid field");}
-        System.out.println("Native collar reference: straight, merged boundaries, concave/convex corner, negative coordinates, C1 diagonal: passed (not runtime morph)");
+        System.out.println("Native collar reference: straight, merged boundaries, concave/convex corner, negative coordinates, C1 diagonal: passed (field contract; GPU and in-world checks are separate)");
     }
 }

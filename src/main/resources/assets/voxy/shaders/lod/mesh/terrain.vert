@@ -9,6 +9,13 @@ layout(location=0) in uvec3 packedPosition;
 #else
 layout(location=0) in uvec2 packedPosition;
 #endif
+#ifdef FV_NATIVE_COLLAR
+layout(binding=11) uniform sampler2D u_NativeField;
+layout(binding=12) uniform sampler2D u_NativeOldField;
+uniform vec4 u_NativeCurrent,u_NativePrevious;
+uniform float u_NativeBlend;
+out float v_NativeWeight;
+#endif
 uniform mat4 u_MVP;
 uniform vec3 u_Origin;
 out vec3 v_Position,v_Normal;
@@ -51,6 +58,13 @@ void main(){
  vec2 oct=vec2(float((hi>>15u)&255u),float((hi>>23u)&255u))/255.*2.-1.;
  vec3 n=vec3(oct,1.-abs(oct.x)-abs(oct.y));
  if(n.z<0.) n.xy=(1.-abs(n.yx))*mix(vec2(-1),vec2(1),greaterThanEqual(n.xy,vec2(0)));
+#endif
+#ifdef FV_NATIVE_COLLAR
+ vec3 fine=round(p);vec2 relative=fine.xz+u_Origin.xz;
+ float current=textureLod(u_NativeField,(relative+u_NativeCurrent.xy)*u_NativeCurrent.zw,0.).r;
+ float previous=textureLod(u_NativeOldField,(relative+u_NativePrevious.xy)*u_NativePrevious.zw,0.).r;
+ v_NativeWeight=min(current,mix(previous,current,u_NativeBlend));
+ p=mix(fine,p,v_NativeWeight);
 #endif
  v_Normal=normalize(n);v_Position=p+u_Origin;gl_Position=u_MVP*vec4(v_Position,1);
 }

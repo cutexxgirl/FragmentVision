@@ -30,6 +30,10 @@ for reverse,packed,compact in ((False,False,False),(True,False,False),(False,Tru
     prefix='#version 460 core\n#define FR_HYBRID_SURFACE\n'+('#define USE_REVERSE_Z\n' if reverse else '')+('#define FV_PACKED_QUADS\n' if packed else '')+('#define FV_COMPACT_TERRAIN\n' if compact else '')
     p=ctx.program(vertex_shader=prefix+parse('lod/mesh/terrain.vert'),fragment_shader=prefix+parse('lod/mesh/terrain.frag').replace('// FRAGMENT_MATERIAL_SOURCE',re.sub(r'(?m)^in (vec3|float) (fr_RelativePosition|fr_SkyLight|fr_BlockLight|fr_BaseLight|fr_CanopyNormal|fv_SurfaceNormal);',r'\1 \2;',material)))
     programs.append(f'baked mesh reverseZ={reverse},packed={packed},compact={compact}')
+for reverse in (False,True):
+    prefix='#version 460 core\n#define FR_HYBRID_SURFACE\n#define FV_NATIVE_COLLAR\n'+('#define USE_REVERSE_Z\n' if reverse else '')
+    p=ctx.program(vertex_shader=prefix+parse('lod/mesh/terrain.vert'),fragment_shader=prefix+parse('lod/mesh/terrain.frag').replace('// FRAGMENT_MATERIAL_SOURCE',re.sub(r'(?m)^in (vec3|float) (fr_RelativePosition|fr_SkyLight|fr_BlockLight|fr_BaseLight|fr_CanopyNormal|fv_SurfaceNormal);',r'\1 \2;',material)))
+    programs.append(f'native collar reverseZ={reverse}')
 report={'result':'passed','renderer':ctx.info['GL_RENDERER'],'programs':programs}
 args.output.parent.mkdir(parents=True,exist_ok=True)
 args.output.write_text(json.dumps(report,indent=2)+'\n')

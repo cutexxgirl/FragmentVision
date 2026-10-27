@@ -2,11 +2,11 @@ package me.cortex.voxy.client.core.rendering.lod.bake;
 
 import java.util.*;
 
-/** CPU reference for the planned native-to-parent collar; not connected to rendering.
+/** World-space native-to-near collar field, sampled by NativeTerrainJoin when readiness changes.
  * Cells describe ready exterior columns, NOT a camera-distance approximation.
  * Collinear exposed edges merge before evaluation, so internal chunk lines cannot
  * change the field. A product gives a differentiable concave-corner blend instead
- * of the diagonal crease of min(edgeWeights). Production needs spatial bins.
+ * of the diagonal crease of min(edgeWeights). The renderer caches box queries and uploads one shared lattice, never loops over edges per GPU vertex.
  */
 public final class NativeTransitionField {
     public record Cell(int x,int z) {}
@@ -24,6 +24,7 @@ public final class NativeTransitionField {
     private final Set<Cell> nativeCells;
     private final List<Edge> edges;
     private final double exactWidth,blendWidth;
+    private final Map<Cell,List<Edge>> influence=new java.util.concurrent.ConcurrentHashMap<>();
     public NativeTransitionField(Set<Cell> cells,double exactWidth,double blendWidth){
         if(!Double.isFinite(exactWidth)||exactWidth<0||!Double.isFinite(blendWidth)||blendWidth<=0)throw new IllegalArgumentException("Transition widths");
         this.nativeCells=Set.copyOf(cells);this.exactWidth=exactWidth;this.blendWidth=blendWidth;
@@ -50,9 +51,19 @@ public final class NativeTransitionField {
     /** 0 = exact/native, 1 = parent. Both coordinates are absolute world positions. */
     public double weight(double x,double z){
         if(!Double.isFinite(x)||!Double.isFinite(z)||Math.abs(x)>Integer.MAX_VALUE||Math.abs(z)>Integer.MAX_VALUE)throw new IllegalArgumentException("World coordinate");
-        if(contains((long)Math.floor(x/16),(long)Math.floor(z/16)))return 0;
+        Cell cell=new Cell((int)Math.floor(x/16),(int)Math.floor(z/16));
+        if(nativeCells.contains(cell))return 0;
+        List<Edge> nearby=influence.computeIfAbsent(cell,c->{
+            double x0=c.x*16.,z0=c.z*16.,x1=x0+16,z1=z0+16,r=exactWidth+blendWidth;
+            var list=new ArrayList<Edge>();for(Edge e:edges){
+                double ex0=e.vertical?e.coordinate:e.start,ex1=e.vertical?e.coordinate:e.end;
+                double ez0=e.vertical?e.start:e.coordinate,ez1=e.vertical?e.end:e.coordinate;
+                double dx=Math.max(0,Math.max(ex0-x1,x0-ex1)),dz=Math.max(0,Math.max(ez0-z1,z0-ez1));
+                if(dx*dx+dz*dz<=r*r)list.add(e);
+            }return List.copyOf(list);
+        });
         double result=1;
-        for(Edge edge:edges){
+        for(Edge edge:nearby){
             double d=edge.distance(x,z);if(d<=exactWidth)return 0;
             double t=(d-exactWidth)/blendWidth;if(t>=1)continue;
             result*=t*t*t*(t*(t*6-15)+10);

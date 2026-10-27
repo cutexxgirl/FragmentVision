@@ -1,0 +1,20 @@
+{
+  "result": "passed",
+  "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+  "programs": [
+    "voxel material=False,translucent=False",
+    "voxel material=False,translucent=True",
+    "voxel material=True,translucent=False",
+    "voxel material=True,translucent=True",
+    "surface reverseZ=False",
+    "surface reverseZ=True",
+    "baked mesh reverseZ=False,packed=False,compact=False",
+    "baked mesh reverseZ=True,packed=False,compact=False",
+    "baked mesh reverseZ=False,packed=True,compact=False",
+    "baked mesh reverseZ=True,packed=True,compact=False",
+    "baked mesh reverseZ=False,packed=False,compact=True",
+    "baked mesh reverseZ=True,packed=False,compact=True",
+    "native collar reverseZ=False",
+    "native collar reverseZ=True"
+  ]
+}
