@@ -36,7 +36,7 @@ for h in range(1,11):
   for cut in cuts:
    q=3|(4<<6)|(5<<15)|(face<<33)|(h<<44)
    if h<=8 or cut:q|=(1<<63)|(cut<<60)
-   qbuf=c.buffer(struct.pack('<Q',q));qbuf.bind_to_storage_buffer(13);vao=c.vertex_array(p,[]);out=c.buffer(reserve=48)
+   qbuf=c.buffer(struct.pack('<Q',q));qbuf.bind_to_storage_buffer(13);vao=c.vertex_array(p,[(qbuf,'2u /i','packedQuad')]);out=c.buffer(reserve=48)
    vao.transform(out,mode=moderngl.POINTS,vertices=4,instances=1)
    positions=np.frombuffer(out.read(),dtype='f4').reshape(4,3)
    low=4+cut/8.;high=4+(h/8. if h<=8 else 8/9. if h==9 else 1)

@@ -13,6 +13,6 @@ print('Shipping mesh shader: 6000 positions bit exact, all six normal axes corre
 src=(root/'src/main/resources/assets/voxy/shaders/lod/mesh/terrain.vert').read_text().replace('#version 460 core','#version 460 core\n#define FV_PACKED_QUADS')
 p=c.program(vertex_shader=src,varyings=['v_Position','v_Normal','v_Attribute']);p['u_MVP'].write(np.eye(4,dtype='f4').tobytes());p['u_Origin'].value=(0,0,0)
 materials=c.buffer(reserve=65536*6*32);materials.clear();materials.bind_to_storage_buffer(14)
-b=c.buffer((data/'quads.bin').read_bytes());b.bind_to_storage_buffer(13);o=c.buffer(reserve=600*4*28);v=c.vertex_array(p,[]);v.transform(o,mode=moderngl.POINTS,vertices=4,instances=600)
+b=c.buffer((data/'quads.bin').read_bytes());b.bind_to_storage_buffer(13);o=c.buffer(reserve=600*4*28);v=c.vertex_array(p,[(b,'2u /i','packedQuad')]);v.transform(o,mode=moderngl.POINTS,vertices=4,instances=600)
 assert o.read()==(data/'quad-expected.bin').read_bytes(),'Shipping packed quad position/normal/attribute mismatch'
 print('Shipping packed quad shader: all six faces, 2400 corners and material/light attributes bit-exact')

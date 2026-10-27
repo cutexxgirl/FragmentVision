@@ -18,7 +18,7 @@ void main() { colour=vec4((v_Normal*.3+.4)*float(v_Attribute>>11u)*.4,1); }
 ''')
 program['u_Origin'].value = (0, 0, 0)
 indices = ctx.buffer(np.array([0,1,2,0,2,3], dtype='u2').tobytes())
-vao = ctx.vertex_array(program, [], index_buffer=indices, index_element_size=2)
+
 fb = ctx.simple_framebuffer((256,256))
 fb.use()
 ctx.enable(moderngl.DEPTH_TEST)
@@ -40,16 +40,17 @@ for i, camera in enumerate(cameras):
     projection[2,2] = -101/99; projection[2,3] = -200/99; projection[3,2] = -1
     program['u_MVP'].write(np.asarray((projection@view).T,dtype='f4').tobytes())
     fb.clear(0,0,0,0,depth=1)
-    source.bind_to_storage_buffer(13)
+    vao=ctx.vertex_array(program,[(source,'2u /i','packedQuad')],index_buffer=indices,index_element_size=2)
     vao.render(mode=moderngl.TRIANGLES, instances=18)
     baseline = fb.read(components=4)
     assert any(baseline), 'Empty reference image'
     fb.clear(0,0,0,0,depth=1)
-    ordered.bind_to_storage_buffer(13)
+    vao.release()
+    vao=ctx.vertex_array(program,[(ordered,'2u /i','packedQuad')],index_buffer=indices,index_element_size=2)
     raw = (data/f'bucket-commands-{i}.bin').read_bytes()
     assert np.frombuffer(raw,dtype='u4').reshape(7,5)[:,1].sum()<18
     commands = ctx.buffer(raw)
     vao.render_indirect(commands, mode=moderngl.TRIANGLES, count=7)
     assert fb.read(components=4)==baseline, f'Indirect/baseInstance/culling mismatch at camera {camera}'
-    commands.release()
+    commands.release();vao.release()
 print('Six views: direct and culled multi-draw images bit-identical, including two-sided bucket;',ctx.info['GL_RENDERER'])

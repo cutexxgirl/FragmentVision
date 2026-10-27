@@ -35,6 +35,7 @@ public class Shader extends TrackedObject {
 
     public void free() {
         super.free0();
+        me.cortex.voxy.client.compat.FragmentAtmosphereCompat.forgetProgram(this.id);
         glDeleteProgram(this.id);
     }
 
@@ -175,6 +176,7 @@ public class Shader extends TrackedObject {
             }
             printProgramLinkLog(program);
             verifyProgramLinked(program);
+            me.cortex.voxy.client.compat.FragmentAtmosphereCompat.forgetProgram(program);
             return program;
         }
 

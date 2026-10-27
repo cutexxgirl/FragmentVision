@@ -43,7 +43,7 @@ public final class BakedMeshBackend implements AutoCloseable {
     private final Map<Page,CapBuffer> pageCaps=new IdentityHashMap<>();
     private final Map<String,CapBuffer> capBuffers=new HashMap<>();
     private static final class QuadSubmission {
-        final long offset;final QuadFaceBuckets.Layout layout;long submitted;
+        final long offset;final QuadFaceBuckets.Layout layout;long submitted;int commandCount;
         QuadSubmission(long offset,QuadFaceBuckets.Layout layout){this.offset=offset;this.layout=layout;}
     }
     private final Map<Page,QuadSubmission> quadSubmissions=new LinkedHashMap<>();
@@ -52,6 +52,8 @@ public final class BakedMeshBackend implements AutoCloseable {
     private IntBuffer commandStaging;
     private final RenderProperties properties;
     private boolean automaticLevels;
+    private int submissionMode=3;
+    public String submissionMode(int mode){if(mode<0||mode>3)throw new IllegalArgumentException("Submission mode");submissionMode=mode;return "Mesh submission="+mode+" (0 split, 1 direct buckets, 2 mixed MDI, 3 compact MDI)";}
     private record Uniforms(int mvp,int phase,int origin,int attributeBits,int attributeOffset,int surfaceMacroWidth,int lodEdge) {}
     private final Map<Integer,Uniforms> uniforms=new HashMap<>();
     private int drawnMeshPages,drawnQuadPages;private final int[] terrainLevels=new int[3];
@@ -59,7 +61,7 @@ public final class BakedMeshBackend implements AutoCloseable {
     public BakedMeshBackend(RenderProperties properties){this.properties=properties;}
     public boolean active(){return active;}
     public String enabled(boolean enabled){if(enabled&&pages.isEmpty())return "No baked pages loaded";active=enabled;return status();}
-    public String status(){return "Baked mesh proof "+(active?"ON":"OFF")+": pages="+pages.size()+", GPU="+gpuBytes+" bytes, triangles="+triangles+", submitted="+drawn+", direction-culled="+culled+"; old Voxy geometry draws/traversal="+(active?"BYPASSED":"normal")+"; levels="+(automaticLevels?"projected error 2px + hysteresis":"fixed")+"; terrain levels="+Arrays.toString(terrainLevels)+", drawn mesh/quad pages="+drawnMeshPages+"/"+drawnQuadPages+"; loaded package coverage only";}
+    public String status(){return "Baked mesh proof "+(active?"ON":"OFF")+": pages="+pages.size()+", GPU="+gpuBytes+" bytes, triangles="+triangles+", submitted="+drawn+", direction-culled="+culled+"; old Voxy geometry draws/traversal="+(active?"BYPASSED":"normal")+"; levels="+(automaticLevels?"projected error 2px + hysteresis":"fixed")+"; terrain levels="+Arrays.toString(terrainLevels)+", drawn mesh/quad pages="+drawnMeshPages+"/"+drawnQuadPages+"; loaded package coverage only; submission="+submissionMode;}
     public String load(String name,int level)throws Exception {
         if(!name.matches("[a-zA-Z0-9_-]+")||level< -1||level>2)throw new IllegalArgumentException("Invalid package/level");
         if(!FragmentAtmosphereCompat.hasMaterial())throw new IllegalStateException("Fragment Render material required");
@@ -225,6 +227,10 @@ public final class BakedMeshBackend implements AutoCloseable {
         int vao=glCreateVertexArrays(),data=glCreateBuffers(),index=glCreateBuffers();pages.add(new Page(vao,data,index,0,GL_UNSIGNED_SHORT,quads.data().length,true,x,y,z,bounds(quads),mask,width,false,0,0,quads.triangles()));
         quadSubmissions.put(pages.getLast(),new QuadSubmission(quadSubmissions.size()*(long)QuadFaceBuckets.COMMAND_BYTES,partition.layout()));
         glNamedBufferData(data,quads.data(),GL_STATIC_DRAW);glNamedBufferData(index,new short[]{0,1,2,0,2,3},GL_STATIC_DRAW);glVertexArrayElementBuffer(vao,index);
+        // Let vertex fetch apply baseInstance, with the same eight bytes per quad.
+        // No shader-side SSBO lookup via gl_BaseInstance is needed for an instance.
+        glVertexArrayVertexBuffer(vao,0,data,0,8);glEnableVertexArrayAttrib(vao,0);glVertexArrayAttribBinding(vao,0,0);
+        glVertexArrayAttribIFormat(vao,0,2,GL_UNSIGNED_INT,0);glVertexArrayBindingDivisor(vao,0,1);
         gpuBytes+=quads.payloadBytes()+12;triangles+=quads.triangles();
     }
     private static float[] emptyBounds(){return new float[]{Float.POSITIVE_INFINITY,Float.POSITIVE_INFINITY,Float.POSITIVE_INFINITY,Float.NEGATIVE_INFINITY,Float.NEGATIVE_INFINITY,Float.NEGATIVE_INFINITY};}
@@ -264,8 +270,16 @@ public final class BakedMeshBackend implements AutoCloseable {
             commandStaging.clear();
             for(var entry:quadSubmissions.entrySet()) {
                 Page page=entry.getKey();
-                long count=entry.getValue().layout.commands(commandStaging,view.cameraX-page.x,view.cameraY-page.y,view.cameraZ-page.z);
-                entry.getValue().submitted=count;
+                QuadSubmission submission=entry.getValue();
+                if(submissionMode==3){
+                    int start=commandStaging.position();long count=0;var layout=submission.layout;
+                    for(int bucket=0;bucket<7;bucket++)if(layout.counts()[bucket]>0&&layout.visible(bucket,view.cameraX-page.x,view.cameraY-page.y,view.cameraZ-page.z)){
+                        commandStaging.put(6).put(layout.counts()[bucket]).put(0).put(0).put(layout.starts()[bucket]);count+=layout.counts()[bucket]*2L;
+                    }
+                    submission.commandCount=(commandStaging.position()-start)/5;
+                    while(commandStaging.position()<start+35)commandStaging.put(0);
+                    submission.submitted=count;
+                }else submission.submitted=submission.layout.commands(commandStaging,view.cameraX-page.x,view.cameraY-page.y,view.cameraZ-page.z);
             }
             commandStaging.flip();glNamedBufferSubData(commandBuffer,0,commandStaging);
         }
@@ -296,7 +310,25 @@ public final class BakedMeshBackend implements AutoCloseable {
             CapBuffer cap=pageCaps.get(page);glUniform1i(uniforms.get(program.id()).surfaceMacroWidth(),cap==null?0:cap.macroWidth);glBindBufferBase(GL_SHADER_STORAGE_BUFFER,15,cap==null?table:cap.handle);
             if(page.compact){glUniform1i(uniforms.get(program.id()).attributeBits(),page.attributeBits);glUniform1i(uniforms.get(program.id()).attributeOffset(),page.dictionarySize);}
             glBindVertexArray(page.vao);glBindBufferBase(GL_SHADER_STORAGE_BUFFER,13,page.quads?page.vertex:page.attributes);
-            if(page.quads){drawnQuadPages++;glMultiDrawElementsIndirect(GL_TRIANGLES,GL_UNSIGNED_SHORT,quadSubmissions.get(page).offset,QuadFaceBuckets.BUCKETS,0);drawn+=quadSubmissions.get(page).submitted;culled+=page.count*2L-quadSubmissions.get(page).submitted;}else{drawnMeshPages++;glDrawElements(page.compact?GL_TRIANGLE_STRIP:GL_TRIANGLES,page.count,page.indexType,0L);drawn+=page.primitiveCount;}
+            if(page.quads){
+                drawnQuadPages++;
+                QuadSubmission submission=quadSubmissions.get(page);
+                // Compact nonempty commands preserve one MDI call per page.
+                // Original zero-count slots lose surfaces in the validated
+                // runtime; the other modes remain available for A/B diagnosis.
+                var layout=submission.layout;
+                if(submissionMode==1){
+                    for(int bucket=0;bucket<QuadFaceBuckets.BUCKETS;bucket++)
+                        if(layout.counts()[bucket]>0&&layout.visible(bucket,view.cameraX-page.x,view.cameraY-page.y,view.cameraZ-page.z))
+                            glDrawElementsInstancedBaseInstance(GL_TRIANGLES,6,GL_UNSIGNED_SHORT,0L,layout.counts()[bucket],layout.starts()[bucket]);
+                }else{
+                    glMultiDrawElementsIndirect(GL_TRIANGLES,GL_UNSIGNED_SHORT,submission.offset,submissionMode==3?submission.commandCount:submissionMode==2?7:6,0);
+                    if(submissionMode==0&&layout.counts()[6]>0)glDrawElementsInstancedBaseInstance(GL_TRIANGLES,6,GL_UNSIGNED_SHORT,0L,layout.counts()[6],layout.starts()[6]);
+                }
+                drawn+=submission.submitted;culled+=page.count*2L-submission.submitted;
+            }else{
+                drawnMeshPages++;glDrawElements(page.compact?GL_TRIANGLE_STRIP:GL_TRIANGLES,page.count,page.indexType,0L);drawn+=page.primitiveCount;
+            }
         }}finally{
             glBindBuffer(GL_DRAW_INDIRECT_BUFFER,previousIndirect);glBindBufferBase(GL_SHADER_STORAGE_BUFFER,15,previousCap);if(!previousRestart)glDisable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
             if(bound!=null)FragmentAtmosphereCompat.releaseMaterial();

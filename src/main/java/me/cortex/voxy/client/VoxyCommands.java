@@ -75,6 +75,7 @@ public class VoxyCommands {
                         .then(Commands.literal("off").executes(c -> hybrid(c, "off")))
                         .then(Commands.literal("earlyCull").then(Commands.argument("enabled", BoolArgumentType.bool()).executes(c -> hybrid(c, BoolArgumentType.getBool(c, "enabled") ? "early-on" : "early-off")))))
                 .then(Commands.literal("mesh").executes(c->mesh(c,"status",null))
+                        .then(Commands.literal("submission").then(Commands.argument("mode",com.mojang.brigadier.arguments.IntegerArgumentType.integer(0,3)).executes(c->mesh(c,"submission",null,com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(c,"mode")))))
                         .then(Commands.literal("off").executes(c->mesh(c,"off",null)))
                         .then(Commands.literal("on").executes(c->mesh(c,"on",null)))
                         .then(Commands.literal("load").then(Commands.argument("package",com.mojang.brigadier.arguments.StringArgumentType.word())
@@ -89,7 +90,7 @@ public class VoxyCommands {
     private static int mesh(CommandContext<CommandSourceStack> ctx,String action,String name) {return mesh(ctx,action,name,-1);}
     private static int mesh(CommandContext<CommandSourceStack> ctx,String action,String name,int level) {
         var renderer=IGetVoxyRenderSystem.getNullable();var backend=renderer==null?null:renderer.getBakedMeshBackend();
-        try{String message=backend==null?"Mesh backend unavailable":switch(action){case "load"->backend.load(name,level);case "on"->backend.enabled(true);case "off"->backend.enabled(false);default->backend.status();};ctx.getSource().sendSuccess(()->Component.literal(message),false);return 1;}
+        try{String message=backend==null?"Mesh backend unavailable":switch(action){case "load"->backend.load(name,level);case "on"->backend.enabled(true);case "off"->backend.enabled(false);case "submission"->backend.submissionMode(level);default->backend.status();};ctx.getSource().sendSuccess(()->Component.literal(message),false);return 1;}
         catch(Exception error){ctx.getSource().sendFailure(Component.literal("Mesh proof load failed: "+error));return 0;}
     }
 

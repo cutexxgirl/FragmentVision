@@ -7,6 +7,16 @@ import java.lang.reflect.Method;
 public final class FragmentAtmosphereCompat {
     private record Api(Method source, Method active, Method bind, Method release) {}
     private static final Api API = discover();
+    private static final Method FORGET_PROGRAM = discoverForgetProgram();
+    private static Method discoverForgetProgram() {
+        try { return Class.forName("com.fragmentobnova.fragmentrender.api.AtmosphereBridge").getMethod("forgetProgram", int.class); }
+        catch (ReflectiveOperationException | LinkageError absent) { return null; }
+    }
+    public static void forgetProgram(int program) {
+        if (FORGET_PROGRAM == null) return;
+        try { FORGET_PROGRAM.invoke(null, program); }
+        catch (ReflectiveOperationException error) { throw new IllegalStateException("Cannot invalidate Fragment program bindings", error); }
+    }
     private FragmentAtmosphereCompat() {}
     private static Api discover() {
         try {
